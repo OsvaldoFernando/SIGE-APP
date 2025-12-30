@@ -155,14 +155,20 @@ class Disciplina(models.Model):
     carga_horaria = models.PositiveIntegerField(verbose_name="Carga Horária (horas)", default=40)
     descricao = models.TextField(blank=True, verbose_name="Descrição")
     codigo = models.CharField(max_length=50, blank=True, verbose_name="Código da Disciplina")
+    ano_curricular = models.PositiveIntegerField(default=1, verbose_name="Ano Curricular")
+    semestre_curricular = models.PositiveIntegerField(
+        choices=[(1, '1º Semestre'), (2, '2º Semestre')], 
+        default=1, 
+        verbose_name="Semestre Curricular"
+    )
     
     class Meta:
         verbose_name = "Disciplina"
         verbose_name_plural = "Disciplinas"
-        ordering = ['curso', 'nome']
+        ordering = ['curso', 'ano_curricular', 'semestre_curricular', 'nome']
     
     def __str__(self):
-        return f"{self.nome} - {self.curso.nome}"
+        return f"{self.nome} ({self.curso.codigo})"
 
 class PrerequisitoDisciplina(models.Model):
     """Define as disciplinas pré-requisito para inscrição em um curso"""

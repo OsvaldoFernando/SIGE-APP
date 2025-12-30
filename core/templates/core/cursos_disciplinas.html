@@ -8,10 +8,73 @@
     .status-badge { padding: 6px 12px; border-radius: 20px; font-weight: 500; font-size: 0.85rem; }
     .btn-action { width: 35px; height: 35px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; margin: 0 2px; transition: all 0.2s; }
     .page-header { background: white; padding: 2rem 0; margin-bottom: 2rem; border-bottom: 1px solid #edf2f7; }
-    .nav-tabs-modern { border: none; margin-bottom: -1px; }
-    .nav-tabs-modern .nav-link { border: none; border-bottom: 3px solid transparent; color: #6c757d; font-weight: 600; padding: 1rem 1.5rem; transition: all 0.3s; }
-    .nav-tabs-modern .nav-link:hover { color: #1e3a8a; background: rgba(30, 58, 138, 0.05); }
-    .nav-tabs-modern .nav-link.active { border-bottom-color: #1e3a8a; color: #1e3a8a; background: transparent; }
+    .nav-tabs-modern { 
+        border: none; 
+        background: #f1f5f9; 
+        padding: 5px; 
+        border-radius: 12px;
+        display: inline-flex;
+    }
+    .nav-tabs-modern .nav-item {
+        margin-right: 5px;
+    }
+    .nav-tabs-modern .nav-item:last-child {
+        margin-right: 0;
+    }
+    .nav-tabs-modern .nav-link { 
+        border: none; 
+        color: #64748b; 
+        font-weight: 600; 
+        padding: 0.6rem 1.5rem; 
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .nav-tabs-modern .nav-link:hover { 
+        color: #1e3a8a; 
+        background: rgba(255, 255, 255, 0.5); 
+    }
+    .nav-tabs-modern .nav-link.active { 
+        color: #1e3a8a; 
+        background: white; 
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .btn-header {
+        border: none;
+        border-radius: 12px;
+        padding: 0.6rem 1.4rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 0.95rem;
+    }
+    .btn-header-light {
+        background: #f1f5f9;
+        color: #475569;
+    }
+    .btn-header-light:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+        transform: translateY(-1px);
+    }
+    .btn-header-primary {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+    .btn-header-primary:hover {
+        background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
+    }
+    .btn-header-primary:active {
+        transform: translateY(0);
+    }
 </style>
 
 <div class="page-header">
@@ -21,27 +84,38 @@
                 <h2 class="fw-bold mb-1" style="color: #1e3a8a;">Gestão de Cursos e Disciplinas</h2>
                 <p class="text-muted mb-0">Organize e gerencie a estrutura curricular da instituição</p>
             </div>
-            <div class="d-flex gap-2">
-                <a href="{% url 'painel_principal' %}" class="btn btn-light px-4" style="border-radius: 10px;">
-                    <i class="bi bi-house-door me-2"></i>Painel
+            <div class="d-flex gap-3">
+                <a href="{% url 'painel_principal' %}" class="btn-header btn-header-light text-decoration-none">
+                    <i class="bi bi-grid-1x2"></i> Painel
                 </a>
-                <button type="button" id="btnNovoHeader" class="btn btn-primary px-4 shadow-sm" style="border-radius: 10px;" data-bs-toggle="modal" data-bs-target="#modalNovoCurso">
-                    <i class="bi bi-plus-lg me-2"></i>Novo Curso
+                <button type="button" id="btnNovoHeader" class="btn-header btn-header-primary" data-bs-toggle="modal" data-bs-target="#modalNovoCurso">
+                    <i class="bi bi-plus-lg"></i> Novo Curso
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<div class="container">
-    <ul class="nav nav-tabs nav-tabs-modern mb-4" id="managementTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="cursos-tab" data-bs-toggle="tab" data-bs-target="#cursos-pane" type="button" role="tab">Cursos</button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="disciplinas-tab" data-bs-toggle="tab" data-bs-target="#disciplinas-pane" type="button" role="tab">Disciplinas</button>
-        </li>
-    </ul>
+<div class="container pb-5">
+    <div class="d-flex justify-content-start mb-4">
+        <ul class="nav nav-tabs nav-tabs-modern" id="managementTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="cursos-tab" data-bs-toggle="tab" data-bs-target="#cursos-pane" type="button" role="tab">
+                    <i class="bi bi-mortarboard-fill"></i> Cursos
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="disciplinas-tab" data-bs-toggle="tab" data-bs-target="#disciplinas-pane" type="button" role="tab">
+                    <i class="bi bi-book-half"></i> Disciplinas
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="plano-tab" data-bs-toggle="tab" data-bs-target="#plano-pane" type="button" role="tab">
+                    <i class="bi bi-card-checklist"></i> Plano Curricular
+                </button>
+            </li>
+        </ul>
+    </div>
 
     <div class="tab-content" id="managementTabsContent">
         <!-- CURSOS TAB -->
@@ -95,6 +169,9 @@
                                         </button>
                                     </td>
                                     <td class="text-end pe-4">
+                                        <a href="{% url 'grelha_curricular' %}" class="btn-action btn btn-outline-primary" title="Ver Plano Curricular">
+                                            <i class="bi bi-card-checklist"></i>
+                                        </a>
                                         <button class="btn-action btn btn-outline-info btn-editar-curso" 
                                                 data-curso-id="{{ curso.id }}" 
                                                 data-curso-codigo="{{ curso.codigo }}"
@@ -162,6 +239,25 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PLANO CURRICULAR TAB -->
+        <div class="tab-pane fade" id="plano-pane" role="tabpanel">
+            <div class="card academic-card overflow-hidden">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <i class="bi bi-card-checklist text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4 class="fw-bold" style="color: #1e3a8a;">Plano Curricular Estruturado</h4>
+                    <p class="text-muted mx-auto mb-4" style="max-width: 500px;">
+                        Visualize e gerencie a grelha curricular completa de todos os cursos. 
+                        Defina a ordem das disciplinas por semestres e anos académicos.
+                    </p>
+                    <a href="{% url 'grelha_curricular' %}" class="btn-header btn-header-primary text-decoration-none">
+                        <i class="bi bi-eye"></i> Aceder à Grelha Curricular
+                    </a>
                 </div>
             </div>
         </div>

@@ -3,16 +3,87 @@
 {% block title %}Grelha Curricular - SIGE{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <a href="{% url 'painel_principal' %}" style="text-decoration: none; color: #666; margin-bottom: 15px; display: inline-block;">← Voltar</a>
-    <h2>Grelha Curricular</h2>
-    <hr>
+<style>
+    .year-section { margin-bottom: 3rem; }
+    .year-title { color: #1e3a8a; border-left: 5px solid #2563eb; padding-left: 15px; margin-bottom: 1.5rem; }
+    .semester-card { border: none; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: 100%; }
+    .semester-header { background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 1rem; border-radius: 12px 12px 0 0; }
+    .discipline-item { padding: 0.75rem 1rem; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
+    .discipline-item:last-child { border-bottom: none; }
+    .carga-horaria { font-size: 0.8rem; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 4px; }
+</style>
 
-    <div class="card">
-        <div class="card-body">
-            <p class="text-muted">Aqui será exibida a grelha curricular com a estrutura de disciplinas por semestre.</p>
-            <p class="text-muted">Funcionalidades: Visualizar, adicionar e organizar disciplinas por semestre/ano letivo.</p>
+<div class="page-header bg-white py-4 mb-4 border-bottom">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1">
+                        <li class="breadcrumb-item"><a href="{% url 'painel_principal' %}">Painel</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'cursos_disciplinas' %}">Gestão Académica</a></li>
+                        <li class="breadcrumb-item active">Plano Curricular</li>
+                    </ol>
+                </nav>
+                <h2 class="fw-bold mb-0" style="color: #1e3a8a;">Plano Curricular Detalhado</h2>
+            </div>
+            <div class="d-flex gap-2">
+                <form class="d-flex gap-2">
+                    <select name="curso" class="form-select" onchange="this.form.submit()" style="border-radius: 10px; min-width: 250px;">
+                        <option value="">Todos os Cursos</option>
+                        {% for c in cursos %}
+                        <option value="{{ c.id }}" {% if c.id|stringformat:"i" == request.GET.curso %}selected{% endif %}>{{ c.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
         </div>
     </div>
+</div>
+
+<div class="container pb-5">
+    {% if request.GET.curso %}
+        {% for ano in anos_range %}
+        <div class="year-section">
+            <h3 class="year-title fw-bold">{{ ano }}º Ano</h3>
+            <div class="row g-4">
+                {% for sem in semestres_range %}
+                <div class="col-md-6">
+                    <div class="card semester-card">
+                        <div class="semester-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 fw-bold text-dark">{{ sem }}º Semestre</h5>
+                            <span class="badge bg-primary bg-opacity-10 text-primary">Créditos: --</span>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="discipline-list">
+                                {% for d in disciplinas %}
+                                    {% if d.ano_curricular == ano and d.semestre_curricular == sem %}
+                                    <div class="discipline-item">
+                                        <div>
+                                            <span class="fw-semibold text-dark d-block">{{ d.nome }}</span>
+                                            <small class="text-muted">{{ d.codigo|default:"S/C" }}</small>
+                                        </div>
+                                        <span class="carga-horaria">{{ d.carga_horaria }}h</span>
+                                    </div>
+                                    {% endif %}
+                                {% empty %}
+                                    <div class="p-4 text-center text-muted">Nenhuma disciplina cadastrada para este curso.</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="card academic-card p-5 text-center">
+            <div class="mb-4">
+                <i class="bi bi-filter-circle text-primary" style="font-size: 3rem;"></i>
+            </div>
+            <h4 class="fw-bold">Selecione um Curso</h4>
+            <p class="text-muted">Escolha um curso no menu acima para visualizar o seu plano curricular estruturado por anos e semestres.</p>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

@@ -1169,9 +1169,27 @@ def cursos_disciplinas(request):
 
 @login_required
 def grelha_curricular(request):
-    """View para exibir grelha curricular"""
-    context = {'active': 'grelha'}
-    return render(request, 'core/grelha_curricular.html', context)
+    """View para exibir grelha curricular estruturada por anos e semestres"""
+    cursos = Curso.objects.filter(ativo=True)
+    curso_id = request.GET.get('curso')
+    disciplinas = []
+    anos_range = []
+    semestres_range = [1, 2]
+    
+    if curso_id:
+        curso = get_object_or_404(Curso, id=curso_id)
+        disciplinas = curso.disciplinas.all()
+        # Calcula anos baseado na duração do curso (assume 12 meses por ano)
+        anos = (curso.duracao_meses // 12) if curso.duracao_meses >= 12 else 1
+        anos_range = range(1, anos + 1)
+
+    return render(request, 'core/grelha_curricular.html', {
+        'cursos': cursos,
+        'disciplinas': disciplinas,
+        'anos_range': anos_range,
+        'semestres_range': semestres_range,
+        'active': 'grelha'
+    })
 
 @login_required
 def cronograma_academico(request):
