@@ -1,0 +1,62 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Gestão de Docentes - SIGE{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div style="display: flex; min-height: 100vh; margin-top: 80px;">
+        <div style="width: 280px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 20px; position: fixed; left: 0; top: 80px; height: calc(100vh - 80px); overflow-y: auto;">
+            <h5 style="color: #fff; margin-bottom: 20px;">Gestão de Docentes</h5>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                <li><a href="{% url 'cadastro_professores' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">👨‍🏫 Cadastro e Gestão</a></li>
+                <li><a href="{% url 'atribuicao_turmas' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📚 Atribuição de Turmas</a></li>
+                <li><a href="{% url 'assiduidade_docentes' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📅 Assiduidade</a></li>
+                <li><a href="{% url 'gestao_licencas' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">🏥 Gestão de Licenças</a></li>
+                <li><a href="{% url 'avaliacao_desempenho' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📊 Avaliação de Desempenho</a></li>
+            </ul>
+        </div>
+
+        <div style="margin-left: 280px; flex: 1; padding: 30px;">
+            <a href="{% url 'painel_principal' %}" style="text-decoration: none; color: #666; font-size: 12px; margin-bottom: 15px; display: inline-block;">← Voltar ao Painel</a>
+            <h1 style="color: #1e3c72; margin-bottom: 30px;">Gestão de Docentes</h1>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <a href="{% url 'cadastro_professores' %}" style="text-decoration: none;">
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #1e3c72; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
+                        <h5 style="color: #1e3c72; margin-bottom: 10px;">👨‍🏫 Cadastro e Gestão</h5>
+                        <p style="color: #666; margin: 0;">Gerenciar perfil e dados dos professores.</p>
+                    </div>
+                </a>
+
+                <a href="{% url 'atribuicao_turmas' %}" style="text-decoration: none;">
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #17a2b8; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
+                        <h5 style="color: #17a2b8; margin-bottom: 10px;">📚 Atribuição de Turmas</h5>
+                        <p style="color: #666; margin: 0;">Atribuir turmas e disciplinas aos professores.</p>
+                    </div>
+                </a>
+
+                <a href="{% url 'assiduidade_docentes' %}" style="text-decoration: none;">
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #28a745; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
+                        <h5 style="color: #28a745; margin-bottom: 10px;">📅 Assiduidade</h5>
+                        <p style="color: #666; margin: 0;">Controlar presenças e faltas dos docentes.</p>
+                    </div>
+                </a>
+
+                <a href="{% url 'gestao_licencas' %}" style="text-decoration: none;">
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #ffc107; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
+                        <h5 style="color: #ffc107; margin-bottom: 10px;">🏥 Gestão de Licenças</h5>
+                        <p style="color: #666; margin: 0;">Gerenciar licenças e períodos de afastamento.</p>
+                    </div>
+                </a>
+
+                <a href="{% url 'avaliacao_desempenho' %}" style="text-decoration: none;">
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #dc3545; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
+                        <h5 style="color: #dc3545; margin-bottom: 10px;">📊 Avaliação de Desempenho</h5>
+                        <p style="color: #666; margin: 0;">Avaliar e acompanhar desempenho dos docentes.</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

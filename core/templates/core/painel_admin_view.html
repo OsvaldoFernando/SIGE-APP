@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Painel Admin - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <a href="{% url 'gestao_administrativa' %}" style="text-decoration: none; color: #666; margin-bottom: 15px; display: inline-block;">← Voltar</a>
+    <h2>Painel Admin</h2>
+    <hr>
+
+    <div class="card">
+        <div class="card-body">
+            <p class="text-muted">Dashboard com estatísticas e informações administrativas gerais.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

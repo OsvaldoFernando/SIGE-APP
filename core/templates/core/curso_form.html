@@ -1,0 +1,150 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{% if curso %}Editar Curso{% else %}Novo Curso{% endif %} - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-custom text-white">
+                    <h3 class="mb-0">
+                        {% if curso %}
+                            <i class="bi bi-pencil-square me-2"></i>Editar Curso
+                        {% else %}
+                            <i class="bi bi-plus-circle me-2"></i>Novo Curso
+                        {% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label">Nome do Curso *</label>
+                                <input type="text" name="nome" class="form-control" 
+                                       value="{{ curso.nome|default:'' }}" required 
+                                       placeholder="Ex: Informática">
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label">Grau Académico *</label>
+                                <select name="grau" class="form-select" required>
+                                    <option value="licenciatura" {% if curso.grau == 'licenciatura' %}selected{% endif %}>Licenciatura</option>
+                                    <option value="mestrado" {% if curso.grau == 'mestrado' %}selected{% endif %}>Mestrado</option>
+                                    <option value="doutoramento" {% if curso.grau == 'doutoramento' %}selected{% endif %}>Doutoramento</option>
+                                    <option value="especialidade" {% if curso.grau == 'especialidade' %}selected{% endif %}>Especialidade</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4 mb-4">
+                                <label class="form-label">Duração *</label>
+                                <select name="duracao_meses" class="form-select" required>
+                                    <option value="3" {% if curso.duracao_meses == 3 %}selected{% endif %}>3 meses</option>
+                                    <option value="6" {% if curso.duracao_meses == 6 %}selected{% endif %}>6 meses</option>
+                                    <option value="12" {% if curso.duracao_meses == 12 or not curso %}selected{% endif %}>1 ano</option>
+                                    <option value="24" {% if curso.duracao_meses == 24 %}selected{% endif %}>2 anos</option>
+                                    <option value="36" {% if curso.duracao_meses == 36 %}selected{% endif %}>3 anos</option>
+                                    <option value="48" {% if curso.duracao_meses == 48 %}selected{% endif %}>4 anos</option>
+                                    <option value="60" {% if curso.duracao_meses == 60 %}selected{% endif %}>5 anos</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <label class="form-label">Regime *</label>
+                                <select name="regime" class="form-select" required>
+                                    <option value="diurno" {% if curso.regime == 'diurno' %}selected{% endif %}>Diurno</option>
+                                    <option value="pos-laboral" {% if curso.regime == 'pos-laboral' %}selected{% endif %}>Pós-Laboral</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <label class="form-label">Modalidade *</label>
+                                <select name="modalidade" class="form-select" required>
+                                    <option value="presencial" {% if curso.modalidade == 'presencial' %}selected{% endif %}>Presencial</option>
+                                    <option value="semipresencial" {% if curso.modalidade == 'semipresencial' %}selected{% endif %}>Semipresencial</option>
+                                    <option value="ead" {% if curso.modalidade == 'ead' %}selected{% endif %}>EAD</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Descrição *</label>
+                            <textarea name="descricao" class="form-control" rows="4" required 
+                                      placeholder="Descreva o curso, objetivos e conteúdos principais">{{ curso.descricao|default:'' }}</textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label">Número de Vagas *</label>
+                                <input type="number" name="vagas" class="form-control" 
+                                       value="{{ curso.vagas|default:'30' }}" required min="1" max="500"
+                                       placeholder="Ex: 30">
+                                <small class="form-text text-muted">Total de vagas disponíveis para o curso</small>
+                            </div>
+                            
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label">Nota Mínima de Aprovação *</label>
+                                <input type="number" name="nota_minima" class="form-control" 
+                                       value="{{ curso.nota_minima|default:'10' }}" required min="0" max="20" step="0.5"
+                                       placeholder="Ex: 10">
+                                <small class="form-text text-muted">Escala de 0 a 20 valores</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="ativo" id="ativo" 
+                                       {% if not curso or curso.ativo %}checked{% endif %}>
+                                <label class="form-check-label" for="ativo">
+                                    <strong>Curso Ativo</strong>
+                                    <small class="text-muted d-block">Cursos ativos aparecem para inscrição dos estudantes</small>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="requer_prerequisitos" id="requer_prerequisitos" 
+                                       {% if curso and curso.requer_prerequisitos %}checked{% endif %}>
+                                <label class="form-check-label" for="requer_prerequisitos">
+                                    <strong>Requer Pré-requisitos</strong>
+                                    <small class="text-muted d-block">Marque se este curso exige disciplinas/notas anteriores para inscrição</small>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-custom btn-lg">
+                                <i class="bi bi-check-circle me-2"></i>
+                                {% if curso %}Salvar Alterações{% else %}Cadastrar Curso{% endif %}
+                            </button>
+                            <a href="{% url 'cursos_lista' %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-custom {
+        background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #1e40af;
+        box-shadow: 0 0 0 0.2rem rgba(30, 64, 175, 0.25);
+    }
+    
+    .form-check-input:checked {
+        background-color: #059669;
+        border-color: #059669;
+    }
+</style>
+{% endblock %}

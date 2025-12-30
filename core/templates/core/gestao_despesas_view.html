@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Gestão de Despesas - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <a href="{% url 'gestao_financeira' %}" style="text-decoration: none; color: #666; margin-bottom: 15px; display: inline-block;">← Voltar</a>
+    <h2>Gestão de Despesas</h2>
+    <hr>
+
+    <div class="card">
+        <div class="card-body">
+            <p class="text-muted">Controlar despesas, orçamentos e investimentos.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

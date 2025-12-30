@@ -1,0 +1,550 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Início - Sistema Integral de Gestão Académica{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Módulos do Sistema</h2>
+        <div class="d-flex align-items-center gap-4">
+            <!-- Seletor de Ano Acadêmico -->
+            <div class="d-flex align-items-center">
+                <label class="me-2 text-muted mb-0" style="white-space: nowrap;">
+                    <i class="bi bi-calendar-range"></i> Ano Acadêmico:
+                </label>
+                <select id="ano_academico_selector" class="form-select form-select-sm" style="width: 150px;">
+                    {% if anos_academicos %}
+                        {% for ano in anos_academicos %}
+                            <option value="{{ ano.id }}" {% if ano.id == ano_atual.id %}selected{% endif %}>
+                                {{ ano.ano_inicio }}/{{ ano.ano_fim }}
+                            </option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="">Nenhum ano</option>
+                    {% endif %}
+                </select>
+            </div>
+            <div class="text-muted" id="data_hora_display">
+                <i class="bi bi-calendar"></i> <span id="data_completa"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Atividades e Recursos -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-collection-fill" viewBox="0 0 16 16">
+                                <path d="M0 13a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 16 13V6a1.5 1.5 0 0 0-1.5-1.5h-13A1.5 1.5 0 0 0 0 6zM2 3a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 0-1h-11A.5.5 0 0 0 2 3m2-2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7A.5.5 0 0 0 4 1"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Atividades e Recursos</h6>
+                        <p class="card-text small text-muted">Gestão de atividades e recursos</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Gestão de Cursos -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="{% url 'cursos_lista' %}" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-person-workspace" viewBox="0 0 16 16">
+                                <path d="M4 16s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-5.95a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
+                                <path d="M2 1a2 2 0 0 0-2 2v9.5A1.5 1.5 0 0 0 1.5 14h.653a5.4 5.4 0 0 1 1.066-2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v9h-2.219c.554.654.89 1.373 1.066 2h.653a1.5 1.5 0 0 0 1.5-1.5V3a2 2 0 0 0-2-2z"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Gestão de Cursos</h6>
+                        <p class="card-text small text-muted">Cadastro e gestão de cursos</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Admissão Estudantes -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="{% url 'admissao_estudantes' %}" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-person-add" viewBox="0 0 16 16">
+                                <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+                                <path d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Admissão Estudantes</h6>
+                        <p class="card-text small text-muted">Serviços de admissões</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Assinaturas -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-book-half" viewBox="0 0 16 16">
+                                <path d="M8.5 2.687c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v9.923c-.918-.35-2.107-.692-3.287-.81-1.094-.111-2.278-.039-3.213.492zM8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.222-.877 1.378.139 2.8.62 3.681 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Assinaturas</h6>
+                        <p class="card-text small text-muted">Listado de assinaturas</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Controlo de Falta -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-clipboard-x-fill" viewBox="0 0 16 16">
+                                <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5z"/>
+                                <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5zm4 7.793 1.146-1.147a.5.5 0 1 1 .708.708L8.707 10l1.147 1.146a.5.5 0 0 1-.708.708L8 10.707l-1.146 1.147a.5.5 0 0 1-.708-.708L7.293 10 6.146 8.854a.5.5 0 1 1 .708-.708z"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Controlo de Falta</h6>
+                        <p class="card-text small text-muted">Gestão e controlo de assiduidade</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Certificados -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-award-fill" viewBox="0 0 16 16">
+                                <path d="m8 0 1.669.864 1.858.282.842 1.68 1.337 1.32L13.4 6l.306 1.854-1.337 1.32-.842 1.68-1.858.282L8 12l-1.669-.864-1.858-.282-.842-1.68-1.337-1.32L2.6 6l-.306-1.854 1.337-1.32.842-1.68L6.331.864z"/>
+                                <path d="M4 11.794V16l4-1 4 1v-4.206l-2.018.306L8 13.126 6.018 12.1z"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Certificados</h6>
+                        <p class="card-text small text-muted">Gestão de certificações</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Cronograma Académico -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-calendar-week-fill" viewBox="0 0 16 16">
+                                <path d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4zM16 14V5H0v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2M9.5 7h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5m3 0h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5M2 10.5a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5zm3.5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Cronograma Académico</h6>
+                        <p class="card-text small text-muted">Gestão de cronograma</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Estudantes -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/core/aluno/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-people-fill" viewBox="0 0 16 16">
+                                <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Estudantes</h6>
+                        <p class="card-text small text-muted">Listado de estudantes</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Finanças -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-cash-stack" viewBox="0 0 16 16">
+                                <path d="M1 3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zm7 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
+                                <path d="M0 5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V7a2 2 0 0 1-2-2z"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Finanças</h6>
+                        <p class="card-text small text-muted">Recebimentos</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Grelha Curricular -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-grid-3x3-gap-fill" viewBox="0 0 16 16">
+                                <path d="M1 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1zM1 7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1zM1 12a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zm5 0a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1z"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Grelha Curricular</h6>
+                        <p class="card-text small text-muted">Listado de malha</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Justificativas de Falta -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-journal-check" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M10.854 6.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 8.793l2.646-2.647a.5.5 0 0 1 .708 0"/>
+                                <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2"/>
+                                <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1z"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Justificativas de Falta</h6>
+                        <p class="card-text small text-muted">Justificação ausência estudante</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Material de Acompanhamento -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-file-earmark-text-fill" viewBox="0 0 16 16">
+                                <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0M9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1M4.5 9a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1zM4 10.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5m.5 2.5a.5.5 0 0 1 0-1h4a.5.5 0 0 1 0 1z"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Material de Acompanhamento</h6>
+                        <p class="card-text small text-muted">Material de apoio</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Modelo de Avaliação -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-clipboard-data-fill" viewBox="0 0 16 16">
+                                <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5z"/>
+                                <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5zM10 8a1 1 0 1 1 2 0v5a1 1 0 1 1-2 0zm-6 4a1 1 0 1 1 2 0v1a1 1 0 1 1-2 0zm4-3a1 1 0 0 1 1 1v3a1 1 0 1 1-2 0v-3a1 1 0 0 1 1-1"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Modelo de Avaliação</h6>
+                        <p class="card-text small text-muted">Listado de Cronograma Evaluativo</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Notícias -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-newspaper" viewBox="0 0 16 16">
+                                <path d="M0 2.5A1.5 1.5 0 0 1 1.5 1h11A1.5 1.5 0 0 1 14 2.5v10.528c0 .3-.05.654-.238.972h.738a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 1 1 0v9a1.5 1.5 0 0 1-1.5 1.5H1.497A1.497 1.497 0 0 1 0 13.5zM12 14c.37 0 .654-.211.853-.441.092-.106.147-.279.147-.531V2.5a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0-.5.5v11c0 .278.223.5.497.5z"/>
+                                <path d="M2 3h10v2H2zm0 3h4v3H2zm0 4h4v1H2zm0 2h4v1H2zm5-6h2v1H7zm3 0h2v1h-2zM7 8h2v1H7zm3 0h2v1h-2zm-3 2h2v1H7zm3 0h2v1h-2zm-3 2h2v1H7zm3 0h2v1h-2z"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Notícias</h6>
+                        <p class="card-text small text-muted">Notícias e informações</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Perfil Pessoal -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                                <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Perfil Pessoal</h6>
+                        <p class="card-text small text-muted">Meu perfil</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Período Letivo -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-calendar-range-fill" viewBox="0 0 16 16">
+                                <path d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4zM16 7V5H0v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8h-2zM6 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2m8 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2M7 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Período Letivo</h6>
+                        <p class="card-text small text-muted">Gestão de período letivo</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Professores -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/core/professor/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-person-video3" viewBox="0 0 16 16">
+                                <path d="M14 9.5a2 2 0 1 1-4 0 2 2 0 0 1 4 0m-6 5.7c0 .8.8.8.8.8h6.4s.8 0 .8-.8-.8-3.2-4-3.2-4 2.4-4 3.2"/>
+                                <path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h5.243c.122-.326.295-.668.526-1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v7.81c.353.23.656.496.91.783Q16 12.312 16 12V4a2 2 0 0 0-2-2z"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Professores</h6>
+                        <p class="card-text small text-muted">Gestão de docentes</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Títulos -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-mortarboard-fill" viewBox="0 0 16 16">
+                                <path d="M8.211 2.047a.5.5 0 0 0-.422 0l-7.5 3.5a.5.5 0 0 0 .025.917l7.5 3a.5.5 0 0 0 .372 0L14 7.14V13a1 1 0 0 0-1 1v2h3v-2a1 1 0 0 0-1-1V6.739l.686-.275a.5.5 0 0 0 .025-.917z"/>
+                                <path d="M4.176 9.032a.5.5 0 0 0-.656.327l-.5 1.7a.5.5 0 0 0 .294.605l4.5 1.8a.5.5 0 0 0 .372 0l4.5-1.8a.5.5 0 0 0 .294-.605l-.5-1.7a.5.5 0 0 0-.656-.327L8 10.466z"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Títulos</h6>
+                        <p class="card-text small text-muted">Gestão de títulos académicos</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Turmas -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/core/turma/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-diagram-3-fill" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M6 3.5A1.5 1.5 0 0 1 7.5 2h1A1.5 1.5 0 0 1 10 3.5v1A1.5 1.5 0 0 1 8.5 6v1H14a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0V8h-5v.5a.5.5 0 0 1-1 0v-1A.5.5 0 0 1 2 7h5.5V6A1.5 1.5 0 0 1 6 4.5zm-6 8A1.5 1.5 0 0 1 1.5 10h1A1.5 1.5 0 0 1 4 11.5v1A1.5 1.5 0 0 1 2.5 14h-1A1.5 1.5 0 0 1 0 12.5zm6 0A1.5 1.5 0 0 1 7.5 10h1a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 8.5 14h-1A1.5 1.5 0 0 1 6 12.5zm6 0a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-1a1.5 1.5 0 0 1-1.5-1.5z"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Turmas</h6>
+                        <p class="card-text small text-muted">Classes e seções</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Disciplinas -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/core/disciplina/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-journal-text" viewBox="0 0 16 16">
+                                <path d="M5 10.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0-2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
+                                <path d="M3 0h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-1h1v1a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v1H1V2a2 2 0 0 1 2-2"/>
+                                <path d="M1 5v-.5a.5.5 0 0 1 1 0V5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0V8h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1zm0 3v-.5a.5.5 0 0 1 1 0v.5h.5a.5.5 0 0 1 0 1h-2a.5.5 0 0 1 0-1z"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Disciplinas</h6>
+                        <p class="card-text small text-muted">Matérias dos cursos</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Biblioteca -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-book-fill" viewBox="0 0 16 16">
+                                <path d="M8 1.783C7.015.936 5.587.81 4.287.94c-1.514.153-3.042.672-3.994 1.105A.5.5 0 0 0 0 2.5v11a.5.5 0 0 0 .707.455c.882-.4 2.303-.881 3.68-1.02 1.409-.142 2.59.087 3.223.877a.5.5 0 0 0 .78 0c.633-.79 1.814-1.019 3.223-.877 1.378.139 2.799.62 3.68 1.02A.5.5 0 0 0 16 13.5v-11a.5.5 0 0 0-.293-.455c-.952-.433-2.48-.952-3.994-1.105C10.413.809 8.985.936 8 1.783"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Biblioteca</h6>
+                        <p class="card-text small text-muted">Empréstimo de livros</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Matrícula -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-clipboard-check-fill" viewBox="0 0 16 16">
+                                <path d="M6.5 0A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0zm3 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5z"/>
+                                <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1A2.5 2.5 0 0 1 9.5 5h-3A2.5 2.5 0 0 1 4 2.5zm6.854 7.354-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 0 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708.708"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Matrícula</h6>
+                        <p class="card-text small text-muted">Matrícula de alunos aprovados</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Horário -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-clock-fill" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Horário</h6>
+                        <p class="card-text small text-muted">Gestão de horários</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Admin -->
+        <div class="col-6 col-md-4 col-lg-3">
+            <a href="/admin/" class="text-decoration-none">
+                <div class="card module-card text-center h-100">
+                    <div class="card-body">
+                        <div class="module-icon mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-speedometer2" viewBox="0 0 16 16">
+                                <path d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4M3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707M2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10m9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5m.754-4.246a.39.39 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.39.39 0 0 0-.029-.518z"/>
+                                <path fill-rule="evenodd" d="M0 10a8 8 0 1 1 15.547 2.661c-.442 1.253-1.845 1.602-2.932 1.25C11.309 13.488 9.475 13 8 13c-1.474 0-3.31.488-4.615.911-1.087.352-2.49.003-2.932-1.25A8 8 0 0 1 0 10m8-7a7 7 0 0 0-6.603 9.329c.203.575.923.876 1.68.63C4.397 12.533 6.358 12 8 12s3.604.532 4.923.96c.757.245 1.477-.056 1.68-.631A7 7 0 0 0 8 3"/>
+                            </svg>
+                        </div>
+                        <h6 class="card-title">Painel Admin</h6>
+                        <p class="card-text small text-muted">Painel de administração</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .module-card {
+        border: 1px solid #e0e0e0;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    .module-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        border-color: #1e3a8a;
+    }
+    .module-icon {
+        color: #1e40af;
+    }
+    .module-card .card-title {
+        color: #333;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+    .module-card:hover .module-icon {
+        color: #059669;
+    }
+    a.text-decoration-none:hover .card-title {
+        color: #1e3a8a;
+    }
+</style>
+
+<script>
+// Atualizar data e hora com saudação
+function atualizarDataHora() {
+    const agora = new Date();
+    
+    // Dias da semana em português
+    const diasSemana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
+    const diaSemana = diasSemana[agora.getDay()];
+    
+    // Data formatada
+    const dia = String(agora.getDate()).padStart(2, '0');
+    const mes = String(agora.getMonth() + 1).padStart(2, '0');
+    const ano = agora.getFullYear();
+    
+    // Hora formatada
+    const hora = String(agora.getHours()).padStart(2, '0');
+    const minuto = String(agora.getMinutes()).padStart(2, '0');
+    
+    // Montar texto completo (sem saudação)
+    const textoCompleto = `${diaSemana}, ${dia}/${mes}/${ano} - ${hora}:${minuto}`;
+    
+    document.getElementById('data_completa').textContent = textoCompleto;
+}
+
+// Atualizar a cada segundo
+atualizarDataHora();
+setInterval(atualizarDataHora, 1000);
+
+// Trocar ano acadêmico
+document.getElementById('ano_academico_selector').addEventListener('change', function() {
+    const anoId = this.value;
+    
+    if (!anoId) {
+        return;
+    }
+    
+    // Obter CSRF token
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                      document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+    
+    fetch('{% url "trocar_ano_academico" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': csrftoken
+        },
+        body: `ano_id=${anoId}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Recarregar a página para atualizar o contexto
+            location.reload();
+        } else {
+            alert('Erro ao trocar ano acadêmico: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao trocar ano acadêmico');
+    });
+});
+</script>
+{% endblock %}

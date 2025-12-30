@@ -1,0 +1,80 @@
+<style>
+    .academic-card-modal { border: none; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .table-modern-modal thead th { background-color: #f8f9fa; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; color: #6c757d; border-bottom: 2px solid #dee2e6; padding: 12px; }
+    .table-modern-modal tbody td { padding: 12px; vertical-align: middle; }
+</style>
+
+<div class="d-flex justify-content-end mb-3">
+    <button type="button" class="btn btn-primary btn-sm px-3 shadow-sm" style="border-radius: 8px;" onclick="openSemestreModal(null, '{{ ano.id }}')">
+        <i class="bi bi-plus-lg me-1"></i> Novo Semestre
+    </button>
+</div>
+
+<div class="card academic-card-modal">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-modern-modal mb-0">
+                <thead>
+                    <tr>
+                        <th>Semestre</th>
+                        <th class="text-center">Duração</th>
+                        <th class="text-center">Ativo</th>
+                        <th class="text-end pe-3">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for semestre in semestres %}
+                    <tr>
+                        <td>
+                            <span class="fw-bold text-dark">{{ semestre.get_nome_display }}</span>
+                        </td>
+                        <td class="text-center small">
+                            {{ semestre.data_inicio|date:"d/m/Y" }} - {{ semestre.data_fim|date:"d/m/Y" }}
+                        </td>
+                        <td class="text-center">
+                            {% if semestre.ativo %}
+                            <span class="badge bg-success rounded-pill px-2 shadow-sm">
+                                <i class="bi bi-check-circle me-1"></i>Sim
+                            </span>
+                            {% else %}
+                            <span class="badge bg-danger rounded-pill px-2 shadow-sm">
+                                <i class="bi bi-x-circle me-1"></i>Não
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-3">
+                            <button type="button" class="btn btn-outline-info btn-sm" onclick="openSemestreModal('{{ semestre.pk }}', '{{ ano.id }}')">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-4 text-danger fw-bold">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            Nenhum semestre cadastrado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts para gerenciar semestres dentro do modal de listagem -->
+<script>
+    function openSemestreModalDirect(anoId, pk = null) {
+        // Esconde o modal de listagem temporariamente se quiser, ou apenas abre o outro por cima
+        // Para simplificar, vamos usar o modal que já existe na página de listagem de anos
+        // Mas como estamos no modal, precisamos garantir que o script de criação/edição funcione.
+        
+        // Reutilizando a lógica do semestre_lista.html adaptada
+        if (typeof openSemestreModal === 'function') {
+            openSemestreModal(pk, anoId);
+        } else {
+            // Se não existir na página pai, implementamos aqui
+            alert("Função de edição não disponível nesta visualização.");
+        }
+    }
+</script>

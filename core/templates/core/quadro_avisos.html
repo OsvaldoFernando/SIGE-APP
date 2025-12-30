@@ -1,0 +1,57 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Quadro de Avisos - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="{% url 'painel_principal' %}" class="list-group-item list-group-item-action">Painel Principal</a>
+                <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action">Dashboard</a>
+                <a href="{% url 'trocar_ano' %}" class="list-group-item list-group-item-action">Ano Acadêmico</a>
+                <a href="{% url 'perfil_usuario' %}" class="list-group-item list-group-item-action">Perfil do Usuário</a>
+                <a href="{% url 'notificacoes' %}" class="list-group-item list-group-item-action">Notificações</a>
+                <a href="{% url 'quadro_avisos' %}" class="list-group-item list-group-item-action active">Quadro de Avisos</a>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <h2>Quadro de Avisos</h2>
+            <hr>
+
+            {% if avisos %}
+            <div class="row">
+                {% for aviso in avisos %}
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ aviso.titulo }}</h5>
+                            <p class="card-text">{{ aviso.mensagem }}</p>
+                            <p class="text-muted small">
+                                {% if aviso.tipo == 'urgente' %}
+                                    <span class="badge bg-danger">Urgente</span>
+                                {% elif aviso.tipo == 'aviso' %}
+                                    <span class="badge bg-warning">Aviso</span>
+                                {% elif aviso.tipo == 'sucesso' %}
+                                    <span class="badge bg-success">Sucesso</span>
+                                {% else %}
+                                    <span class="badge bg-info">Informação</span>
+                                {% endif %}
+                                - {{ aviso.data_criacao|date:"d/m/Y H:i" }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <strong>Nenhum aviso no momento.</strong> Aqui aparecerão os avisos e comunicados importantes.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

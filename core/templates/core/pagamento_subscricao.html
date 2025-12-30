@@ -1,0 +1,121 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header text-center text-white" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);">
+                    <h3><i class="bi bi-credit-card"></i> Pagamento de Subscrição</h3>
+                </div>
+                <div class="card-body">
+                    {% if subscricao %}
+                    <div class="alert alert-info mb-4">
+                        <h5><i class="bi bi-info-circle"></i> Informação</h5>
+                        <p class="mb-0">Você está efetuando um pagamento para a subscrição de <strong>{{ subscricao.nome_escola }}</strong>.</p>
+                    </div>
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="plano" class="form-label">Plano de Subscrição *</label>
+                            <select class="form-select" id="plano" name="plano" required onchange="atualizarValor()">
+                                <option value="">Selecione um plano</option>
+                                <option value="mensal">Mensal - 30 dias</option>
+                                <option value="trimestral">Trimestral - 90 dias</option>
+                                <option value="semestral">Semestral - 180 dias</option>
+                                <option value="anual">Anual - 365 dias</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="valor" class="form-label">Valor Pago (Kz) *</label>
+                            <input type="number" class="form-control" id="valor" name="valor" step="0.01" required placeholder="0.00">
+                            <div class="form-text">Valor sugerido: <span id="valor_sugerido" style="font-weight: bold; color: #059669;">-</span></div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="data_pagamento" class="form-label">Data do Pagamento *</label>
+                            <input type="date" class="form-control" id="data_pagamento" name="data_pagamento" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="numero_referencia" class="form-label">Número de Referência / Comprovante</label>
+                            <input type="text" class="form-control" id="numero_referencia" name="numero_referencia" placeholder="Ex: REF123456">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="comprovante" class="form-label">Comprovante de Pagamento *</label>
+                            <input type="file" class="form-control" id="comprovante" name="comprovante" accept="image/*,application/pdf" required>
+                            <div class="form-text">Formatos aceitos: PDF, JPG, PNG (máx. 5MB)</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="observacoes" class="form-label">Observações</label>
+                            <textarea class="form-control" id="observacoes" name="observacoes" rows="3" placeholder="Informações adicionais sobre o pagamento"></textarea>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); border: none;">
+                                <i class="bi bi-check-circle"></i> Submeter Pagamento
+                            </button>
+                            <a href="{% url 'login' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Voltar ao Login
+                            </a>
+                        </div>
+                    </form>
+                    
+                    <hr class="my-4">
+                    <div class="alert alert-success">
+                        <h6><i class="bi bi-check-circle"></i> Como Efetuar o Pagamento</h6>
+                        <ul class="mb-0">
+                            <li>Efetue o pagamento através do banco ou via transferência</li>
+                            <li>Guarde o comprovante de pagamento (foto ou PDF)</li>
+                            <li>Preencha os dados do pagamento neste formulário</li>
+                            <li>Envie o comprovante em formato JPG, PNG ou PDF</li>
+                            <li>Aguarde a aprovação do administrador (normalmente em até 24 horas)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6><i class="bi bi-info-circle"></i> Valores Sugeridos por Plano</h6>
+                        <ul class="mb-0">
+                            <li><strong>Mensal:</strong> 50.000,00 Kz</li>
+                            <li><strong>Trimestral:</strong> 140.000,00 Kz</li>
+                            <li><strong>Semestral:</strong> 270.000,00 Kz</li>
+                            <li><strong>Anual:</strong> 500.000,00 Kz</li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function atualizarValor() {
+    const plano = document.getElementById('plano').value;
+    const valorSugerido = document.getElementById('valor_sugerido');
+    
+    if (plano === 'mensal') {
+        valorSugerido.textContent = '50.000,00 Kz';
+    } else if (plano === 'trimestral') {
+        valorSugerido.textContent = '140.000,00 Kz';
+    } else if (plano === 'semestral') {
+        valorSugerido.textContent = '270.000,00 Kz';
+    } else if (plano === 'anual') {
+        valorSugerido.textContent = '500.000,00 Kz';
+    } else {
+        valorSugerido.textContent = '-';
+    }
+}
+
+// Definir data de hoje como máximo
+document.addEventListener('DOMContentLoaded', function() {
+    const hoje = new Date().toISOString().split('T')[0];
+    document.getElementById('data_pagamento').setAttribute('max', hoje);
+});
+</script>
+{% endblock %}

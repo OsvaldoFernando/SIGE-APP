@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Atividades Extracurriculares - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <a href="{% url 'gestao_estudantes' %}" style="text-decoration: none; color: #666; margin-bottom: 15px; display: inline-block;">← Voltar</a>
+    <h2>Atividades Extracurriculares</h2>
+    <hr>
+
+    <div class="card">
+        <div class="card-body">
+            <p class="text-muted">Gerenciar atividades extracurriculares e eventos de estudantes.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

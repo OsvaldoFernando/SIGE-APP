@@ -1,0 +1,18 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Grelha Curricular - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <a href="{% url 'painel_principal' %}" style="text-decoration: none; color: #666; margin-bottom: 15px; display: inline-block;">← Voltar</a>
+    <h2>Grelha Curricular</h2>
+    <hr>
+
+    <div class="card">
+        <div class="card-body">
+            <p class="text-muted">Aqui será exibida a grelha curricular com a estrutura de disciplinas por semestre.</p>
+            <p class="text-muted">Funcionalidades: Visualizar, adicionar e organizar disciplinas por semestre/ano letivo.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

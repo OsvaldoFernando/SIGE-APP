@@ -1,0 +1,98 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Perfil do Usuário - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="{% url 'painel_principal' %}" class="list-group-item list-group-item-action">Painel Principal</a>
+                <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action">Dashboard</a>
+                <a href="{% url 'trocar_ano' %}" class="list-group-item list-group-item-action">Ano Acadêmico</a>
+                <a href="{% url 'perfil_usuario' %}" class="list-group-item list-group-item-action active">Perfil do Usuário</a>
+                <a href="{% url 'notificacoes' %}" class="list-group-item list-group-item-action">Notificações</a>
+                <a href="{% url 'quadro_avisos' %}" class="list-group-item list-group-item-action">Quadro de Avisos</a>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <h2>Perfil do Usuário</h2>
+            <hr>
+
+            <div class="card">
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5>Informações Pessoais</h5>
+                            <p><strong>Nome:</strong> {{ user.get_full_name|default:user.username }}</p>
+                            <p><strong>Utilizador:</strong> {{ user.username }}</p>
+                            <p><strong>Email:</strong> {{ user.email }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Informações de Acesso</h5>
+                            <p><strong>Nível de Acesso:</strong> 
+                                <span class="badge bg-success">{{ user.perfil.get_nivel_acesso_display }}</span>
+                            </p>
+                            <p><strong>Status:</strong> 
+                                <span class="badge {% if user.perfil.ativo %}bg-success{% else %}bg-danger{% endif %}">
+                                    {% if user.perfil.ativo %}Ativo{% else %}Inativo{% endif %}
+                                </span>
+                            </p>
+                            <p><strong>Membro desde:</strong> {{ user.date_joined|date:"d/m/Y" }}</p>
+                        </div>
+                    </div>
+
+                    {% if user.perfil.telefone %}
+                    <p><strong>Telefone:</strong> {{ user.perfil.telefone }}</p>
+                    {% endif %}
+
+                    <hr>
+
+                    <div class="mt-4">
+                        <h5>Ações</h5>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAlterarSenha">
+                            Alterar Senha
+                        </button>
+                        <a href="{% url 'logout' %}" class="btn btn-danger">Sair</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Alterar Senha -->
+<div class="modal fade" id="modalAlterarSenha" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Alterar Senha</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="#">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Senha Atual</label>
+                        <input type="password" class="form-control" name="senha_atual" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nova Senha</label>
+                        <input type="password" class="form-control" name="nova_senha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Confirmar Senha</label>
+                        <input type="password" class="form-control" name="confirmar_senha" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Período Letivo - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <a href="{% url 'painel_principal' %}" style="text-decoration: none; color: #666; margin-bottom: 15px; display: inline-block;">← Voltar</a>
+    <h2>Período Letivo</h2>
+    <hr>
+
+    <div class="card">
+        <div class="card-body">
+            <p class="text-muted">Gerenciar períodos letivos e semestres acadêmicos.</p>
+            <p class="text-muted">Configure: Data de início, data de término, e semestres.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

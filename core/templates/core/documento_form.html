@@ -1,0 +1,76 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{% if documento %}Editar{% else %}Criar{% endif %} Documento - SIGE{% endblock %}
+
+{% block content %}
+<div style="margin-top: 80px; background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); color: white; padding: 40px 0;">
+    <div class="container">
+        <h1 style="margin: 0;">{% if documento %}Editar Documento{% else %}Criar Novo Documento{% endif %}</h1>
+        <p style="margin: 10px 0 0 0; opacity: 0.9;">Templates com variáveis dinâmicas</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <form method="POST" class="card p-4">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="titulo" class="form-label">Título do Documento *</label>
+                    <input type="text" id="titulo" name="titulo" class="form-control" value="{{ documento.titulo|default:'' }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="secao" class="form-label">Seção/Módulo *</label>
+                    <select id="secao" name="secao" class="form-control" required>
+                        <option value="">-- Selecione uma seção --</option>
+                        {% for valor, label in secoes %}
+                            <option value="{{ valor }}" {% if documento.secao == valor %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="conteudo" class="form-label">Conteúdo do Documento *</label>
+                    <textarea id="conteudo" name="conteudo" class="form-control" rows="15" required>{{ documento.conteudo|default:'' }}</textarea>
+                    <small class="form-text text-muted">Use variáveis como {nome}, {bilhete_identidade}, {email}, {telefone}, etc.</small>
+                </div>
+
+                <div class="mb-3">
+                    <label for="descricao" class="form-label">Descrição</label>
+                    <textarea id="descricao" name="descricao" class="form-control" rows="3">{{ documento.descricao|default:'' }}</textarea>
+                </div>
+
+                <div class="form-check mb-3">
+                    <input type="checkbox" id="ativo" name="ativo" class="form-check-input" {% if documento.ativo %}checked{% endif %}>
+                    <label class="form-check-label" for="ativo">Ativo</label>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-success">
+                        {% if documento %}Atualizar{% else %}Criar{% endif %} Documento
+                    </button>
+                    <a href="{% url 'gestao_documentos' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Variáveis Disponíveis</h5>
+                </div>
+                <div class="card-body" style="font-size: 0.9rem; max-height: 600px; overflow-y: auto;">
+                    {% for var, desc in variaveis.items %}
+                        <div class="mb-2">
+                            <code class="bg-light p-1 d-block">{{{ var }}}</code>
+                            <small class="text-muted">{{ desc }}</small>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

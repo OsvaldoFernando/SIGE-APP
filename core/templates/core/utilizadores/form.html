@@ -1,0 +1,112 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{% if edicao %}Editar{% else %}Novo{% endif %} Utilizador - SIGE{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header text-white text-center py-4" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);">
+                    <h3 class="mb-0">
+                        <i class="bi bi-{% if edicao %}pencil-square{% else %}person-plus{% endif %} me-2"></i>
+                        {% if edicao %}Editar Utilizador{% else %}Novo Utilizador{% endif %}
+                    </h3>
+                </div>
+
+                <div class="card-body p-4">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post" class="needs-validation">
+                        {% csrf_token %}
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="username" class="form-label">Nome de Utilizador</label>
+                                <input type="text" class="form-control" id="username" name="username" 
+                                    value="{% if edicao %}{{ user.username }}{% endif %}" 
+                                    {% if edicao %}readonly{% else %}required{% endif %} placeholder="usuario123">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                    value="{% if edicao %}{{ user.email }}{% endif %}" 
+                                    required placeholder="usuario@email.com">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="first_name" class="form-label">Primeiro Nome</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" 
+                                    value="{% if edicao %}{{ user.first_name }}{% endif %}" placeholder="João">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="last_name" class="form-label">Último Nome</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" 
+                                    value="{% if edicao %}{{ user.last_name }}{% endif %}" placeholder="Silva">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="password" class="form-label">
+                                    Senha {% if edicao %}<small class="text-muted">(deixar vazio para manter atual)</small>{% else %}<span class="text-danger">*</span>{% endif %}
+                                </label>
+                                <input type="password" class="form-control" id="password" name="password" 
+                                    {% if not edicao %}required{% endif %} placeholder="••••••••">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="telefone" class="form-label">Telefone</label>
+                                <input type="tel" class="form-control" id="telefone" name="telefone" 
+                                    value="{% if edicao %}{{ perfil.telefone }}{% endif %}" placeholder="+244 923 123 456">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="nivel_acesso" class="form-label">Nível de Acesso</label>
+                                <select class="form-select" id="nivel_acesso" name="nivel_acesso" required>
+                                    {% for value, label in niveis_acesso %}
+                                    <option value="{{ value }}" {% if edicao and perfil.nivel_acesso == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Status</label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="is_active" name="is_active" 
+                                        {% if not edicao or user.is_active %}checked{% endif %}>
+                                    <label class="form-check-label" for="is_active">
+                                        Utilizador Ativo
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'listar_utilizadores' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); border: none;">
+                                <i class="bi bi-check-circle me-2"></i>{% if edicao %}Atualizar{% else %}Criar{% endif %} Utilizador
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

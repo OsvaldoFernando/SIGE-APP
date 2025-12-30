@@ -1,0 +1,541 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Painel Principal - SIGE{% endblock %}
+
+{% block content %}
+<div style="margin-top: 80px; background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); color: white; padding: 40px 0;">
+    <div class="container">
+        <h1 style="margin: 0; font-size: 2.5rem;">Bem-vindo ao SIGE</h1>
+        <p style="margin: 10px 0 0 0; opacity: 0.9;">Sistema Integrado de Gestão Educacional</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); color: white;">
+                <div class="card-body">
+                    <div style="font-size: 2rem;">📋</div>
+                    <h6 class="card-title">Inscrições</h6>
+                    <h2 class="mb-0">{{ total_inscricoes }}</h2>
+                    <small style="opacity: 0.8;">total no sistema</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white;">
+                <div class="card-body">
+                    <div style="font-size: 2rem;">✅</div>
+                    <h6 class="card-title">Aprovados</h6>
+                    <h2 class="mb-0">{{ total_aprovados }}</h2>
+                    <small style="opacity: 0.8;">candidatos</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: white;">
+                <div class="card-body">
+                    <div style="font-size: 2rem;">❌</div>
+                    <h6 class="card-title">Não Aprovados</h6>
+                    <h2 class="mb-0">{{ total_reprovados }}</h2>
+                    <small style="opacity: 0.8;">candidatos</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); color: white;">
+                <div class="card-body">
+                    <div style="font-size: 2rem;">⏳</div>
+                    <h6 class="card-title">Aguardando</h6>
+                    <h2 class="mb-0">{{ aguardando_nota }}</h2>
+                    <small style="opacity: 0.8;">avaliação</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    <h3 class="mb-4" style="color: #1e3a8a;">🎓 Gestão Acadêmica</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'cursos_disciplinas' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📚</div>
+                        <h6 class="card-title text-dark">Cursos e Disciplinas</h6>
+                        <p class="card-text small text-muted">Gerenciar cursos</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'ano_academico_lista' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🗓️</div>
+                        <h6 class="card-title text-dark">Anos Académicos</h6>
+                        <p class="card-text small text-muted">Gestão de anos</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'grelha_curricular' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📋</div>
+                        <h6 class="card-title text-dark">Grelha Curricular</h6>
+                        <p class="card-text small text-muted">Estrutura curricular</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'cronograma_academico' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📅</div>
+                        <h6 class="card-title text-dark">Cronograma</h6>
+                        <p class="card-text small text-muted">Datas importantes</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a;">👥 Gestão de Estudantes</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admissao_estudantes' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📝</div>
+                        <h6 class="card-title text-dark">Admissão</h6>
+                        <p class="card-text small text-muted">Inscrições</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'lista_estudantes' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">👥</div>
+                        <h6 class="card-title text-dark">Estudantes</h6>
+                        <p class="card-text small text-muted">Lista completa</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'matricula' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">✍️</div>
+                        <h6 class="card-title text-dark">Matrícula</h6>
+                        <p class="card-text small text-muted">Registros</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'assiduidade' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📊</div>
+                        <h6 class="card-title text-dark">Assiduidade</h6>
+                        <p class="card-text small text-muted">Frequência</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a;">👨‍🏫 Gestão de Docentes</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'cadastro_professores' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">👨‍🏫</div>
+                        <h6 class="card-title text-dark">Professores</h6>
+                        <p class="card-text small text-muted">Registrar</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'atribuicao_turmas' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📌</div>
+                        <h6 class="card-title text-dark">Turmas</h6>
+                        <p class="card-text small text-muted">Atribuições</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'assiduidade_docentes' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📋</div>
+                        <h6 class="card-title text-dark">Assiduidade</h6>
+                        <p class="card-text small text-muted">Professores</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a;">💰 Gestão Financeira</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'gestao_financeira' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">💰</div>
+                        <h6 class="card-title text-dark">Finanças</h6>
+                        <p class="card-text small text-muted">Gestão financeira</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'faturas_pagamentos' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📄</div>
+                        <h6 class="card-title text-dark">Faturas</h6>
+                        <p class="card-text small text-muted">Pagamentos</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'bolsas_beneficios' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🎓</div>
+                        <h6 class="card-title text-dark">Bolsas</h6>
+                        <p class="card-text small text-muted">Benefícios</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a;">🔐 Gestão de Utilizadores e Permissões</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'listar_utilizadores' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">👥</div>
+                        <h6 class="card-title text-dark">Utilizadores</h6>
+                        <p class="card-text small text-muted">Gerenciar contas</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'criar_utilizador' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">➕</div>
+                        <h6 class="card-title text-dark">Novo Utilizador</h6>
+                        <p class="card-text small text-muted">Criar conta</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:core_perfilusuario_changelist' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🔑</div>
+                        <h6 class="card-title text-dark">Perfis e Acessos</h6>
+                        <p class="card-text small text-muted">Permissões</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a;">💬 Comunicação e Suporte</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'quadro_avisos' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📰</div>
+                        <h6 class="card-title text-dark">Quadro de Notícias</h6>
+                        <p class="card-text small text-muted">Avisos gerais</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'notificacoes' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">💬</div>
+                        <h6 class="card-title text-dark">Mensagens</h6>
+                        <p class="card-text small text-muted">Comunicação interna</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🎫</div>
+                        <h6 class="card-title text-dark">Suporte Técnico</h6>
+                        <p class="card-text small text-muted">Tickets e ajuda</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📧</div>
+                        <h6 class="card-title text-dark">SMS / Email</h6>
+                        <p class="card-text small text-muted">Envios em massa</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">💭</div>
+                        <h6 class="card-title text-dark">Chat ao Vivo</h6>
+                        <p class="card-text small text-muted">Tempo real</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a;">📈 Relatórios e Estatísticas</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📚</div>
+                        <h6 class="card-title text-dark">Relatórios Acadêmicos</h6>
+                        <p class="card-text small text-muted">Desempenho escolar</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'relatorios_financeiros' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">💹</div>
+                        <h6 class="card-title text-dark">Relatórios Financeiros</h6>
+                        <p class="card-text small text-muted">Análise financeira</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'assiduidade' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📋</div>
+                        <h6 class="card-title text-dark">Relatórios de Assiduidade</h6>
+                        <p class="card-text small text-muted">Frequência e presença</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📊</div>
+                        <h6 class="card-title text-dark">Relatórios de Desempenho</h6>
+                        <p class="card-text small text-muted">Análise de resultados</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">💾</div>
+                        <h6 class="card-title text-dark">Exportação de Dados</h6>
+                        <p class="card-text small text-muted">Download e backup</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a;">🏢 Gestão Administrativa</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'recursos_humanos' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">👔</div>
+                        <h6 class="card-title text-dark">RH</h6>
+                        <p class="card-text small text-muted">Pessoal</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'departamentos' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🏢</div>
+                        <h6 class="card-title text-dark">Departamentos</h6>
+                        <p class="card-text small text-muted">Organizações</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'gestao_eventos' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🎉</div>
+                        <h6 class="card-title text-dark">Eventos</h6>
+                        <p class="card-text small text-muted">Acadêmicos</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a;">📄 Gestão de Documentos</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'gestao_documentos' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📋</div>
+                        <h6 class="card-title text-dark">Meus Documentos</h6>
+                        <p class="card-text small text-muted">Ver todos os templates</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'documento_criar' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">➕</div>
+                        <h6 class="card-title text-dark">Novo Documento</h6>
+                        <p class="card-text small text-muted">Criar template</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'gestao_documentos' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🎯</div>
+                        <h6 class="card-title text-dark">Variáveis Dinâmicas</h6>
+                        <p class="card-text small text-muted">Dados do banco</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'gestao_documentos' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📑</div>
+                        <h6 class="card-title text-dark">Gerar PDF</h6>
+                        <p class="card-text small text-muted">Export automático</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a;">🔐 Configurações do Sistema</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">⚙️</div>
+                        <h6 class="card-title text-dark">Parâmetros Gerais</h6>
+                        <p class="card-text small text-muted">Configurações globais</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🌐</div>
+                        <h6 class="card-title text-dark">Idioma</h6>
+                        <p class="card-text small text-muted">Localização</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🛡️</div>
+                        <h6 class="card-title text-dark">Segurança e Permissões</h6>
+                        <p class="card-text small text-muted">Controle de acesso</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">💿</div>
+                        <h6 class="card-title text-dark">Backup e Restauração</h6>
+                        <p class="card-text small text-muted">Proteção de dados</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🔗</div>
+                        <h6 class="card-title text-dark">Integrações</h6>
+                        <p class="card-text small text-muted">API, QR Code, etc</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card-menu {
+        transition: all 0.3s ease;
+    }
+    .card-menu:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important;
+    }
+</style>
+{% endblock %}
+        position: fixed;
+        left: 0;
+        top: 0;

@@ -1,0 +1,79 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Gestão de Documentos - SIGE{% endblock %}
+
+{% block content %}
+<div style="margin-top: 80px; background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); color: white; padding: 40px 0;">
+    <div class="container">
+        <h1 style="margin: 0;">📄 Gestão de Documentos</h1>
+        <p style="margin: 10px 0 0 0; opacity: 0.9;">Crie e gerencie templates de documentos com variáveis dinâmicas</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="mb-4">
+        <a href="{% url 'documento_criar' %}" class="btn btn-success btn-lg">
+            <i class="fas fa-plus"></i> Novo Documento
+        </a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if documentos %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Título</th>
+                        <th>Seção</th>
+                        <th>Status</th>
+                        <th>Criado em</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for documento in documentos %}
+                    <tr>
+                        <td><strong>{{ documento.titulo }}</strong></td>
+                        <td>{{ documento.get_secao_display }}</td>
+                        <td>
+                            {% if documento.ativo %}
+                                <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inativo</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ documento.data_criacao|date:"d/m/Y" }}</td>
+                        <td>
+                            <a href="{% url 'documento_visualizar' documento.id %}" class="btn btn-sm btn-info" title="Visualizar">
+                                👁️
+                            </a>
+                            <a href="{% url 'documento_editar' documento.id %}" class="btn btn-sm btn-warning" title="Editar">
+                                ✏️
+                            </a>
+                            <a href="{% url 'gerar_pdf_documento' documento.id %}" class="btn btn-sm btn-success" title="Gerar PDF">
+                                📄
+                            </a>
+                            <a href="{% url 'documento_deletar' documento.id %}" class="btn btn-sm btn-danger" title="Deletar" onclick="return confirm('Deseja deletar este documento?')">
+                                🗑️
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <p>Nenhum documento criado ainda. <a href="{% url 'documento_criar' %}">Crie o seu primeiro documento!</a></p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

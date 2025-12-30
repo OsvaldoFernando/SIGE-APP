@@ -1,0 +1,109 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Perfis Pendentes - SIGE{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-person-lines-fill"></i> Gerenciar Perfis de Usuários</h2>
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Voltar
+                </a>
+            </div>
+
+            {% if perfis_pendentes %}
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i> <strong>{{ perfis_pendentes.count }}</strong> usuário(s) aguardando atribuição de perfil
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);">
+                    <h5 class="mb-0"><i class="bi bi-hourglass-split"></i> Usuários Pendentes</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Usuário</th>
+                                    <th>Nome Completo</th>
+                                    <th>Email</th>
+                                    <th>Telefone</th>
+                                    <th>Data de Cadastro</th>
+                                    <th>Atribuir Perfil</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for perfil in perfis_pendentes %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ perfil.user.username }}</strong>
+                                    </td>
+                                    <td>{{ perfil.user.get_full_name|default:"-" }}</td>
+                                    <td>{{ perfil.user.email|default:"-" }}</td>
+                                    <td>{{ perfil.telefone|default:"-" }}</td>
+                                    <td>{{ perfil.data_cadastro|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <form method="post" action="{% url 'atribuir_perfil' perfil.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <div class="input-group input-group-sm" style="max-width: 250px;">
+                                                <select name="nivel_acesso" class="form-select form-select-sm" required>
+                                                    <option value="">Selecione o perfil...</option>
+                                                    <option value="admin">Administrador</option>
+                                                    <option value="secretaria">Secretaria</option>
+                                                    <option value="professor">Professor</option>
+                                                    <option value="coordenador">Coordenador</option>
+                                                    <option value="aluno">Aluno</option>
+                                                </select>
+                                                <button type="submit" class="btn btn-success btn-sm">
+                                                    <i class="bi bi-check-circle"></i> Atribuir
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-success">
+                <i class="bi bi-check-circle"></i> Não há usuários pendentes de atribuição de perfil.
+            </div>
+            {% endif %}
+
+            <div class="card shadow mt-4">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informações sobre Perfis</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><strong>Níveis de Acesso:</strong></h6>
+                            <ul>
+                                <li><strong>Administrador:</strong> Acesso total ao sistema</li>
+                                <li><strong>Secretaria:</strong> Gestão de matrículas e registros</li>
+                                <li><strong>Professor:</strong> Gestão de turmas e notas</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul style="margin-top: 28px;">
+                                <li><strong>Coordenador:</strong> Supervisão acadêmica</li>
+                                <li><strong>Aluno:</strong> Acesso limitado a consultas</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="alert alert-info mt-3 mb-0">
+                        <i class="bi bi-lightbulb"></i> <strong>Dica:</strong> Usuários com perfil pendente não conseguem acessar o sistema até que um perfil seja atribuído.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

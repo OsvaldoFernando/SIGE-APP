@@ -1,0 +1,62 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header text-center text-white py-4" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);">
+                    <h3 class="mb-0"><i class="bi bi-key"></i> Recuperar Senha</h3>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Escolha o método de recuperação de senha:</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="identificador" class="form-label">Nome de Usuário ou Email</label>
+                            <input type="text" class="form-control" id="identificador" name="identificador" required>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Método de Recuperação</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="metodo" id="metodo_telefone" value="telefone" checked>
+                                <label class="form-check-label" for="metodo_telefone">
+                                    <i class="bi bi-phone"></i> Receber código OTP via SMS
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="metodo" id="metodo_email" value="email">
+                                <label class="form-check-label" for="metodo_email">
+                                    <i class="bi bi-envelope"></i> Receber link via Email
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); border: none;">
+                                <i class="bi bi-send"></i> Enviar
+                            </button>
+                            <a href="{% url 'login' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Voltar ao Login
+                            </a>
+                        </div>
+                    </form>
+                    
+                    <hr class="my-4">
+                    <div class="alert alert-info">
+                        <h6><i class="bi bi-info-circle"></i> Informações</h6>
+                        <ul class="mb-0">
+                            <li><strong>Telefone:</strong> Você receberá um código de 6 dígitos válido por 10 minutos</li>
+                            <li><strong>Email:</strong> Você receberá um link de recuperação válido por 1 hora</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header text-center text-white" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);">
+                    <h3><i class="bi bi-shield-lock"></i> Validar Código OTP</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-phone"></i> Código OTP enviado para: <strong>{{ recuperacao.telefone_enviado }}</strong>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="codigo_otp" class="form-label">Código OTP (6 dígitos)</label>
+                            <input type="text" class="form-control form-control-lg text-center" id="codigo_otp" name="codigo_otp" maxlength="6" pattern="[0-9]{6}" required autofocus>
+                            <div class="form-text">Digite o código de 6 dígitos recebido no seu telefone</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="nova_senha" class="form-label">Nova Senha</label>
+                            <input type="password" class="form-control" id="nova_senha" name="nova_senha" minlength="6" required>
+                            <div class="form-text">Mínimo de 6 caracteres</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="confirmar_senha" class="form-label">Confirmar Senha</label>
+                            <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" minlength="6" required>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); border: none;">
+                                <i class="bi bi-check-circle"></i> Redefinir Senha
+                            </button>
+                            <a href="{% url 'esqueci_senha' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Solicitar Novo Código
+                            </a>
+                        </div>
+                    </form>
+                    
+                    <hr class="my-4">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-clock"></i> O código expira em 10 minutos
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-focar no campo de código
+document.getElementById('codigo_otp').focus();
+
+// Formatar código OTP (apenas números)
+document.getElementById('codigo_otp').addEventListener('input', function(e) {
+    this.value = this.value.replace(/[^0-9]/g, '');
+});
+</script>
+{% endblock %}

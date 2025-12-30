@@ -1,0 +1,782 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Inscrição - {{ curso.nome }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Formulário com Barra de Progresso -->
+            <div class="card shadow">
+                <div class="card-header bg-custom text-white py-2">
+                    <h5 class="mb-1">Formulário de Inscrição - {{ curso.nome }}</h5>
+                </div>
+                
+                <!-- Barra de Progresso -->
+                <div class="py-3 px-2" style="background-color: #f8f9fa; border-bottom: 1px solid #dee2e6;">
+                    <div class="progress-wizard">
+                        <div class="wizard-step active" data-step="1">
+                            <div class="wizard-icon"><i class="bi bi-person-circle"></i></div>
+                            <div class="wizard-label">Pessoais</div>
+                        </div>
+                        <div class="wizard-step" data-step="2">
+                            <div class="wizard-icon"><i class="bi bi-mortarboard-fill"></i></div>
+                            <div class="wizard-label">Acadêmicas</div>
+                        </div>
+                        <div class="wizard-step" data-step="3">
+                            <div class="wizard-icon"><i class="bi bi-cash-coin"></i></div>
+                            <div class="wizard-label">Financeiras</div>
+                        </div>
+                        <div class="wizard-step" data-step="4">
+                            <div class="wizard-icon"><i class="bi bi-people-fill"></i></div>
+                            <div class="wizard-label">Encarregado</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-3">
+                    <form method="post" id="inscricaoForm">
+                        {% csrf_token %}
+                        
+                        <!-- Etapa 1: Informações Pessoais -->
+                        <div class="form-step active" data-step="1">
+                            <h5 class="mb-3"><i class="bi bi-person-circle me-2"></i>Informações Pessoais</h5>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Nome Completo *</label>
+                                    <input type="text" name="nome_completo" class="form-control" required>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Data de Nascimento *</label>
+                                    <input type="date" name="data_nascimento" id="data_nascimento" class="form-control" required>
+                                    <small class="text-muted" id="idade_display"></small>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Província de Nascimento *</label>
+                                    <select id="provincia_nascimento" class="form-select" required>
+                                        <option value="">Selecione a província...</option>
+                                        <option value="Bengo">Bengo</option>
+                                        <option value="Benguela">Benguela</option>
+                                        <option value="Bié">Bié</option>
+                                        <option value="Cabinda">Cabinda</option>
+                                        <option value="Cuando Cubango">Cuando Cubango</option>
+                                        <option value="Cuanza Norte">Cuanza Norte</option>
+                                        <option value="Cuanza Sul">Cuanza Sul</option>
+                                        <option value="Cunene">Cunene</option>
+                                        <option value="Huambo">Huambo</option>
+                                        <option value="Huíla">Huíla</option>
+                                        <option value="Luanda">Luanda</option>
+                                        <option value="Lunda Norte">Lunda Norte</option>
+                                        <option value="Lunda Sul">Lunda Sul</option>
+                                        <option value="Malanje">Malanje</option>
+                                        <option value="Moxico">Moxico</option>
+                                        <option value="Namibe">Namibe</option>
+                                        <option value="Uíge">Uíge</option>
+                                        <option value="Zaire">Zaire</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3" id="municipio_container" style="display: none;">
+                                    <label class="form-label">Município de Nascimento *</label>
+                                    <select name="local_nascimento" id="municipio_nascimento" class="form-select">
+                                        <option value="">Selecione o município...</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Nacionalidade *</label>
+                                    <input type="text" name="nacionalidade" class="form-control" value="Angolana" required>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Número do BI *</label>
+                                    <input type="text" name="bilhete_identidade" id="bilhete_identidade" class="form-control" required maxlength="14" placeholder="000000000AB000">
+                                    <small class="text-muted">Formato: 9 números + 2 letras + 3 números (ex: 123456789AB123)</small>
+                                    <small class="text-danger d-none" id="bi_formato_msg">⚠️ Formato inválido! Use: 9 números + 2 letras + 3 números</small>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Data de Validade do BI *</label>
+                                    <input type="date" name="data_validade_bi" id="data_validade_bi" class="form-control" required>
+                                    <small class="text-danger d-none" id="bi_vencido_msg">⚠️ BI vencido!</small>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Sexo *</label>
+                                    <select name="sexo" class="form-select" required>
+                                        <option value="">Selecione...</option>
+                                        <option value="M">Masculino</option>
+                                        <option value="F">Feminino</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Estado Civil</label>
+                                    <select name="estado_civil" class="form-select">
+                                        <option value="S" selected>Solteiro(a)</option>
+                                        <option value="C">Casado(a)</option>
+                                        <option value="D">Divorciado(a)</option>
+                                        <option value="V">Viúvo(a)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Endereço Completo *</label>
+                                    <textarea name="endereco" class="form-control" rows="2" required placeholder="Rua, Bairro, Município, Província"></textarea>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Telefone *</label>
+                                    <input type="tel" name="telefone" class="form-control" required placeholder="+244 000 000 000">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email *</label>
+                                    <input type="email" name="email" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Etapa 2: Informações Acadêmicas -->
+                        <div class="form-step" data-step="2">
+                            <h5 class="mb-3"><i class="bi bi-mortarboard-fill me-2"></i>Informações Acadêmicas</h5>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Última Escola Frequentada *</label>
+                                    <input type="text" id="escola_search" class="form-control" placeholder="Digite para buscar..." autocomplete="off">
+                                    <input type="hidden" name="escola_id" id="escola_id" required>
+                                    <div id="escola_results" class="autocomplete-results"></div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary mt-2" id="btn_nova_escola">
+                                        <i class="bi bi-plus-circle me-1"></i>Cadastrar Nova Escola
+                                    </button>
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Ano de Conclusão *</label>
+                                    <input type="text" name="ano_conclusao" class="form-control" required placeholder="2024" maxlength="4">
+                                </div>
+                                
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Turno Preferencial *</label>
+                                    <select name="turno_preferencial" class="form-select" required>
+                                        <option value="M" selected>Manhã</option>
+                                        <option value="T">Tarde</option>
+                                        <option value="N">Noite</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Certificados/Diplomas Obtidos</label>
+                                    <textarea name="certificados_obtidos" class="form-control" rows="2" placeholder="Liste os certificados e diplomas"></textarea>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Notas/Histórico Escolar</label>
+                                    <textarea name="historico_escolar" class="form-control" rows="2" placeholder="Média geral, disciplinas principais"></textarea>
+                                </div>
+                                
+                                {% if prerequisitos %}
+                                <hr class="my-4">
+                                <h6 class="text-danger mb-3">⚠️ Pré-requisitos Acadêmicos Exigidos</h6>
+                                {% for prereq in prerequisitos %}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">{{ prereq.disciplina_prerequisito.nome }} - Nota *</label>
+                                    <input type="number" name="nota_{{ prereq.disciplina_prerequisito.id }}" 
+                                           class="form-control" min="0" max="20" step="0.5" required
+                                           placeholder="Nota (0-20)" title="Nota mínima: {{ prereq.nota_minima_prerequisito }}">
+                                    <small class="form-text text-muted">Mínima: {{ prereq.nota_minima_prerequisito }}</small>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Ano de Conclusão</label>
+                                    <input type="number" name="ano_{{ prereq.disciplina_prerequisito.id }}" 
+                                           class="form-control" min="2000" max="2024" value="2024">
+                                </div>
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Etapa 3: Informações Financeiras -->
+                        <div class="form-step" data-step="3">
+                            <h5 class="mb-3"><i class="bi bi-cash-coin me-2"></i>Informações Financeiras</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Número do Comprovante/Boleto</label>
+                                    <input type="text" name="numero_comprovante" class="form-control" placeholder="Ex: BOL-123456">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nome do Responsável Financeiro</label>
+                                    <input type="text" name="responsavel_financeiro_nome" class="form-control">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Telefone do Responsável Financeiro</label>
+                                    <input type="tel" name="responsavel_financeiro_telefone" class="form-control">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Relação com o Estudante</label>
+                                    <input type="text" name="responsavel_financeiro_relacao" class="form-control" placeholder="Ex: Pai, Mãe, Tio">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Etapa 4: Encarregado de Educação -->
+                        <div class="form-step" data-step="4">
+                            <!-- Ícone de visto grande no centro -->
+                            <div class="text-center mb-4" id="check_icon_final" style="display: none;">
+                                <div style="width: 120px; height: 120px; margin: 0 auto; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(5, 150, 105, 0.3); animation: checkBounce 0.6s ease;">
+                                    <i class="bi bi-check-lg" style="font-size: 80px; color: white;"></i>
+                                </div>
+                                <h4 class="mt-3 text-success">Quase lá!</h4>
+                                <p class="text-muted">Finalize com os dados do encarregado de educação</p>
+                            </div>
+                            
+                            <h5 class="mb-3"><i class="bi bi-people-fill me-2"></i>Encarregado de Educação</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Nome do Encarregado</label>
+                                    <input type="text" name="encarregado_nome" class="form-control">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Grau de Parentesco</label>
+                                    <input type="text" name="encarregado_parentesco" class="form-control" placeholder="Ex: Pai, Mãe, Tutor">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Telefone do Encarregado</label>
+                                    <input type="tel" name="encarregado_telefone" class="form-control">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email do Encarregado</label>
+                                    <input type="email" name="encarregado_email" class="form-control">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Profissão do Encarregado</label>
+                                    <input type="text" name="encarregado_profissao" class="form-control">
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Local de Trabalho</label>
+                                    <input type="text" name="encarregado_local_trabalho" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Botões de Navegação -->
+                        <hr class="my-4">
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" id="btn_prev">
+                                <i class="bi bi-arrow-left me-2"></i>Anterior
+                            </button>
+                            <button type="button" class="btn btn-custom" id="btn_next">
+                                Próximo<i class="bi bi-arrow-right ms-2"></i>
+                            </button>
+                            <button type="submit" class="btn btn-success d-none" id="btn_submit">
+                                <i class="bi bi-check-circle me-2"></i>Confirmar Inscrição
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Cadastrar Nova Escola -->
+<div class="modal fade" id="modalNovaEscola" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-custom text-white">
+                <h5 class="modal-title">Cadastrar Nova Escola</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Nome da Escola *</label>
+                    <input type="text" id="nova_escola_nome" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Município</label>
+                    <input type="text" id="nova_escola_municipio" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Província</label>
+                    <input type="text" id="nova_escola_provincia" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Tipo</label>
+                    <select id="nova_escola_tipo" class="form-select">
+                        <option value="Pública" selected>Pública</option>
+                        <option value="Privada">Privada</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btn_salvar_escola">Salvar Escola</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-custom {
+        background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);
+    }
+    
+    .progress-wizard {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+    }
+    
+    .progress-wizard::before {
+        content: '';
+        position: absolute;
+        top: 25px;
+        left: 12.5%;
+        right: 12.5%;
+        height: 3px;
+        background: #e0e0e0;
+        z-index: 0;
+    }
+    
+    .wizard-step {
+        flex: 1;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .wizard-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #e0e0e0;
+        color: #666;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        margin-bottom: 8px;
+        transition: all 0.3s;
+    }
+    
+    .wizard-step.active .wizard-icon {
+        background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);
+        color: white;
+        transform: scale(1.1);
+    }
+    
+    .wizard-step.completed .wizard-icon {
+        background: #059669;
+        color: white;
+    }
+    
+    .wizard-label {
+        font-size: 0.9rem;
+        color: #666;
+        font-weight: 500;
+    }
+    
+    .wizard-step.active .wizard-label {
+        color: #1e3a8a;
+        font-weight: 600;
+    }
+    
+    .form-step {
+        display: none;
+    }
+    
+    .form-step.active {
+        display: block;
+        animation: fadeIn 0.3s;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateX(20px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .autocomplete-results {
+        position: absolute;
+        z-index: 1000;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        max-height: 200px;
+        overflow-y: auto;
+        width: 100%;
+        display: none;
+    }
+    
+    .autocomplete-item {
+        padding: 10px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .autocomplete-item:hover {
+        background: #f8f9fa;
+    }
+    
+    .btn-custom {
+        background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);
+        border: none;
+        color: white;
+    }
+    
+    .btn-custom:hover {
+        background: linear-gradient(135deg, #1e40af 0%, #10b981 100%);
+        color: white;
+    }
+    
+    @keyframes checkBounce {
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.1);
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+</style>
+
+<script>
+let currentStep = 1;
+const totalSteps = 4;
+
+// Navegação entre etapas
+document.getElementById('btn_next').addEventListener('click', () => {
+    if (validateStep(currentStep)) {
+        // Mensagens de sucesso para cada etapa
+        const mensagens = {
+            1: '✓ Informações Pessoais concluídas!',
+            2: '✓ Informações Acadêmicas concluídas!',
+            3: '✓ Informações Financeiras concluídas!'
+        };
+        
+        if (mensagens[currentStep]) {
+            showToast('success', mensagens[currentStep]);
+        }
+        
+        if (currentStep < totalSteps) {
+            goToStep(currentStep + 1);
+        }
+    }
+});
+
+document.getElementById('btn_prev').addEventListener('click', () => {
+    if (currentStep > 1) {
+        goToStep(currentStep - 1);
+    }
+});
+
+function goToStep(step) {
+    // Remover active das etapas
+    document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.wizard-step').forEach(el => {
+        el.classList.remove('active');
+        if (parseInt(el.dataset.step) < step) {
+            el.classList.add('completed');
+        } else {
+            el.classList.remove('completed');
+        }
+    });
+    
+    // Ativar nova etapa
+    document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
+    document.querySelector(`.wizard-step[data-step="${step}"]`).classList.add('active');
+    
+    currentStep = step;
+    
+    // Mostrar ícone de visto na última etapa
+    const checkIcon = document.getElementById('check_icon_final');
+    if (step === totalSteps && checkIcon) {
+        checkIcon.style.display = 'block';
+    } else if (checkIcon) {
+        checkIcon.style.display = 'none';
+    }
+    
+    // Controlar botões
+    document.getElementById('btn_prev').classList.toggle('d-none', step === 1);
+    document.getElementById('btn_next').classList.toggle('d-none', step === totalSteps);
+    document.getElementById('btn_submit').classList.toggle('d-none', step !== totalSteps);
+}
+
+function validateStep(step) {
+    const stepEl = document.querySelector(`.form-step[data-step="${step}"]`);
+    const requiredInputs = stepEl.querySelectorAll('[required]');
+    
+    for (let input of requiredInputs) {
+        if (!input.value.trim()) {
+            input.focus();
+            showToast('error', 'Por favor, preencha todos os campos obrigatórios (*)');
+            return false;
+        }
+    }
+    
+    // Validação especial do BI
+    if (step === 1) {
+        const biVencido = document.getElementById('data_validade_bi');
+        const hoje = new Date().toISOString().split('T')[0];
+        
+        if (biVencido.value < hoje) {
+            showToast('error', '⚠️ Seu BI está vencido! Por favor, renove o documento antes de prosseguir.');
+            biVencido.focus();
+            return false;
+        }
+        
+        // Validação do formato do BI
+        const biInput = document.getElementById('bilhete_identidade');
+        const bi = biInput.value;
+        
+        if (!validarFormatoBI(bi)) {
+            showToast('error', '⚠️ Formato do BI inválido! Use: 9 números + 2 letras + 3 números (ex: 123456789AB123)');
+            biInput.focus();
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+// Cálculo automático de idade
+document.getElementById('data_nascimento').addEventListener('change', function() {
+    const dataNasc = new Date(this.value);
+    const hoje = new Date();
+    let idade = hoje.getFullYear() - dataNasc.getFullYear();
+    const m = hoje.getMonth() - dataNasc.getMonth();
+    
+    if (m < 0 || (m === 0 && hoje.getDate() < dataNasc.getDate())) {
+        idade--;
+    }
+    
+    // Calcular próximo aniversário
+    const proxAniv = new Date(hoje.getFullYear(), dataNasc.getMonth(), dataNasc.getDate());
+    if (proxAniv < hoje) {
+        proxAniv.setFullYear(proxAniv.getFullYear() + 1);
+    }
+    
+    const diasAniv = Math.ceil((proxAniv - hoje) / (1000 * 60 * 60 * 24));
+    
+    document.getElementById('idade_display').textContent = 
+        `Idade: ${idade} anos | Próximo aniversário: ${proxAniv.toLocaleDateString('pt-PT')} (${diasAniv} dias)`;
+});
+
+// Validação de BI vencido
+document.getElementById('data_validade_bi').addEventListener('change', function() {
+    const hoje = new Date().toISOString().split('T')[0];
+    const msg = document.getElementById('bi_vencido_msg');
+    
+    if (this.value < hoje) {
+        msg.classList.remove('d-none');
+        this.classList.add('is-invalid');
+    } else {
+        msg.classList.add('d-none');
+        this.classList.remove('is-invalid');
+    }
+});
+
+// Validação do formato do BI
+function validarFormatoBI(bi) {
+    // Formato: 9 números + 2 letras + 3 números (14 caracteres totais)
+    // Exemplo: 123456789AB123
+    
+    if (!bi || bi.length !== 14) {
+        return false;
+    }
+    
+    // Verificar primeiros 9 caracteres (devem ser números)
+    for (let i = 0; i < 9; i++) {
+        if (!/\d/.test(bi[i])) {
+            return false;
+        }
+    }
+    
+    // Verificar posições 10 e 11 (índices 9 e 10 - devem ser letras)
+    if (!/[A-Za-z]/.test(bi[9]) || !/[A-Za-z]/.test(bi[10])) {
+        return false;
+    }
+    
+    // Verificar últimos 3 caracteres (devem ser números)
+    for (let i = 11; i < 14; i++) {
+        if (!/\d/.test(bi[i])) {
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+// Validação em tempo real do BI
+document.getElementById('bilhete_identidade').addEventListener('input', function() {
+    const bi = this.value.toUpperCase();
+    this.value = bi; // Converter para maiúsculas
+    
+    const msg = document.getElementById('bi_formato_msg');
+    
+    if (bi.length === 14) {
+        if (!validarFormatoBI(bi)) {
+            msg.classList.remove('d-none');
+            this.classList.add('is-invalid');
+        } else {
+            msg.classList.add('d-none');
+            this.classList.remove('is-invalid');
+        }
+    } else if (bi.length > 0) {
+        msg.classList.add('d-none');
+        this.classList.remove('is-invalid');
+    }
+});
+
+// Autocomplete de Escolas
+let escolaTimeout;
+document.getElementById('escola_search').addEventListener('input', function() {
+    clearTimeout(escolaTimeout);
+    const query = this.value.trim();
+    
+    if (query.length < 2) {
+        document.getElementById('escola_results').style.display = 'none';
+        return;
+    }
+    
+    escolaTimeout = setTimeout(() => {
+        fetch(`/api/escolas/autocomplete/?q=${encodeURIComponent(query)}`)
+            .then(res => res.json())
+            .then(data => {
+                const resultsDiv = document.getElementById('escola_results');
+                resultsDiv.innerHTML = '';
+                
+                if (data.escolas.length > 0) {
+                    data.escolas.forEach(escola => {
+                        const item = document.createElement('div');
+                        item.className = 'autocomplete-item';
+                        item.textContent = `${escola.nome}${escola.municipio ? ` - ${escola.municipio}` : ''}`;
+                        item.onclick = () => selectEscola(escola);
+                        resultsDiv.appendChild(item);
+                    });
+                    resultsDiv.style.display = 'block';
+                } else {
+                    resultsDiv.style.display = 'none';
+                }
+            });
+    }, 300);
+});
+
+function selectEscola(escola) {
+    document.getElementById('escola_search').value = escola.nome;
+    document.getElementById('escola_id').value = escola.id;
+    document.getElementById('escola_results').style.display = 'none';
+}
+
+// Modal Nova Escola
+document.getElementById('btn_nova_escola').addEventListener('click', () => {
+    new bootstrap.Modal(document.getElementById('modalNovaEscola')).show();
+});
+
+document.getElementById('btn_salvar_escola').addEventListener('click', () => {
+    const nome = document.getElementById('nova_escola_nome').value.trim();
+    const municipio = document.getElementById('nova_escola_municipio').value.trim();
+    const provincia = document.getElementById('nova_escola_provincia').value.trim();
+    const tipo = document.getElementById('nova_escola_tipo').value;
+    
+    if (!nome) {
+        showToast('error', 'Nome da escola é obrigatório!');
+        return;
+    }
+    
+    fetch('/api/escolas/create/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({ nome, municipio, provincia, tipo })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            selectEscola(data.escola);
+            bootstrap.Modal.getInstance(document.getElementById('modalNovaEscola')).hide();
+            showToast('success', `Escola "${data.escola.nome}" cadastrada com sucesso!`);
+            
+            // Limpar formulário
+            document.getElementById('nova_escola_nome').value = '';
+            document.getElementById('nova_escola_municipio').value = '';
+            document.getElementById('nova_escola_provincia').value = '';
+        } else {
+            showToast('error', 'Erro ao cadastrar escola: ' + data.error);
+        }
+    });
+});
+
+// Fechar autocomplete ao clicar fora
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('#escola_search') && !e.target.closest('#escola_results')) {
+        document.getElementById('escola_results').style.display = 'none';
+    }
+});
+
+// Municípios por província em Angola
+const municipiosPorProvincia = {
+    'Luanda': ['Belas', 'Cacuaco', 'Cazenga', 'Icolo e Bengo', 'Luanda', 'Quiçama', 'Viana', 'Kilamba Kiaxi', 'Talatona'],
+    'Bengo': ['Ambriz', 'Bula Atumba', 'Dande', 'Dembos', 'Nambuangongo', 'Pango Aluquém'],
+    'Benguela': ['Balombo', 'Baía Farta', 'Benguela', 'Bocoio', 'Caimbambo', 'Catumbela', 'Chongoroi', 'Cubal', 'Ganda', 'Lobito'],
+    'Bié': ['Andulo', 'Camacupa', 'Catabola', 'Chinguar', 'Chitembo', 'Cuemba', 'Cunhinga', 'Cuíto', 'Nharea'],
+    'Cabinda': ['Belize', 'Buco-Zau', 'Cabinda', 'Cacongo'],
+    'Cuando Cubango': ['Calai', 'Cuangar', 'Cuchi', 'Cuito Cuanavale', 'Dirico', 'Mavinga', 'Menongue', 'Nankova', 'Rivungo'],
+    'Cuanza Norte': ['Ambaca', 'Banga', 'Bolongongo', 'Cambambe', 'Cazengo', 'Golungo Alto', 'Gonguembo', 'Lucala', 'Quiculungo', 'Samba Cajú'],
+    'Cuanza Sul': ['Amboim', 'Cassongue', 'Cela', 'Conda', 'Ebo', 'Libolo', 'Mussende', 'Porto Amboim', 'Quibala', 'Quilenda', 'Seles', 'Sumbe', 'Waku Kungo'],
+    'Cunene': ['Cahama', 'Cuanhama', 'Curoca', 'Cuvelai', 'Namacunde', 'Ombadja'],
+    'Huambo': ['Bailundo', 'Caála', 'Cachiungo', 'Chinjenje', 'Chicomba', 'Ecunha', 'Huambo', 'Londuimbali', 'Longonjo', 'Mungo', 'Ucuma'],
+    'Huíla': ['Caconda', 'Cacula', 'Caluquembe', 'Chiange', 'Chibia', 'Chicomba', 'Chipindo', 'Cuvango', 'Humpata', 'Jamba', 'Lubango', 'Matala', 'Quilengues', 'Quipungo'],
+    'Lunda Norte': ['Cambulo', 'Capenda Camulemba', 'Caungula', 'Chitato', 'Cuango', 'Cuílo', 'Lubalo', 'Lucapa', 'Xá-Muteba'],
+    'Lunda Sul': ['Cacolo', 'Dala', 'Muconda', 'Saurimo'],
+    'Malanje': ['Cacuso', 'Calandula', 'Cambundi-Catembo', 'Cangandala', 'Caombo', 'Cuaba Nzogo', 'Cunda-Dia-Baze', 'Luquembo', 'Malanje', 'Marimba', 'Massango', 'Mucari', 'Quela', 'Quirima'],
+    'Moxico': ['Alto Zambeze', 'Bundas', 'Camanongue', 'Cameia', 'Léua', 'Luau', 'Luacano', 'Luchazes', 'Lumeje', 'Moxico'],
+    'Namibe': ['Bibala', 'Camucuio', 'Namibe', 'Tômbwa', 'Virei'],
+    'Uíge': ['Alto Cauale', 'Ambuíla', 'Bembe', 'Buengas', 'Bungo', 'Damba', 'Milunga', 'Mucaba', 'Negage', 'Puri', 'Quimbele', 'Quitexe', 'Sanza Pombo', 'Songo', 'Uíge', 'Zombo'],
+    'Zaire': ['Cuimba', 'M\'banza Congo', 'Nóqui', 'N\'zeto', 'Soyo', 'Tomboco']
+};
+
+// Selecionar província e mostrar municípios
+document.getElementById('provincia_nascimento').addEventListener('change', function() {
+    const provincia = this.value;
+    const municipioContainer = document.getElementById('municipio_container');
+    const municipioSelect = document.getElementById('municipio_nascimento');
+    
+    if (provincia && municipiosPorProvincia[provincia]) {
+        // Mostrar campo de município
+        municipioContainer.style.display = 'block';
+        
+        // Popular municípios
+        municipioSelect.innerHTML = '<option value="">Selecione o município...</option>';
+        municipiosPorProvincia[provincia].forEach(municipio => {
+            const option = document.createElement('option');
+            option.value = municipio + ', ' + provincia;
+            option.textContent = municipio;
+            municipioSelect.appendChild(option);
+        });
+        
+        municipioSelect.required = true;
+    } else {
+        municipioContainer.style.display = 'none';
+        municipioSelect.required = false;
+    }
+});
+
+// Iniciar na primeira etapa
+goToStep(1);
+</script>
+{% endblock %}
