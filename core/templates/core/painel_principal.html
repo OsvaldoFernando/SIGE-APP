@@ -56,7 +56,7 @@
 
     <hr class="my-4">
 
-    <h3 class="mb-4" style="color: #1e3a8a;">🎓 Gestão Acadêmica</h3>
+    <h3 class="mb-4" style="color: #1e3a8a; text-align: center;">🎓 Área de Trabalho</h3>
     <div class="row g-3 mb-5">
         <div class="col-md-4 col-lg-3">
             <a href="{% url 'cursos_disciplinas' %}" class="text-decoration-none">
@@ -98,6 +98,662 @@
                         <div style="font-size: 2rem;">📅</div>
                         <h6 class="card-title text-dark">Cronograma</h6>
                         <p class="card-text small text-muted">Datas importantes</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a; text-align: center;">👤 Responsável</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'painel_principal' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">👤</div>
+                        <h6 class="card-title text-dark">Meu Perfil</h6>
+                        <p class="card-text small text-muted">Dados pessoais</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'painel_principal' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">👥</div>
+                        <h6 class="card-title text-dark">Minha Equipe</h6>
+                        <p class="card-text small text-muted">Colaboradores</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'painel_principal' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📊</div>
+                        <h6 class="card-title text-dark">Meu Desempenho</h6>
+                        <p class="card-text small text-muted">Relatórios</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'painel_principal' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📋</div>
+                        <h6 class="card-title text-dark">Minhas Tarefas</h6>
+                        <p class="card-text small text-muted">Pendências</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a; text-align: center;">🎓 Cursos</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'listar_cursos' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📚</div>
+                        <h6 class="card-title text-dark">Lista de Cursos</h6>
+                        <p class="card-text small text-muted">Todos os cursos</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'criar_curso' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">➕</div>
+                        <h6 class="card-title text-dark">Novo Curso</h6>
+                        <p class="card-text small text-muted">Criar curso</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">✏️</div>
+                        <h6 class="card-title text-dark">Editar Curso</h6>
+                        <p class="card-text small text-muted">Modificar curso</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">👥</div>
+                        <h6 class="card-title text-dark">Inscritos</h6>
+                        <p class="card-text small text-muted">Alunos por curso</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📊</div>
+                        <h6 class="card-title text-dark">Estatísticas</h6>
+                        <p class="card-text small text-muted">Análise de cursos</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📋</div>
+                        <h6 class="card-title text-dark">Relatórios</h6>
+                        <p class="card-text small text-muted">Desempenho</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a; text-align: center;">🗂️ Matriz Curricular</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'grelha_curricular' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📊</div>
+                        <h6 class="card-title text-dark">Grelha Curricular</h6>
+                        <p class="card-text small text-muted">Estrutura de cursos</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📝</div>
+                        <h6 class="card-title text-dark">Nova Matriz</h6>
+                        <p class="card-text small text-muted">Criar matriz curricular</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">✏️</div>
+                        <h6 class="card-title text-dark">Editar Matriz</h6>
+                        <p class="card-text small text-muted">Modificar estrutura</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🔗</div>
+                        <h6 class="card-title text-dark">Pré-requisitos</h6>
+                        <p class="card-text small text-muted">Dependências de disciplinas</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📋</div>
+                        <h6 class="card-title text-dark">Cronograma</h6>
+                        <p class="card-text small text-muted">Datas e períodos</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📈</div>
+                        <h6 class="card-title text-dark">Validação</h6>
+                        <p class="card-text small text-muted">Verificar matriz</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a; text-align: center;">📊 Sistema Avaliativo</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📋</div>
+                        <h6 class="card-title text-dark">Tipos de Avaliação</h6>
+                        <p class="card-text small text-muted">Modelos e formatos</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">➕</div>
+                        <h6 class="card-title text-dark">Nova Avaliação</h6>
+                        <p class="card-text small text-muted">Criar avaliação</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📅</div>
+                        <h6 class="card-title text-dark">Cronograma</h6>
+                        <p class="card-text small text-muted">Datas de avaliações</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🎯</div>
+                        <h6 class="card-title text-dark">Critérios</h6>
+                        <p class="card-text small text-muted">Padrões de avaliação</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📊</div>
+                        <h6 class="card-title text-dark">Resultados</h6>
+                        <p class="card-text small text-muted">Notas e desempenho</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📈</div>
+                        <h6 class="card-title text-dark">Relatórios</h6>
+                        <p class="card-text small text-muted">Análise de avaliações</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a; text-align: center;">📅 Calendário Escolar</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📆</div>
+                        <h6 class="card-title text-dark">Calendário Geral</h6>
+                        <p class="card-text small text-muted">Visão completa do ano</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">➕</div>
+                        <h6 class="card-title text-dark">Novo Período</h6>
+                        <p class="card-text small text-muted">Criar período letivo</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🏫</div>
+                        <h6 class="card-title text-dark">Férias</h6>
+                        <p class="card-text small text-muted">Períodos de férias</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🎉</div>
+                        <h6 class="card-title text-dark">Feriados</h6>
+                        <p class="card-text small text-muted">Datas comemorativas</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">✏️</div>
+                        <h6 class="card-title text-dark">Editar</h6>
+                        <p class="card-text small text-muted">Modificar calendário</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🖨️</div>
+                        <h6 class="card-title text-dark">Imprimir</h6>
+                        <p class="card-text small text-muted">Gerar calendário</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a; text-align: center;">📚 Disciplinas</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'cursos_disciplinas' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📖</div>
+                        <h6 class="card-title text-dark">Lista de Disciplinas</h6>
+                        <p class="card-text small text-muted">Todas as disciplinas</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">➕</div>
+                        <h6 class="card-title text-dark">Nova Disciplina</h6>
+                        <p class="card-text small text-muted">Criar disciplina</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">✏️</div>
+                        <h6 class="card-title text-dark">Editar Disciplina</h6>
+                        <p class="card-text small text-muted">Modificar informações</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📋</div>
+                        <h6 class="card-title text-dark">Syllabus</h6>
+                        <p class="card-text small text-muted">Programa acadêmico</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">👥</div>
+                        <h6 class="card-title text-dark">Turmas</h6>
+                        <p class="card-text small text-muted">Turmas por disciplina</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📊</div>
+                        <h6 class="card-title text-dark">Avaliações</h6>
+                        <p class="card-text small text-muted">Notas e desempenho</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a; text-align: center;">👨‍🏫 Professores</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'cadastro_professores' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">👨‍🏫</div>
+                        <h6 class="card-title text-dark">Lista de Professores</h6>
+                        <p class="card-text small text-muted">Todos os docentes</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'atribuicao_turmas' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📌</div>
+                        <h6 class="card-title text-dark">Turmas Atribuídas</h6>
+                        <p class="card-text small text-muted">Alocação de turmas</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'assiduidade_docentes' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📊</div>
+                        <h6 class="card-title text-dark">Assiduidade</h6>
+                        <p class="card-text small text-muted">Frequência docente</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'painel_principal' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📈</div>
+                        <h6 class="card-title text-dark">Relatórios</h6>
+                        <p class="card-text small text-muted">Performance</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a; text-align: center;">📚 Relatórios Pedagógicos</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📊</div>
+                        <h6 class="card-title text-dark">Desempenho Acadêmico</h6>
+                        <p class="card-text small text-muted">Análise por turma</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📈</div>
+                        <h6 class="card-title text-dark">Avaliações</h6>
+                        <p class="card-text small text-muted">Notas e resultados</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">👥</div>
+                        <h6 class="card-title text-dark">Análise de Turmas</h6>
+                        <p class="card-text small text-muted">Composição e progresso</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📋</div>
+                        <h6 class="card-title text-dark">Frequência</h6>
+                        <p class="card-text small text-muted">Análise de presença</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🎯</div>
+                        <h6 class="card-title text-dark">Metas Acadêmicas</h6>
+                        <p class="card-text small text-muted">Cumprimento de objetivos</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📑</div>
+                        <h6 class="card-title text-dark">Boletins</h6>
+                        <p class="card-text small text-muted">Geração de relatórios</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a; text-align: center;">🏛️ Patrimônio</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📦</div>
+                        <h6 class="card-title text-dark">Inventário</h6>
+                        <p class="card-text small text-muted">Controle de bens</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🏢</div>
+                        <h6 class="card-title text-dark">Infraestrutura</h6>
+                        <p class="card-text small text-muted">Prédios e salas</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">💻</div>
+                        <h6 class="card-title text-dark">Equipamentos</h6>
+                        <p class="card-text small text-muted">TI e multimídia</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🛠️</div>
+                        <h6 class="card-title text-dark">Manutenção</h6>
+                        <p class="card-text small text-muted">Reparos agendados</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📊</div>
+                        <h6 class="card-title text-dark">Depreciação</h6>
+                        <p class="card-text small text-muted">Cálculo de valores</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📋</div>
+                        <h6 class="card-title text-dark">Relatórios</h6>
+                        <p class="card-text small text-muted">Análise patrimonial</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <h3 class="mb-4" style="color: #1e3a8a; text-align: center;">📄 Doc & Impressões</h3>
+    <div class="row g-3 mb-5">
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'gestao_documentos' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📋</div>
+                        <h6 class="card-title text-dark">Meus Documentos</h6>
+                        <p class="card-text small text-muted">Biblioteca de templates</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'documento_criar' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">➕</div>
+                        <h6 class="card-title text-dark">Novo Documento</h6>
+                        <p class="card-text small text-muted">Criar template</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🖨️</div>
+                        <h6 class="card-title text-dark">Impressões</h6>
+                        <p class="card-text small text-muted">Histórico de impressão</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📑</div>
+                        <h6 class="card-title text-dark">Gerar PDF</h6>
+                        <p class="card-text small text-muted">Export automático</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">🎨</div>
+                        <h6 class="card-title text-dark">Assinatura Digital</h6>
+                        <p class="card-text small text-muted">Certificação de docs</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="{% url 'admin:index' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📤</div>
+                        <h6 class="card-title text-dark">Envios em Lote</h6>
+                        <p class="card-text small text-muted">Email e SMS</p>
                     </div>
                 </div>
             </a>

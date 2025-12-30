@@ -1,12 +1,12 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Gestão Acadêmica - SIGA{% endblock %}
+{% block title %}Área de Trabalho - SIGA{% endblock %}
 
 {% block content %}
 <div class="container-fluid p-0">
     <div style="display: flex; min-height: 100vh; margin-top: 80px;">
         <div style="width: 280px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 20px; position: fixed; left: 0; top: 80px; height: calc(100vh - 80px); overflow-y: auto;">
-            <h5 style="color: #fff; margin-bottom: 20px;">Gestão Acadêmica</h5>
+            <h5 style="color: #fff; margin-bottom: 20px;">Área de Trabalho</h5>
             <ul style="list-style: none; padding: 0; margin: 0;">
                 <li><a href="{% url 'cursos_disciplinas' %}" class="nav-link {% if active == 'cursos' %}active{% endif %}" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📚 Cursos e Disciplinas</a></li>
                 <li><a href="{% url 'grelha_curricular' %}" class="nav-link {% if active == 'grelha' %}active{% endif %}" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📋 Grelha Curricular</a></li>
@@ -21,7 +21,7 @@
 
         <div style="margin-left: 280px; flex: 1; padding: 30px;">
             <a href="{% url 'painel_principal' %}" style="text-decoration: none; color: #666; font-size: 12px; margin-bottom: 15px; display: inline-block;">← Voltar ao Painel</a>
-            <h1 style="color: #1e3c72; margin-bottom: 30px;">Gestão Acadêmica</h1>
+            <h1 style="color: #1e3c72; margin-bottom: 30px; text-align: center;">Área de Trabalho</h1>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
                 <a href="{% url 'cursos_disciplinas' %}" style="text-decoration: none;">

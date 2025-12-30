@@ -103,6 +103,11 @@ urlpatterns = [
     path('utilizadores/<int:user_id>/editar/', views.editar_utilizador, name='editar_utilizador'),
     path('utilizadores/<int:user_id>/deletar/', views.deletar_utilizador, name='deletar_utilizador'),
     path('utilizadores/<int:user_id>/ativar/', views.ativar_utilizador, name='ativar_utilizador'),
+    
+    # Alias para URLs dos Menus do Painel (compatibilidade com template)
+    path('listar-cursos/', views.listar_cursos, name='listar_cursos'),
+    path('criar-curso/', views.criar_curso, name='criar_curso'),
+    path('editar-curso/', views.editar_curso, name='editar_curso'),
 ]
 
 if settings.DEBUG:
