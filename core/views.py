@@ -404,6 +404,55 @@ def dashboard(request):
     })
 """
 
+def consultar_aprovacao(request):
+    if request.method == 'POST':
+        query = request.POST.get('numero_ou_bi', '').strip()
+        if query:
+            inscricao = Inscricao.objects.filter(
+                Q(numero_inscricao=query) | Q(bilhete_identidade=query)
+            ).first()
+            
+            if inscricao:
+                if inscricao.aprovado:
+                    messages.success(request, f'Parabéns {inscricao.nome_completo}! Você foi aprovado. Pode prosseguir com a matrícula.')
+                    return render(request, 'core/consultar_aprovacao.html', {
+                        'inscricao': inscricao,
+                        'aprovado': True
+                    })
+                elif inscricao.nota_teste is not None:
+                    messages.warning(request, f'Lamentamos {inscricao.nome_completo}, mas você não foi selecionado para este curso.')
+                else:
+                    messages.info(request, f'Olá {inscricao.nome_completo}, seu teste ainda está sendo processado. Por favor, aguarde.')
+            else:
+                messages.error(request, 'Inscrição ou BI não encontrado no sistema.')
+    
+    return render(request, 'core/consultar_aprovacao.html')
+
+@require_http_methods(["GET"])
+def verificar_existente(request):
+    query = request.GET.get('q', '').strip()
+    campo = request.GET.get('campo', '').strip()
+    
+    if len(query) < 3 or campo not in ['nome_completo', 'bilhete_identidade', 'telefone']:
+        return JsonResponse({'encontrado': False})
+    
+    if campo == 'nome_completo':
+        existente = Inscricao.objects.filter(nome_completo__icontains=query).first()
+    elif campo == 'bilhete_identidade':
+        existente = Inscricao.objects.filter(bilhete_identidade=query).first()
+    else: # telefone
+        existente = Inscricao.objects.filter(telefone__contains=query).first()
+        
+    if existente:
+        return JsonResponse({
+            'encontrado': True,
+            'valor': getattr(existente, campo),
+            'nome': existente.nome_completo,
+            'id': existente.id
+        })
+        
+    return JsonResponse({'encontrado': False})
+
 @require_http_methods(["GET"])
 def escolas_autocomplete(request):
     """Retorna escolas para autocomplete"""

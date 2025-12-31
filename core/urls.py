@@ -36,6 +36,7 @@ urlpatterns = [
     
     # URLs para Menus do Painel Principal
     path('nova-matricula/', views.selecionar_tipo_matricula, name='nova_matricula'),
+    path('consultar-aprovacao/', views.consultar_aprovacao, name='consultar_aprovacao'),
     path('admissao-estudantes/', views.admissao_estudantes, name='admissao_estudantes'),
     path('termo-renovacao/', views.termo_renovacao, name='termo_renovacao'),
     path('receber-documento-matricula/', views.receber_documento_matricula, name='receber_documento_matricula'),
@@ -56,4 +57,5 @@ urlpatterns = [
     path('quadro-avisos/', views.quadro_avisos, name='quadro_avisos'),
     path('recursos-humanos/', views.recursos_humanos, name='recursos_humanos'),
     path('relatorios-financeiros/', views.relatorios_financeiros, name='relatorios_financeiros'),
+    path('api/verificar-existente/', views.verificar_existente, name='verificar_existente'),
 ]

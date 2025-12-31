@@ -233,8 +233,9 @@ class Inscricao(models.Model):
     numero_inscricao = models.CharField(max_length=20, unique=True, blank=True, verbose_name="Número de Inscrição")
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='inscricoes', verbose_name="Curso")
     
-    # 1. Informações Pessoais
+    # 1. Identificação
     nome_completo = models.CharField(max_length=200, verbose_name="Nome Completo")
+    foto = models.ImageField(upload_to='estudantes/fotos/', blank=True, null=True, verbose_name="Foto do Estudante")
     data_nascimento = models.DateField(verbose_name="Data de Nascimento")
     local_nascimento = models.CharField(max_length=200, verbose_name="Local de Nascimento", default="Luanda")
     nacionalidade = models.CharField(max_length=100, verbose_name="Nacionalidade", default="Angolana")
@@ -245,6 +246,9 @@ class Inscricao(models.Model):
     endereco = models.TextField(verbose_name="Endereço Completo")
     telefone = models.CharField(max_length=20, verbose_name="Telefone")
     email = models.EmailField(verbose_name="Email")
+    data_cadastro = models.DateTimeField(default=timezone.now, verbose_name="Data de Cadastro")
+    status = models.CharField(max_length=20, default='Ativo', verbose_name="Status")
+    matricula_bloqueada = models.BooleanField(default=False, verbose_name="Matrícula Bloqueada?")
     
     # 2. Informações Académicas
     escola = models.ForeignKey(Escola, on_delete=models.SET_NULL, null=True, blank=True, related_name='inscricoes', verbose_name="Última Escola Frequentada")
@@ -259,13 +263,17 @@ class Inscricao(models.Model):
     responsavel_financeiro_telefone = models.CharField(max_length=20, verbose_name="Telefone do Responsável Financeiro", blank=True)
     responsavel_financeiro_relacao = models.CharField(max_length=100, verbose_name="Relação com o Estudante", blank=True)
     
-    # 4. Encarregado de Educação
-    encarregado_nome = models.CharField(max_length=200, verbose_name="Nome do Encarregado de Educação", blank=True)
-    encarregado_parentesco = models.CharField(max_length=100, verbose_name="Grau de Parentesco", blank=True)
-    encarregado_telefone = models.CharField(max_length=20, verbose_name="Telefone do Encarregado", blank=True)
-    encarregado_email = models.EmailField(verbose_name="Email do Encarregado", blank=True)
-    encarregado_profissao = models.CharField(max_length=200, verbose_name="Profissão do Encarregado", blank=True)
-    encarregado_local_trabalho = models.CharField(max_length=200, verbose_name="Local de Trabalho do Encarregado", blank=True)
+    # 4. Responsáveis
+    responsavel_legal_nome = models.CharField(max_length=200, blank=True, verbose_name="Nome do Responsável Legal/Financeiro")
+    responsavel_legal_vinculo = models.CharField(max_length=100, blank=True, verbose_name="Grau/Vínculo Legal")
+    responsavel_legal_telefone = models.CharField(max_length=20, blank=True, verbose_name="Telefone Legal")
+    
+    responsavel_pedagogico_nome = models.CharField(max_length=200, blank=True, verbose_name="Nome do Responsável Pedagógico")
+    responsavel_pedagogico_vinculo = models.CharField(max_length=100, blank=True, verbose_name="Grau/Vínculo Pedagógico")
+    responsavel_pedagogico_telefone = models.CharField(max_length=20, blank=True, verbose_name="Telefone Pedagógico")
+    
+    # 6. Configurações
+    receber_emails_sistema = models.BooleanField(default=True, verbose_name="Deseja receber emails do sistema?")
     
     # Sistema de Aprovação
     nota_teste = models.DecimalField(
@@ -480,7 +488,7 @@ class PerfilUsuario(models.Model):
     )
     telefone = models.CharField(max_length=20, blank=True, verbose_name="Telefone")
     foto = models.ImageField(upload_to='usuarios/', blank=True, null=True, verbose_name="Foto")
-    data_cadastro = models.DateTimeField(auto_now_add=True, verbose_name="Data de Cadastro")
+    data_cadastro = models.DateTimeField(default=timezone.now, verbose_name="Data de Cadastro")
     ativo = models.BooleanField(default=True, verbose_name="Ativo")
     
     class Meta:

@@ -16,6 +16,14 @@
     </div>
 
     <div class="row g-4">
+        <!-- Botão Voltar -->
+        <div class="col-12 mb-2">
+            <a href="{% url 'painel_principal' %}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center" style="border-radius: 2px;">
+                <i class="bi bi-arrow-left me-2"></i>
+                <span>Voltar ao Painel</span>
+            </a>
+        </div>
+        
         <!-- Aluno Novato (Blue) -->
         <div class="col-md-6">
             <a href="/inscricao/1/" class="text-decoration-none">
@@ -80,22 +88,22 @@
             </a>
         </div>
 
-        <!-- Rematrícula em lote (Purple) -->
+        <!-- Consultar Aprovação (Purple) -->
         <div class="col-md-6">
-            <a href="#" class="text-decoration-none">
+            <a href="{% url 'consultar_aprovacao' %}" class="text-decoration-none">
                 <div class="card border-0 h-100" style="background-color: #8E44AD; color: white; border-radius: 2px; overflow: hidden; min-height: 160px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <div class="card-body p-4 d-flex">
                         <div class="flex-shrink-0 me-4 d-flex align-items-center">
-                            <i class="bi bi-arrow-repeat" style="font-size: 80px; line-height: 1; opacity: 1;"></i>
-                            <i class="bi bi-people-fill ms-2" style="font-size: 40px;"></i>
+                            <i class="bi bi-search" style="font-size: 80px; line-height: 1; opacity: 1;"></i>
+                            <i class="bi bi-check-circle-fill ms-2" style="font-size: 40px;"></i>
                         </div>
                         <div class="flex-grow-1 text-end">
-                            <h2 style="font-weight: 300; font-size: 38px; margin-bottom: 5px; letter-spacing: -1px;">Rematrícula <span style="font-size: 24px;">em lote</span></h2>
-                            <p style="font-size: 13px; opacity: 0.9; margin: 0; line-height: 1.4;">Alunos que estudaram no ano atual<br>e que irão continuar no próximo ano.</p>
+                            <h2 style="font-weight: 300; font-size: 38px; margin-bottom: 5px; letter-spacing: -1px;">Consultar Aprovação</h2>
+                            <p style="font-size: 13px; opacity: 0.9; margin: 0; line-height: 1.4;">Verifique se foi aprovado no teste de<br>admissão para prosseguir com a matrícula.</p>
                         </div>
                     </div>
                     <div class="card-footer border-0 py-2 px-3 d-flex justify-content-between align-items-center" style="background-color: rgba(0,0,0,0.15);">
-                        <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Escolher o ano letivo e turma</span>
+                        <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Verificar resultado do teste</span>
                         <i class="bi bi-arrow-right-circle" style="font-size: 18px;"></i>
                     </div>
                 </div>

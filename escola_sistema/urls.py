@@ -34,6 +34,7 @@ urlpatterns = [
     path('admissao-view/', views.admissao, name='admissao'),
     path('admissao/', views.admissao, name='admissao'),
     path('nova-matricula/', views.selecionar_tipo_matricula, name='nova_matricula'),
+    path('consultar-aprovacao/', views.consultar_aprovacao, name='consultar_aprovacao'),
     path('matricula/', views.matricula, name='matricula'),
     path('termo-renovacao/', views.termo_renovacao, name='termo_renovacao'),
     path('receber-documento-matricula/', views.receber_documento_matricula, name='receber_documento_matricula'),
