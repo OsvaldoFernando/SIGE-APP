@@ -1239,10 +1239,146 @@ def admissao(request):
     return render(request, 'core/admissao_view.html', context)
 
 @login_required
+def selecionar_tipo_matricula(request):
+    """View para selecionar tipo de matrícula"""
+    context = {
+        'tipos_matricula': [
+            {
+                'id': 'novato',
+                'titulo': 'Aluno Novato',
+                'descricao': 'Aluno recém-chegado à instituição, ou que ainda não tem cadastro neste sistema',
+                'icone': '👤',
+                'cor': 'btn-primary',
+                'botao': 'INICIAR CADASTRO DO ALUNO',
+                'url': '/inscricao/1/'
+            },
+            {
+                'id': 'veterano',
+                'titulo': 'Aluno Veterano',
+                'descricao': 'Aluno já estudou nesta instituição e que já tem cadastro neste sistema',
+                'icone': '👥',
+                'cor': 'btn-success',
+                'botao': 'ENCONTRAR O CADASTRO DO ALUNO PARA REALIZAR A MATRÍCULA',
+                'url': '#'
+            },
+            {
+                'id': 'rematricula_individual',
+                'titulo': 'Rematrícula individual',
+                'descricao': 'Aluno que estudou no ano atual e que continuará no próximo ano.',
+                'icone': '↻',
+                'cor': 'btn-info',
+                'botao': 'BUSCAR ALUNO',
+                'url': '/matricula/'
+            },
+            {
+                'id': 'rematricula_lote',
+                'titulo': 'Rematrícula em lote',
+                'descricao': 'Alunos que estudaram no ano atual e que irão continuar no próximo ano.',
+                'icone': '↻↻',
+                'cor': 'btn-info',
+                'botao': 'ESCOLHER O ANO LETIVO E TURMA',
+                'url': '#'
+            },
+            {
+                'id': 'selecionado',
+                'titulo': 'Aluno Selecionado',
+                'descricao': 'Aluno que foi selecionado ou aprovado em um processo seletivo da instituição',
+                'icone': '✓',
+                'cor': 'btn-warning',
+                'botao': 'ESCOLHER O CONCURSO E ALUNO PARA REALIZAR A MATRÍCULA',
+                'url': '#'
+            }
+        ]
+    }
+    return render(request, 'core/selecionar_tipo_matricula.html', context)
+
+@login_required
 def matricula(request):
     """View para matrícula de estudantes"""
-    context = {}
+    # Get all enrollments with filtering
+    inscricoes = Inscricao.objects.all().select_related('curso')
+    
+    # Filter options
+    status_filter = request.GET.get('status', 'todos')
+    curso_filter = request.GET.get('curso', '')
+    
+    if status_filter == 'pendente':
+        inscricoes = inscricoes.filter(aprovado=False)
+    elif status_filter == 'aprovado':
+        inscricoes = inscricoes.filter(aprovado=True)
+    
+    if curso_filter:
+        inscricoes = inscricoes.filter(curso_id=curso_filter)
+    
+    # Handle approval/rejection
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        inscricao_id = request.POST.get('inscricao_id')
+        
+        try:
+            inscricao = Inscricao.objects.get(id=inscricao_id)
+            
+            if action == 'aprovar':
+                inscricao.aprovado = True
+                inscricao.data_resultado = timezone.now()
+                inscricao.save()
+                messages.success(request, f'Matrícula de {inscricao.nome_completo} aprovada com sucesso!')
+            elif action == 'rejeitar':
+                inscricao.aprovado = False
+                inscricao.data_resultado = None
+                inscricao.save()
+                messages.success(request, f'Matrícula de {inscricao.nome_completo} rejeitada!')
+        except Inscricao.DoesNotExist:
+            messages.error(request, 'Matrícula não encontrada!')
+        
+        return redirect('matricula')
+    
+    cursos = Curso.objects.all()
+    
+    context = {
+        'inscricoes': inscricoes,
+        'cursos': cursos,
+        'status_filter': status_filter,
+        'curso_filter': curso_filter,
+        'total': Inscricao.objects.count(),
+        'aprovadas': Inscricao.objects.filter(aprovado=True).count(),
+        'pendentes': Inscricao.objects.filter(aprovado=False).count(),
+    }
     return render(request, 'core/matricula_view.html', context)
+
+@login_required
+def termo_renovacao(request):
+    """View para termo de renovação de matrícula"""
+    inscricoes_aprovadas = Inscricao.objects.filter(aprovado=True).select_related('curso')
+    
+    if request.method == 'POST':
+        inscricao_id = request.POST.get('inscricao_id')
+        try:
+            inscricao = Inscricao.objects.get(id=inscricao_id)
+            messages.success(request, f'Termo de renovação processado para {inscricao.nome_completo}!')
+            return redirect('termo_renovacao')
+        except Inscricao.DoesNotExist:
+            messages.error(request, 'Matrícula não encontrada!')
+    
+    context = {'inscricoes': inscricoes_aprovadas}
+    return render(request, 'core/termo_renovacao_view.html', context)
+
+@login_required
+def receber_documento_matricula(request):
+    """View para receber documento de matrícula"""
+    inscricoes_aprovadas = Inscricao.objects.filter(aprovado=True).select_related('curso')
+    
+    if request.method == 'POST':
+        inscricao_id = request.POST.get('inscricao_id')
+        try:
+            inscricao = Inscricao.objects.get(id=inscricao_id)
+            messages.success(request, f'Documento de matrícula entregue para {inscricao.nome_completo}!')
+            return redirect('receber_documento_matricula')
+        except Inscricao.DoesNotExist:
+            messages.error(request, 'Matrícula não encontrada!')
+    
+    context = {'inscricoes': inscricoes_aprovadas}
+    return render(request, 'core/receber_documento_matricula_view.html', context)
 
 @login_required
 def lista_estudantes(request):

@@ -35,7 +35,11 @@ urlpatterns = [
     path('anos-academicos/<int:pk>/editar/', views.ano_academico_edit, name='ano_academico_edit'),
     
     # URLs para Menus do Painel Principal
+    path('gestao-estudantes/', views.gestao_estudantes, name='gestao_estudantes'),
+    path('admissao/', views.admissao, name='admissao'),
     path('admissao-estudantes/', views.admissao_estudantes, name='admissao_estudantes'),
+    path('termo-renovacao/', views.termo_renovacao, name='termo_renovacao'),
+    path('receber-documento-matricula/', views.receber_documento_matricula, name='receber_documento_matricula'),
     path('assiduidade/', views.assiduidade, name='assiduidade'),
     path('assiduidade-docentes/', views.assiduidade_docentes, name='assiduidade_docentes'),
     path('atribuicao-turmas/', views.atribuicao_turmas, name='atribuicao_turmas'),

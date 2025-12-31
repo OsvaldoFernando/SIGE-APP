@@ -5,13 +5,204 @@
 {% block content %}
 <div class="container my-5">
     <a href="{% url 'gestao_estudantes' %}" style="text-decoration: none; color: #666; margin-bottom: 15px; display: inline-block;">← Voltar</a>
-    <h2>Matrícula</h2>
-    <hr>
+    
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>Gestão de Matrículas</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="/nova-matricula/" class="btn btn-primary">+ Nova Matrícula</a>
+        </div>
+    </div>
+    
+    <!-- Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Matrículas</h5>
+                    <h2 class="text-primary">{{ total }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Aprovadas</h5>
+                    <h2 class="text-success">{{ aprovadas }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Pendentes</h5>
+                    <h2 class="text-warning">{{ pendentes }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <div class="card">
+    <!-- Filters -->
+    <div class="card mb-4">
         <div class="card-body">
-            <p class="text-muted">Realizar e gerenciar matrículas de estudantes.</p>
+            <h5 class="card-title">Filtros</h5>
+            <form method="GET" class="row g-3">
+                <div class="col-md-6">
+                    <label for="status" class="form-label">Status</label>
+                    <select id="status" name="status" class="form-select">
+                        <option value="todos" {% if status_filter == 'todos' %}selected{% endif %}>Todos</option>
+                        <option value="pendente" {% if status_filter == 'pendente' %}selected{% endif %}>Pendentes</option>
+                        <option value="aprovado" {% if status_filter == 'aprovado' %}selected{% endif %}>Aprovadas</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="curso" class="form-label">Curso</label>
+                    <select id="curso" name="curso" class="form-select">
+                        <option value="">Todos os Cursos</option>
+                        {% for curso in cursos %}
+                            <option value="{{ curso.id }}" {% if curso_filter|slugify == curso.id|slugify %}selected{% endif %}>
+                                {{ curso.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                    <a href="{% url 'matricula' %}" class="btn btn-secondary">Limpar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Enrollments Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Lista de Matrículas</h5>
+        </div>
+        <div class="card-body">
+            {% if inscricoes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nº Inscrição</th>
+                                <th>Nome</th>
+                                <th>Curso</th>
+                                <th>Data de Inscrição</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inscricao in inscricoes %}
+                                <tr>
+                                    <td><strong>{{ inscricao.numero_inscricao }}</strong></td>
+                                    <td>{{ inscricao.nome_completo }}</td>
+                                    <td>{{ inscricao.curso.nome }}</td>
+                                    <td>{{ inscricao.data_inscricao|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        {% if inscricao.aprovado %}
+                                            <span class="badge bg-success">Aprovada</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Pendente</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detalhesModal" 
+                                                onclick="carregarDetalhes({{ inscricao.id }}, '{{ inscricao.nome_completo|escapejs }}', '{{ inscricao.numero_inscricao }}', '{{ inscricao.aprovado|lower }}')">
+                                            Ver Detalhes
+                                        </button>
+                                        
+                                        {% if not inscricao.aprovado %}
+                                            <form method="POST" style="display: inline;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="inscricao_id" value="{{ inscricao.id }}">
+                                                <input type="hidden" name="action" value="aprovar">
+                                                <button type="submit" class="btn btn-sm btn-success" onclick="return confirm('Confirmar aprovação?')">
+                                                    Aprovar
+                                                </button>
+                                            </form>
+                                            <form method="POST" style="display: inline;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="inscricao_id" value="{{ inscricao.id }}">
+                                                <input type="hidden" name="action" value="rejeitar">
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Confirmar rejeição?')">
+                                                    Rejeitar
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <p class="mb-0">Nenhuma matrícula encontrada com os filtros selecionados.</p>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detalhesModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalhes da Matrícula</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="modalContent">Carregando...</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function carregarDetalhes(id, nome, numero, aprovado) {
+    // You can expand this to load full details from the server
+    document.getElementById('modalContent').innerHTML = `
+        <h6>Informações Básicas</h6>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p><strong>Número de Inscrição:</strong> ${numero}</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Status:</strong> ${aprovado === 'true' ? '<span class="badge bg-success">Aprovada</span>' : '<span class="badge bg-warning">Pendente</span>'}</p>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <p><strong>Nome Completo:</strong> ${nome}</p>
+            </div>
+        </div>
+        <p class="text-muted">Para ver mais detalhes, utilize a tabela acima.</p>
+    `;
+}
+</script>
+
+<style>
+    .btn {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.85rem;
+    }
+    
+    .table td {
+        vertical-align: middle;
+    }
+</style>
 {% endblock %}

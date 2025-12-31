@@ -8,15 +8,10 @@
         <div style="width: 280px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 20px; position: fixed; left: 0; top: 80px; height: calc(100vh - 80px); overflow-y: auto;">
             <h5 style="color: #fff; margin-bottom: 20px;">Gestão de Estudantes</h5>
             <ul style="list-style: none; padding: 0; margin: 0;">
-                <li><a href="{% url 'admissao' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📋 Admissão</a></li>
-                <li><a href="{% url 'matricula' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📝 Matrícula</a></li>
-                <li><a href="{% url 'lista_estudantes' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">👥 Lista de Estudantes</a></li>
-                <li><a href="{% url 'assiduidade' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📅 Assiduidade e Justificativas</a></li>
-                <li><a href="{% url 'certificados' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">🎖️ Certificados</a></li>
-                <li><a href="{% url 'historico' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📚 Histórico Escolar</a></li>
-                <li><a href="{% url 'materiais' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📖 Materiais de Apoio</a></li>
-                <li><a href="{% url 'solicitacao_docs' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">🗂️ Solicitação de Documentos</a></li>
-                <li><a href="{% url 'atividades_extracurriculares' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">🎭 Atividades Extracurriculares</a></li>
+                <li><a href="/nova-matricula/" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📊 Nova Matrícula</a></li>
+                <li><a href="{% url 'matricula' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📝 Gestão de Matrícula</a></li>
+                <li><a href="{% url 'termo_renovacao' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">🔄 Termo de Renovação</a></li>
+                <li><a href="{% url 'receber_documento_matricula' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📄 Receber Documento</a></li>
             </ul>
         </div>
 
@@ -25,66 +20,31 @@
             <h1 style="color: #1e3c72; margin-bottom: 30px;">Gestão de Estudantes</h1>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                <a href="{% url 'admissao' %}" style="text-decoration: none;">
+                <a href="/nova-matricula/" style="text-decoration: none;">
                     <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #1e3c72; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
-                        <h5 style="color: #1e3c72; margin-bottom: 10px;">📋 Admissão</h5>
-                        <p style="color: #666; margin: 0;">Gerenciar admissões e inscrições de candidatos.</p>
+                        <h5 style="color: #1e3c72; margin-bottom: 10px;">📊 Nova Matrícula</h5>
+                        <p style="color: #666; margin: 0;">Selecionar tipo de matrícula e cadastrar alunos.</p>
                     </div>
                 </a>
 
                 <a href="{% url 'matricula' %}" style="text-decoration: none;">
                     <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #17a2b8; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
-                        <h5 style="color: #17a2b8; margin-bottom: 10px;">📝 Matrícula</h5>
+                        <h5 style="color: #17a2b8; margin-bottom: 10px;">📝 Gestão de Matrícula</h5>
                         <p style="color: #666; margin: 0;">Realizar e gerenciar matrículas de estudantes.</p>
                     </div>
                 </a>
 
-                <a href="{% url 'lista_estudantes' %}" style="text-decoration: none;">
+                <a href="{% url 'termo_renovacao' %}" style="text-decoration: none;">
                     <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #28a745; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
-                        <h5 style="color: #28a745; margin-bottom: 10px;">👥 Lista de Estudantes</h5>
-                        <p style="color: #666; margin: 0;">Visualizar lista completa de estudantes.</p>
+                        <h5 style="color: #28a745; margin-bottom: 10px;">🔄 Termo de Renovação</h5>
+                        <p style="color: #666; margin: 0;">Processar termos de renovação de matrículas.</p>
                     </div>
                 </a>
 
-                <a href="{% url 'assiduidade' %}" style="text-decoration: none;">
+                <a href="{% url 'receber_documento_matricula' %}" style="text-decoration: none;">
                     <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #ffc107; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
-                        <h5 style="color: #ffc107; margin-bottom: 10px;">📅 Assiduidade e Justificativas</h5>
-                        <p style="color: #666; margin: 0;">Controlar presenças e faltas.</p>
-                    </div>
-                </a>
-
-                <a href="{% url 'certificados' %}" style="text-decoration: none;">
-                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #dc3545; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
-                        <h5 style="color: #dc3545; margin-bottom: 10px;">🎖️ Certificados</h5>
-                        <p style="color: #666; margin: 0;">Gerar e gerenciar certificados.</p>
-                    </div>
-                </a>
-
-                <a href="{% url 'historico' %}" style="text-decoration: none;">
-                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #6f42c1; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
-                        <h5 style="color: #6f42c1; margin-bottom: 10px;">📚 Histórico Escolar</h5>
-                        <p style="color: #666; margin: 0;">Consultar histórico acadêmico.</p>
-                    </div>
-                </a>
-
-                <a href="{% url 'materiais' %}" style="text-decoration: none;">
-                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #20c997; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
-                        <h5 style="color: #20c997; margin-bottom: 10px;">📖 Materiais de Apoio</h5>
-                        <p style="color: #666; margin: 0;">Distribuir e gerenciar materiais educativos.</p>
-                    </div>
-                </a>
-
-                <a href="{% url 'solicitacao_docs' %}" style="text-decoration: none;">
-                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #e83e8c; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
-                        <h5 style="color: #e83e8c; margin-bottom: 10px;">🗂️ Solicitação de Documentos</h5>
-                        <p style="color: #666; margin: 0;">Gerenciar solicitações de documentos.</p>
-                    </div>
-                </a>
-
-                <a href="{% url 'atividades_extracurriculares' %}" style="text-decoration: none;">
-                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #fd7e14; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
-                        <h5 style="color: #fd7e14; margin-bottom: 10px;">🎭 Atividades Extracurriculares</h5>
-                        <p style="color: #666; margin: 0;">Gerenciar atividades e eventos.</p>
+                        <h5 style="color: #ffc107; margin-bottom: 10px;">📄 Receber Documento</h5>
+                        <p style="color: #666; margin: 0;">Registrar recebimento de documentos de matrícula.</p>
                     </div>
                 </a>
             </div>

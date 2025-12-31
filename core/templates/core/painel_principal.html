@@ -763,23 +763,12 @@
     <h3 class="mb-4" style="color: #1e3a8a;">👥 Gestão de Estudantes</h3>
     <div class="row g-3 mb-5">
         <div class="col-md-4 col-lg-3">
-            <a href="{% url 'admissao_estudantes' %}" class="text-decoration-none">
+            <a href="/nova-matricula/" class="text-decoration-none">
                 <div class="card border-0 shadow-sm h-100 card-menu">
                     <div class="card-body">
-                        <div style="font-size: 2rem;">📝</div>
-                        <h6 class="card-title text-dark">Admissão</h6>
-                        <p class="card-text small text-muted">Inscrições</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-4 col-lg-3">
-            <a href="{% url 'lista_estudantes' %}" class="text-decoration-none">
-                <div class="card border-0 shadow-sm h-100 card-menu">
-                    <div class="card-body">
-                        <div style="font-size: 2rem;">👥</div>
-                        <h6 class="card-title text-dark">Estudantes</h6>
-                        <p class="card-text small text-muted">Lista completa</p>
+                        <div style="font-size: 2rem;">📊</div>
+                        <h6 class="card-title text-dark">Nova Matrícula</h6>
+                        <p class="card-text small text-muted">Cadastros</p>
                     </div>
                 </div>
             </a>
@@ -788,20 +777,31 @@
             <a href="{% url 'matricula' %}" class="text-decoration-none">
                 <div class="card border-0 shadow-sm h-100 card-menu">
                     <div class="card-body">
-                        <div style="font-size: 2rem;">✍️</div>
-                        <h6 class="card-title text-dark">Matrícula</h6>
+                        <div style="font-size: 2rem;">📝</div>
+                        <h6 class="card-title text-dark">Gestão Matrícula</h6>
                         <p class="card-text small text-muted">Registros</p>
                     </div>
                 </div>
             </a>
         </div>
         <div class="col-md-4 col-lg-3">
-            <a href="{% url 'assiduidade' %}" class="text-decoration-none">
+            <a href="/termo-renovacao/" class="text-decoration-none">
                 <div class="card border-0 shadow-sm h-100 card-menu">
                     <div class="card-body">
-                        <div style="font-size: 2rem;">📊</div>
-                        <h6 class="card-title text-dark">Assiduidade</h6>
-                        <p class="card-text small text-muted">Frequência</p>
+                        <div style="font-size: 2rem;">🔄</div>
+                        <h6 class="card-title text-dark">Renovação</h6>
+                        <p class="card-text small text-muted">Termo renovação</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-4 col-lg-3">
+            <a href="/receber-documento-matricula/" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body">
+                        <div style="font-size: 2rem;">📄</div>
+                        <h6 class="card-title text-dark">Documentos</h6>
+                        <p class="card-text small text-muted">Receber doc</p>
                     </div>
                 </div>
             </a>

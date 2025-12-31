@@ -1,0 +1,69 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Nova Matrícula - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="breadcrumb">
+        <a href="{% url 'gestao_estudantes' %}">Matrícula</a> &gt; <span>Nova matrícula</span>
+    </div>
+
+    <div class="alert alert-danger mt-4 mb-4" style="background-color: #dc3545; color: white; padding: 15px; border-radius: 5px;">
+        <strong>Escolha um tipo de matrícula:</strong>
+    </div>
+
+    <div class="row g-4">
+        {% for tipo in tipos_matricula %}
+            <div class="col-md-6">
+                <div class="card h-100" style="border-left: 5px solid #{{ tipo.cor|slice:'11:17' }}; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div class="card-body">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                            <div>
+                                <span style="font-size: 2.5rem; margin-right: 15px;">{{ tipo.icone }}</span>
+                            </div>
+                            <div style="flex: 1;">
+                                <h5 class="card-title" style="margin: 0; color: #1e3a8a;">{{ tipo.titulo }}</h5>
+                            </div>
+                        </div>
+                        <p class="card-text text-muted" style="font-size: 0.95rem; margin-bottom: 15px;">{{ tipo.descricao }}</p>
+                        <a href="{{ tipo.url }}" class="btn btn-sm w-100" 
+                           style="background-color: {% if tipo.id == 'novato' %}#0d6efd{% elif tipo.id == 'veterano' %}#198754{% elif 'rematricula' in tipo.id %}#0dcaf0{% else %}#ffc107{% endif %}; color: {% if tipo.id == 'selecionado' %}black{% else %}white{% endif %}; padding: 8px 12px; text-transform: uppercase; font-size: 0.75rem; font-weight: bold;">
+                            {{ tipo.botao }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .breadcrumb {
+        padding: 10px 0;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+    }
+    
+    .breadcrumb a {
+        color: #666;
+        text-decoration: none;
+    }
+    
+    .breadcrumb a:hover {
+        text-decoration: underline;
+    }
+    
+    .breadcrumb span {
+        color: #999;
+    }
+    
+    .card {
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
