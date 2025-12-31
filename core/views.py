@@ -52,12 +52,17 @@ def index(request):
     config = ConfiguracaoEscola.objects.first()
     anos_academicos = AnoAcademico.objects.all()
     
+    # Adicionar cálculo de receita diária (exemplo simplificado)
+    # Aqui você pode buscar do modelo de Pagamentos se existir
+    receita_hoje = 0.00
+    
     return render(request, 'core/index.html', {
         'cursos': cursos,
         'config': config,
         'anos_academicos': anos_academicos,
         'ano_atual': ano_atual,
-        'semestre_atual': semestre_atual
+        'semestre_atual': semestre_atual,
+        'receita_hoje': receita_hoje
     })
 
 def inscricao_create(request, curso_id):
@@ -1228,11 +1233,6 @@ def syllabus(request):
     return render(request, 'core/syllabus.html', context)
 
 @login_required
-def gestao_estudantes(request):
-    """View para página principal de gestão de estudantes"""
-    return render(request, 'core/gestao_estudantes.html')
-
-@login_required
 def admissao(request):
     """View para admissão de estudantes"""
     context = {}
@@ -1241,56 +1241,7 @@ def admissao(request):
 @login_required
 def selecionar_tipo_matricula(request):
     """View para selecionar tipo de matrícula"""
-    context = {
-        'tipos_matricula': [
-            {
-                'id': 'novato',
-                'titulo': 'Aluno Novato',
-                'descricao': 'Aluno recém-chegado à instituição, ou que ainda não tem cadastro neste sistema',
-                'icone': '👤',
-                'cor': 'btn-primary',
-                'botao': 'INICIAR CADASTRO DO ALUNO',
-                'url': '/inscricao/1/'
-            },
-            {
-                'id': 'veterano',
-                'titulo': 'Aluno Veterano',
-                'descricao': 'Aluno já estudou nesta instituição e que já tem cadastro neste sistema',
-                'icone': '👥',
-                'cor': 'btn-success',
-                'botao': 'ENCONTRAR O CADASTRO DO ALUNO PARA REALIZAR A MATRÍCULA',
-                'url': '#'
-            },
-            {
-                'id': 'rematricula_individual',
-                'titulo': 'Rematrícula individual',
-                'descricao': 'Aluno que estudou no ano atual e que continuará no próximo ano.',
-                'icone': '↻',
-                'cor': 'btn-info',
-                'botao': 'BUSCAR ALUNO',
-                'url': '/matricula/'
-            },
-            {
-                'id': 'rematricula_lote',
-                'titulo': 'Rematrícula em lote',
-                'descricao': 'Alunos que estudaram no ano atual e que irão continuar no próximo ano.',
-                'icone': '↻↻',
-                'cor': 'btn-info',
-                'botao': 'ESCOLHER O ANO LETIVO E TURMA',
-                'url': '#'
-            },
-            {
-                'id': 'selecionado',
-                'titulo': 'Aluno Selecionado',
-                'descricao': 'Aluno que foi selecionado ou aprovado em um processo seletivo da instituição',
-                'icone': '✓',
-                'cor': 'btn-warning',
-                'botao': 'ESCOLHER O CONCURSO E ALUNO PARA REALIZAR A MATRÍCULA',
-                'url': '#'
-            }
-        ]
-    }
-    return render(request, 'core/selecionar_tipo_matricula.html', context)
+    return render(request, 'core/selecionar_tipo_matricula.html')
 
 @login_required
 def matricula(request):

@@ -154,6 +154,8 @@
                     <span class="opacity-50">|</span>
                     <span><i class="bi bi-clock-history"></i> {{ semestre_atual.get_nome_display }}</span>
                     {% endif %}
+                    <span class="opacity-50">|</span>
+                    <span id="relogio-digital"><i class="bi bi-clock"></i> 00:00:00</span>
                 </div>
                 {% endif %}
             </div>
@@ -163,6 +165,9 @@
                 </a>
                 <a href="{% url 'cursos_lista' %}" title="Cursos" class="btn btn-link text-white p-2">
                     <i class="bi bi-mortarboard fs-4"></i>
+                </a>
+                <a href="{% url 'matricula' %}" title="Matrículas" class="btn btn-link text-white p-2">
+                    <i class="bi bi-people fs-4"></i>
                 </a>
                 {% if user.is_staff %}
                     <a href="{% url 'perfis_pendentes' %}" title="Perfis Pendentes" class="btn btn-link text-white p-2 position-relative">
@@ -375,6 +380,15 @@
             const agora = new Date();
             const horaNum = agora.getHours();
             
+            // Atualizar Relógio Digital
+            const relogioElement = document.getElementById('relogio-digital');
+            if (relogioElement) {
+                const horas = String(agora.getHours()).padStart(2, '0');
+                const minutos = String(agora.getMinutes()).padStart(2, '0');
+                const segundos = String(agora.getSeconds()).padStart(2, '0');
+                relogioElement.innerHTML = `<i class="bi bi-clock"></i> ${horas}:${minutos}:${segundos}`;
+            }
+            
             let saudacao;
             if (horaNum >= 5 && horaNum < 12) {
                 saudacao = 'Bom dia';
@@ -390,9 +404,9 @@
             }
         }
         
-        // Chamar ao carregar e atualizar a cada minuto
+        // Chamar ao carregar e atualizar a cada segundo para o relógio
         atualizarCumprimento();
-        setInterval(atualizarCumprimento, 60000);
+        setInterval(atualizarCumprimento, 1000);
         
         // Atualizar contagem de notificações
         function atualizarNotificacoesCount() {

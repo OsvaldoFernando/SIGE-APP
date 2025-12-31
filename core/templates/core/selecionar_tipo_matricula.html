@@ -3,66 +3,137 @@
 {% block title %}Nova Matrícula - SIGE{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="breadcrumb">
-        <a href="{% url 'gestao_estudantes' %}">Matrícula</a> &gt; <span>Nova matrícula</span>
+<div class="container-fluid px-4 my-4" style="font-family: Arial, sans-serif;">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb mb-3" style="font-size: 13px; color: #666; background: transparent; padding: 0;">
+        <i class="bi bi-pencil-square me-1"></i> Matrícula <span class="mx-1">&gt;</span> <span class="text-muted">Nova matrícula</span>
     </div>
 
-    <div class="alert alert-danger mt-4 mb-4" style="background-color: #dc3545; color: white; padding: 15px; border-radius: 5px;">
-        <strong>Escolha um tipo de matrícula:</strong>
+    <!-- Red Header Bar -->
+    <div class="d-flex align-items-center mb-4" style="background-color: #E74C3C; color: white; padding: 10px 15px; border-radius: 2px;">
+        <i class="bi bi-list me-2" style="font-size: 18px;"></i>
+        <span style="font-size: 16px;">Escolha um tipo de matrícula:</span>
     </div>
 
     <div class="row g-4">
-        {% for tipo in tipos_matricula %}
-            <div class="col-md-6">
-                <div class="card h-100" style="border-left: 5px solid #{{ tipo.cor|slice:'11:17' }}; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <div class="card-body">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
-                            <div>
-                                <span style="font-size: 2.5rem; margin-right: 15px;">{{ tipo.icone }}</span>
-                            </div>
-                            <div style="flex: 1;">
-                                <h5 class="card-title" style="margin: 0; color: #1e3a8a;">{{ tipo.titulo }}</h5>
-                            </div>
+        <!-- Aluno Novato (Blue) -->
+        <div class="col-md-6">
+            <a href="/inscricao/1/" class="text-decoration-none">
+                <div class="card border-0 h-100" style="background-color: #3498DB; color: white; border-radius: 2px; overflow: hidden; min-height: 160px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div class="card-body p-4 d-flex">
+                        <div class="flex-shrink-0 me-4">
+                            <i class="bi bi-person-fill" style="font-size: 80px; line-height: 1; opacity: 1;"></i>
                         </div>
-                        <p class="card-text text-muted" style="font-size: 0.95rem; margin-bottom: 15px;">{{ tipo.descricao }}</p>
-                        <a href="{{ tipo.url }}" class="btn btn-sm w-100" 
-                           style="background-color: {% if tipo.id == 'novato' %}#0d6efd{% elif tipo.id == 'veterano' %}#198754{% elif 'rematricula' in tipo.id %}#0dcaf0{% else %}#ffc107{% endif %}; color: {% if tipo.id == 'selecionado' %}black{% else %}white{% endif %}; padding: 8px 12px; text-transform: uppercase; font-size: 0.75rem; font-weight: bold;">
-                            {{ tipo.botao }}
-                        </a>
+                        <div class="flex-grow-1 text-end">
+                            <h2 style="font-weight: 300; font-size: 38px; margin-bottom: 5px; letter-spacing: -1px;">Aluno Novato</h2>
+                            <p style="font-size: 13px; opacity: 0.9; margin: 0; line-height: 1.4;">Aluno recém-chegado à instituição, ou que<br>ainda não tem cadastro neste sistema.</p>
+                        </div>
+                    </div>
+                    <div class="card-footer border-0 py-2 px-3 d-flex justify-content-between align-items-center" style="background-color: rgba(0,0,0,0.15);">
+                        <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Iniciar cadastro do aluno</span>
+                        <i class="bi bi-arrow-right-circle" style="font-size: 18px;"></i>
                     </div>
                 </div>
-            </div>
-        {% endfor %}
+            </a>
+        </div>
+
+        <!-- Aluno Veterano (Green) -->
+        <div class="col-md-6">
+            <a href="#" class="text-decoration-none">
+                <div class="card border-0 h-100" style="background-color: #16A085; color: white; border-radius: 2px; overflow: hidden; min-height: 160px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div class="card-body p-4 d-flex">
+                        <div class="flex-shrink-0 me-4">
+                            <i class="bi bi-person-badge-fill" style="font-size: 80px; line-height: 1; opacity: 1;"></i>
+                        </div>
+                        <div class="flex-grow-1 text-end">
+                            <h2 style="font-weight: 300; font-size: 38px; margin-bottom: 5px; letter-spacing: -1px;">Aluno Veterano</h2>
+                            <p style="font-size: 13px; opacity: 0.9; margin: 0; line-height: 1.4;">Aluno já estudou nesta instituição e que<br>já tem cadastro neste sistema.</p>
+                        </div>
+                    </div>
+                    <div class="card-footer border-0 py-2 px-3 d-flex justify-content-between align-items-center" style="background-color: rgba(0,0,0,0.15);">
+                        <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Encontrar o cadastro do aluno para realizar a matrícula</span>
+                        <i class="bi bi-arrow-right-circle" style="font-size: 18px;"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Rematrícula individual (Purple) -->
+        <div class="col-md-6">
+            <a href="{% url 'matricula' %}" class="text-decoration-none">
+                <div class="card border-0 h-100" style="background-color: #8E44AD; color: white; border-radius: 2px; overflow: hidden; min-height: 160px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div class="card-body p-4 d-flex">
+                        <div class="flex-shrink-0 me-4 d-flex align-items-center">
+                            <i class="bi bi-arrow-repeat" style="font-size: 80px; line-height: 1; opacity: 1;"></i>
+                            <i class="bi bi-person-fill ms-2" style="font-size: 40px;"></i>
+                        </div>
+                        <div class="flex-grow-1 text-end">
+                            <h2 style="font-weight: 300; font-size: 38px; margin-bottom: 5px; letter-spacing: -1px;">Rematrícula <span style="font-size: 24px;">individual</span></h2>
+                            <p style="font-size: 13px; opacity: 0.9; margin: 0; line-height: 1.4;">Aluno que estudou no ano atual<br>e que continuará no próximo ano.</p>
+                        </div>
+                    </div>
+                    <div class="card-footer border-0 py-2 px-3 d-flex justify-content-between align-items-center" style="background-color: rgba(0,0,0,0.15);">
+                        <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Buscar aluno</span>
+                        <i class="bi bi-arrow-right-circle" style="font-size: 18px;"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Rematrícula em lote (Purple) -->
+        <div class="col-md-6">
+            <a href="#" class="text-decoration-none">
+                <div class="card border-0 h-100" style="background-color: #8E44AD; color: white; border-radius: 2px; overflow: hidden; min-height: 160px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div class="card-body p-4 d-flex">
+                        <div class="flex-shrink-0 me-4 d-flex align-items-center">
+                            <i class="bi bi-arrow-repeat" style="font-size: 80px; line-height: 1; opacity: 1;"></i>
+                            <i class="bi bi-people-fill ms-2" style="font-size: 40px;"></i>
+                        </div>
+                        <div class="flex-grow-1 text-end">
+                            <h2 style="font-weight: 300; font-size: 38px; margin-bottom: 5px; letter-spacing: -1px;">Rematrícula <span style="font-size: 24px;">em lote</span></h2>
+                            <p style="font-size: 13px; opacity: 0.9; margin: 0; line-height: 1.4;">Alunos que estudaram no ano atual<br>e que irão continuar no próximo ano.</p>
+                        </div>
+                    </div>
+                    <div class="card-footer border-0 py-2 px-3 d-flex justify-content-between align-items-center" style="background-color: rgba(0,0,0,0.15);">
+                        <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Escolher o ano letivo e turma</span>
+                        <i class="bi bi-arrow-right-circle" style="font-size: 18px;"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Aluno Selecionado (Orange) -->
+        <div class="col-md-6">
+            <a href="#" class="text-decoration-none">
+                <div class="card border-0 h-100" style="background-color: #F39C12; color: white; border-radius: 2px; overflow: hidden; min-height: 160px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div class="card-body p-4 d-flex">
+                        <div class="flex-shrink-0 me-4">
+                            <i class="bi bi-pencil-square" style="font-size: 80px; line-height: 1; opacity: 1;"></i>
+                        </div>
+                        <div class="flex-grow-1 text-end">
+                            <h2 style="font-weight: 300; font-size: 38px; margin-bottom: 5px; letter-spacing: -1px;">Aluno Selecionado</h2>
+                            <p style="font-size: 13px; opacity: 0.9; margin: 0; line-height: 1.4;">Aluno que foi sorteado ou aprovado em um<br>processo seletivo da instituição.</p>
+                        </div>
+                    </div>
+                    <div class="card-footer border-0 py-2 px-3 d-flex justify-content-between align-items-center" style="background-color: rgba(0,0,0,0.15);">
+                        <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Escolher o concurso e aluno para realizar a matrícula</span>
+                        <i class="bi bi-arrow-right-circle" style="font-size: 18px;"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
     </div>
 </div>
 
 <style>
-    .breadcrumb {
-        padding: 10px 0;
-        margin-bottom: 20px;
-        font-size: 0.9rem;
+    body {
+        background-color: #f8f9fa !important;
     }
-    
-    .breadcrumb a {
-        color: #666;
-        text-decoration: none;
-    }
-    
-    .breadcrumb a:hover {
-        text-decoration: underline;
-    }
-    
-    .breadcrumb span {
-        color: #999;
-    }
-    
     .card {
-        transition: all 0.3s ease;
+        transition: transform 0.1s ease, filter 0.1s ease;
     }
-    
     .card:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        filter: brightness(1.05);
         transform: translateY(-2px);
     }
 </style>

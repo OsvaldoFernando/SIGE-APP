@@ -52,6 +52,16 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%); color: white;">
+                <div class="card-body">
+                    <div style="font-size: 2rem;">💰</div>
+                    <h6 class="card-title">Receita Hoje</h6>
+                    <h2 class="mb-0">Kz {{ receita_hoje|default:"0,00" }}</h2>
+                    <small style="opacity: 0.8;">entrada diária</small>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Barra de Pesquisa e Controle de Menus -->
@@ -74,48 +84,26 @@
     <div id="menusContainer">
         <!-- SEÇÃO DE MATRÍCULA (ADICIONADA) -->
         <div class="menu-section">
-            <h3 class="mb-4 menu-title" style="color: #1e3a8a; text-align: center;">📝 Alunos e Matrículas</h3>
+            <h3 class="mb-4 menu-title" style="color: #1e3a8a; text-align: left;">📝 Alunos e Matrículas</h3>
             <div class="row g-3 mb-5 menu-items">
                 <div class="col-md-4 col-lg-3 menu-item">
                     <a href="{% url 'matricula' %}" class="text-decoration-none">
                         <div class="card border-0 shadow-sm h-100 card-menu" style="border-left: 4px solid #1e3a8a !important;">
                             <div class="card-body">
                                 <div style="font-size: 2rem;">📝</div>
-                                <h6 class="card-title text-dark">Nova Matrícula</h6>
-                                <p class="card-text small text-muted">Efetuar matrícula de aluno</p>
+                                <h6 class="card-title text-dark">Gestão de Matrícula</h6>
+                                <p class="card-text small text-muted">Gerenciar matrículas de alunos</p>
                             </div>
                         </div>
                     </a>
                 </div>
                 <div class="col-md-4 col-lg-3 menu-item">
-                    <a href="{% url 'admissao' %}" class="text-decoration-none">
+                    <a href="{% url 'nova_matricula' %}" class="text-decoration-none">
                         <div class="card border-0 shadow-sm h-100 card-menu">
                             <div class="card-body">
                                 <div style="font-size: 2rem;">📥</div>
-                                <h6 class="card-title text-dark">Admissão</h6>
-                                <p class="card-text small text-muted">Processo de admissão</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-4 col-lg-3 menu-item">
-                    <a href="{% url 'lista_estudantes' %}" class="text-decoration-none">
-                        <div class="card border-0 shadow-sm h-100 card-menu">
-                            <div class="card-body">
-                                <div style="font-size: 2rem;">👥</div>
-                                <h6 class="card-title text-dark">Lista de Alunos</h6>
-                                <p class="card-text small text-muted">Ver todos os estudantes</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-4 col-lg-3 menu-item">
-                    <a href="{% url 'gestao_estudantes' %}" class="text-decoration-none">
-                        <div class="card border-0 shadow-sm h-100 card-menu">
-                            <div class="card-body">
-                                <div style="font-size: 2rem;">⚙️</div>
-                                <h6 class="card-title text-dark">Gestão Escolar</h6>
-                                <p class="card-text small text-muted">Configurações acadêmicas</p>
+                                <h6 class="card-title text-dark">Nova Matrícula</h6>
+                                <p class="card-text small text-muted">Processo de nova matrícula</p>
                             </div>
                         </div>
                     </a>
