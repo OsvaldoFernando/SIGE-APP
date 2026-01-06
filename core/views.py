@@ -1098,6 +1098,48 @@ def trocar_ano(request):
 @login_required
 def perfil_usuario(request):
     """View para exibir e editar perfil do usuário"""
+    try:
+        perfil = request.user.perfil
+    except Exception:
+        from .models import PerfilUsuario
+        perfil = PerfilUsuario.objects.create(usuario=request.user)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'update_photo' and request.FILES.get('foto'):
+            perfil.foto = request.FILES.get('foto')
+            perfil.save()
+            messages.success(request, 'Foto de perfil atualizada com sucesso!')
+            
+        elif action == 'update_profile':
+            nome_completo = request.POST.get('nome', '').strip()
+            if nome_completo:
+                partes = nome_completo.split(' ')
+                request.user.first_name = partes[0]
+                request.user.last_name = ' '.join(partes[1:]) if len(partes) > 1 else ''
+            
+            request.user.email = request.POST.get('email')
+            request.user.save()
+            perfil.telefone = request.POST.get('telefone')
+            perfil.save()
+            messages.success(request, 'Perfil atualizado com sucesso!')
+            
+        elif action == 'change_password':
+            from django.contrib.auth import update_session_auth_hash
+            from django.contrib.auth.forms import PasswordChangeForm
+            form = PasswordChangeForm(request.user, request.POST)
+            if form.is_valid():
+                user = form.save()
+                update_session_auth_hash(request, user)
+                messages.success(request, 'Senha alterada com sucesso!')
+            else:
+                for error_list in form.errors.values():
+                    for error in error_list:
+                        messages.error(request, error)
+        
+        return redirect('perfil_usuario')
+
     context = {
         'user': request.user,
     }

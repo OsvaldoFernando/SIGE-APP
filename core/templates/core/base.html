@@ -1,27 +1,33 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Sistema Escolar{% endblock %}</title>
+    <title>{% block title %}SIGE - Sistema Integrado de Gestão Educacional{% endblock %}</title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --secondary-color: #059669;
+            --accent-color: #f59e0b;
+            --light-bg: #f8fafc;
+        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
-            padding-top: 70px;
         }
         .navbar-top {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 75px;
-            background: #1e3a8a;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            height: 70px;
             color: white;
             display: flex;
             align-items: center;
@@ -42,8 +48,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
+            overflow: hidden;
             border: 2px solid rgba(255,255,255,0.2);
+        }
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         .academic-badge {
             background: rgba(255,255,255,0.1);
@@ -55,107 +66,54 @@
             align-items: center;
             gap: 8px;
         }
-        .user-greeting {
-            text-align: left;
-        }
-        .user-greeting-text {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
         .user-greeting-name {
             font-weight: bold;
             font-size: 1rem;
         }
-        .navbar-controls {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-        .navbar-controls a {
-            color: white;
-            text-decoration: none;
-            font-size: 1.3rem;
-            position: relative;
-            transition: opacity 0.3s;
-        }
-        .navbar-controls a:hover {
-            opacity: 0.8;
-        }
-        .badge-notification {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: #dc3545;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: bold;
-        }
         main {
             flex: 1;
+            padding-top: 20px;
         }
         .card {
             transition: transform 0.3s;
             height: 100%;
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
         .card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
-        .btn-custom {
-            background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);
-            border: none;
-            color: white;
-        }
-        .btn-custom:hover {
-            background: linear-gradient(135deg, #059669 0%, #1e3a8a 100%);
-            color: white;
-        }
         footer {
-            background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             color: white;
             padding: 20px 0;
             margin-top: auto;
         }
-        footer a {
-            color: rgba(255,255,255,0.9);
-            text-decoration: none;
-        }
-        footer a:hover {
-            color: white;
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
-    <!-- Top Navigation Bar -->
     {% if user.is_authenticated %}
     <div class="navbar-top">
         <div class="navbar-content d-flex justify-content-between align-items-center w-100">
-            <div class="d-flex align-items-center gap-4 flex-grow-1">
+            <div class="d-flex align-items-center gap-4">
                 <div class="user-info">
                     <div class="user-avatar">
-                        <i class="bi bi-person-circle"></i>
+                        {% if user.perfil.foto %}
+                            <img src="{{ user.perfil.foto.url }}" alt="{{ user.username }}">
+                        {% else %}
+                            <i class="bi bi-person-circle fs-2"></i>
+                        {% endif %}
                     </div>
-                    <div class="user-greeting">
-                        <div class="user-greeting-text small opacity-75" id="cumprimento-horario">Bem-vindo!</div>
-                        <div class="user-greeting-name fw-bold">{{ user.get_full_name|default:user.username }}</div>
+                    <div class="user-greeting d-none d-md-block">
+                        <div class="user-greeting-text small opacity-75">Olá,</div>
+                        <div class="user-greeting-name">{{ user.get_full_name|default:user.username }}</div>
                     </div>
                 </div>
                 {% if ano_atual %}
-                <div class="academic-badge">
+                <div class="academic-badge d-none d-lg-flex">
                     <span><i class="bi bi-calendar3"></i> {{ ano_atual }}</span>
-                    {% if semestre_atual %}
-                    <span class="opacity-50">|</span>
-                    <span><i class="bi bi-clock-history"></i> {{ semestre_atual.get_nome_display }}</span>
-                    {% endif %}
-                    <span class="opacity-50">|</span>
-                    <span id="relogio-digital"><i class="bi bi-clock"></i> 00:00:00</span>
                 </div>
                 {% endif %}
             </div>
@@ -164,24 +122,14 @@
                 <a href="{% url 'painel_principal' %}" title="Início" class="btn btn-link text-white p-2">
                     <i class="bi bi-house-door fs-4"></i>
                 </a>
-                <a href="{% url 'cursos_lista' %}" title="Cursos" class="btn btn-link text-white p-2">
+                <a href="{% url 'listar_cursos' %}" title="Cursos" class="btn btn-link text-white p-2">
                     <i class="bi bi-mortarboard fs-4"></i>
                 </a>
                 <a href="{% url 'matricula' %}" title="Matrículas" class="btn btn-link text-white p-2">
                     <i class="bi bi-people fs-4"></i>
                 </a>
-                {% if user.is_staff %}
-                    <a href="{% url 'perfis_pendentes' %}" title="Perfis Pendentes" class="btn btn-link text-white p-2 position-relative">
-                        <i class="bi bi-person-check fs-4"></i>
-                        <span class="badge-notification" id="perfis-pendentes-badge" style="display: none;">0</span>
-                    </a>
-                {% endif %}
-                <a href="{% url 'notificacoes' %}" title="Notificações" class="btn btn-link text-white p-2 position-relative">
-                    <i class="bi bi-bell fs-4"></i>
-                    <span class="badge-notification" id="notificacoes-badge" style="display: none;">0</span>
-                </a>
-                <a href="{% url 'admin:index' %}" title="Admin" class="btn btn-link text-white p-2">
-                    <i class="bi bi-speedometer2 fs-4"></i>
+                <a href="{% url 'perfil_usuario' %}" title="Meu Perfil" class="btn btn-link text-white p-2">
+                    <i class="bi bi-person-gear fs-4"></i>
                 </a>
                 <a href="{% url 'logout' %}" title="Sair" class="btn btn-link text-white p-2">
                     <i class="bi bi-box-arrow-right fs-4"></i>
@@ -191,269 +139,26 @@
     </div>
     {% endif %}
 
-    <!-- Container de Toasts no canto inferior direito -->
-    <div id="toast-container" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; max-width: 350px;"></div>
-
-    {% block content %}{% endblock %}
-    
-    <!-- Processar mensagens Django como Toast -->
-    {% if messages and not request.path == '/login/' and not request.path == '/login' %}
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                {% for message in messages %}
-                    showToast('{{ message.tags }}', '{{ message|escapejs }}');
-                {% endfor %}
-            });
-        </script>
-    {% endif %}
-
-    <!-- Botão Scroll to Top/Bottom -->
-    <button id="btnScroll" class="btn btn-primary rounded-circle shadow-lg" title="Ir para o topo/fim" style="position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; z-index: 9999; display: none; align-items: center; justify-content: center; background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); border: none; transition: all 0.3s ease;">
-        <i class="bi bi-chevron-double-up" id="scrollIcon"></i>
-    </button>
-
-    <script>
-        const btnScroll = document.getElementById('btnScroll');
-        const scrollIcon = document.getElementById('scrollIcon');
-
-        window.onscroll = function() {
-            // Mostrar botão apenas se houver scroll suficiente
-            if (document.body.scrollHeight > window.innerHeight + 100) {
-                btnScroll.style.display = 'flex';
-            } else {
-                btnScroll.style.display = 'none';
-            }
-
-            // Se estiver mais perto do topo, ícone aponta para baixo, senão para cima
-            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
-                scrollIcon.className = 'bi bi-chevron-double-up';
-            } else {
-                scrollIcon.className = 'bi bi-chevron-double-down';
-            }
-        };
-
-        btnScroll.addEventListener('click', () => {
-            const isAtBottom = (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100;
-            
-            if (isAtBottom) {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            }
-        });
-    </script>
-
-    <!-- Footer/Barra de Informações Inferior -->
-    <footer>
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-3 text-start">
-                    <p class="mb-0">
-                        <strong>SIGE v1.0.0</strong><br>
-                        <small>Sistema Integrado de Gestão Educacional</small>
-                    </p>
+    <main class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 shadow-sm border-0 mb-4" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                <div class="col-md-3">
-                    <p class="mb-0">
-                        Desenvolvido por<br>
-                        <strong>IOGD - Queta Future - Empresa de tecnologia, software, inovação</strong>
-                    </p>
-                </div>
-                <div class="col-md-3 text-center">
-                    {% if user.is_authenticated %}
-                        <p class="mb-0">
-                            {% if subscricao %}
-                                <span class="badge {% if subscricao.esta_ativo %}bg-success{% else %}bg-danger{% endif %}">
-                                    {% if subscricao.esta_ativo %}
-                                        ✓ Ativa
-                                    {% else %}
-                                        ✗ Expirada
-                                    {% endif %}
-                                </span>
-                                <br>
-                                <small>
-                                    {% if subscricao.esta_ativo %}
-                                        {{ subscricao.dias_restantes }} dias
-                                    {% else %}
-                                        Renove sua subscrição
-                                    {% endif %}
-                                </small>
-                            {% else %}
-                                <span class="badge bg-warning text-dark">Sem Subscrição</span>
-                            {% endif %}
-                        </p>
-                    {% endif %}
-                </div>
-                <div class="col-md-3 text-end">
-                    <p class="mb-0 small">&copy; {% now "Y" %} SIGE. Todos os direitos reservados.</p>
-                </div>
-            </div>
+            {% endfor %}
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="mt-5 py-4">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2026 SIGE - Sistema Integrado de Gestão Educacional. Todos os direitos reservados.</p>
         </div>
     </footer>
 
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        // Sistema de Toasts Global
-        function showToast(type, message, duration = 10000) {
-            const container = document.getElementById('toast-container');
-            
-            // Mapear tipos Django para Bootstrap
-            const typeMap = {
-                'success': { bg: 'bg-success', icon: '✓', title: 'Sucesso' },
-                'error': { bg: 'bg-danger', icon: '✗', title: 'Erro' },
-                'danger': { bg: 'bg-danger', icon: '✗', title: 'Erro' },
-                'warning': { bg: 'bg-warning', icon: '⚠', title: 'Aviso' },
-                'info': { bg: 'bg-info', icon: 'ℹ', title: 'Informação' }
-            };
-            
-            const config = typeMap[type] || typeMap['info'];
-            
-            // Criar toast
-            const toastId = 'toast-' + Date.now();
-            const toastHTML = `
-                <div id="${toastId}" class="toast show mb-2" role="alert" style="animation: slideInRight 0.3s ease-out;">
-                    <div class="toast-header ${config.bg} text-white">
-                        <strong class="me-auto">
-                            <span style="font-size: 1.2em; margin-right: 8px;">${config.icon}</span>
-                            ${config.title}
-                        </strong>
-                        <button type="button" class="btn-close btn-close-white" onclick="removeToast('${toastId}')"></button>
-                    </div>
-                    <div class="toast-body">
-                        ${message}
-                    </div>
-                </div>
-            `;
-            
-            container.insertAdjacentHTML('beforeend', toastHTML);
-            
-            // Auto remover após duração
-            if (duration > 0) {
-                setTimeout(() => removeToast(toastId), duration);
-            }
-        }
-        
-        function removeToast(toastId) {
-            const toast = document.getElementById(toastId);
-            if (toast) {
-                toast.style.animation = 'slideOutRight 0.3s ease-out';
-                setTimeout(() => toast.remove(), 300);
-            }
-        }
-        
-        // Adicionar animações CSS
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideInRight {
-                from {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-            }
-            
-            @keyframes slideOutRight {
-                from {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-                to {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-            }
-            
-            .toast {
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            }
-        `;
-        document.head.appendChild(style);
-    </script>
-    
-    {% if user.is_authenticated %}
-    <script>
-        // Atualizar cumprimento baseado na hora local
-        function atualizarCumprimento() {
-            const agora = new Date();
-            const horaNum = agora.getHours();
-            
-            // Atualizar Relógio Digital
-            const relogioElement = document.getElementById('relogio-digital');
-            if (relogioElement) {
-                const horas = String(agora.getHours()).padStart(2, '0');
-                const minutos = String(agora.getMinutes()).padStart(2, '0');
-                const segundos = String(agora.getSeconds()).padStart(2, '0');
-                relogioElement.innerHTML = `<i class="bi bi-clock"></i> ${horas}:${minutos}:${segundos}`;
-            }
-            
-            let saudacao;
-            if (horaNum >= 5 && horaNum < 12) {
-                saudacao = 'Bom dia';
-            } else if (horaNum >= 12 && horaNum < 18) {
-                saudacao = 'Boa tarde';
-            } else {
-                saudacao = 'Boa noite';
-            }
-            
-            const element = document.getElementById('cumprimento-horario');
-            if (element) {
-                element.textContent = saudacao + '!';
-            }
-        }
-        
-        // Chamar ao carregar e atualizar a cada segundo para o relógio
-        atualizarCumprimento();
-        setInterval(atualizarCumprimento, 1000);
-        
-        // Atualizar contagem de notificações
-        function atualizarNotificacoesCount() {
-            fetch('{% url "notificacoes_count" %}')
-                .then(response => response.json())
-                .then(data => {
-                    const badge = document.getElementById('notificacoes-badge');
-                    if (badge) {
-                        if (data.count > 0) {
-                            badge.textContent = data.count;
-                            badge.style.display = 'flex';
-                        } else {
-                            badge.style.display = 'none';
-                        }
-                    }
-                })
-                .catch(error => console.error('Erro ao buscar notificações:', error));
-        }
-        
-        // Atualizar contagem de perfis pendentes (apenas para staff)
-        {% if user.is_staff %}
-        function atualizarPerfisPendentesCount() {
-            fetch('{% url "perfis_pendentes_count" %}')
-                .then(response => response.json())
-                .then(data => {
-                    const badge = document.getElementById('perfis-pendentes-badge');
-                    if (badge) {
-                        if (data.count > 0) {
-                            badge.textContent = data.count;
-                            badge.style.display = 'flex';
-                        } else {
-                            badge.style.display = 'none';
-                        }
-                    }
-                })
-                .catch(error => console.error('Erro ao buscar perfis pendentes:', error));
-        }
-        
-        atualizarPerfisPendentesCount();
-        setInterval(atualizarPerfisPendentesCount, 30000);
-        {% endif %}
-        
-        // Atualizar a cada 30 segundos
-        atualizarNotificacoesCount();
-        setInterval(atualizarNotificacoesCount, 30000);
-    </script>
-    {% endif %}
 </body>
 </html>
