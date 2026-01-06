@@ -234,6 +234,12 @@ class Inscricao(models.Model):
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='inscricoes', verbose_name="Curso")
     
     # 1. Identificação
+    TIPO_INSCRICAO_CHOICES = [
+        ('presencial', 'Presencial'),
+        ('online', 'Online'),
+    ]
+    tipo_inscricao = models.CharField(max_length=20, choices=TIPO_INSCRICAO_CHOICES, default='online', verbose_name="Tipo de Inscrição")
+    
     nome_completo = models.CharField(max_length=200, verbose_name="Nome Completo")
     foto = models.ImageField(upload_to='estudantes/fotos/', blank=True, null=True, verbose_name="Foto do Estudante")
     data_nascimento = models.DateField(verbose_name="Data de Nascimento")
@@ -272,9 +278,11 @@ class Inscricao(models.Model):
     responsavel_pedagogico_vinculo = models.CharField(max_length=100, blank=True, verbose_name="Grau/Vínculo Pedagógico")
     responsavel_pedagogico_telefone = models.CharField(max_length=20, blank=True, verbose_name="Telefone Pedagógico")
     
-    # 6. Configurações
-    receber_emails_sistema = models.BooleanField(default=True, verbose_name="Deseja receber emails do sistema?")
-    
+    # 7. Documentos
+    certificado_escolar = models.FileField(upload_to='estudantes/documentos/', blank=True, null=True, verbose_name="Certificado Escolar")
+    copia_bi = models.FileField(upload_to='estudantes/documentos/', blank=True, null=True, verbose_name="Cópia do BI")
+    comprovativo_pagamento = models.FileField(upload_to='estudantes/documentos/', blank=True, null=True, verbose_name="Comprovativo de Pagamento")
+
     # Sistema de Aprovação
     nota_teste = models.DecimalField(
         max_digits=4, 

@@ -83,6 +83,9 @@ def inscricao_create(request, curso_id):
         context['prerequisitos'] = curso.prerequisitos.all()
     
     if request.method == 'POST':
+        # Definir tipo de inscrição automaticamente com base na autenticação
+        tipo_inscricao = 'presencial' if request.user.is_authenticated else 'online'
+        
         # Validar BI único
         bilhete_identidade = request.POST.get('bilhete_identidade')
         if bilhete_identidade and Inscricao.objects.filter(bilhete_identidade=bilhete_identidade).exists():
@@ -112,6 +115,7 @@ def inscricao_create(request, curso_id):
         
         inscricao = Inscricao(
             curso=curso,
+            tipo_inscricao=tipo_inscricao,
             # 1. Informações Pessoais
             nome_completo=request.POST['nome_completo'],
             data_nascimento=request.POST['data_nascimento'],
@@ -142,7 +146,16 @@ def inscricao_create(request, curso_id):
             encarregado_email=request.POST.get('encarregado_email', ''),
             encarregado_profissao=request.POST.get('encarregado_profissao', ''),
             encarregado_local_trabalho=request.POST.get('encarregado_local_trabalho', ''),
+            # 7. Documentos
+            certificado_escolar=request.FILES.get('certificado_escolar'),
+            copia_bi=request.FILES.get('copia_bi'),
+            comprovativo_pagamento=request.FILES.get('comprovativo_pagamento'),
         )
+        
+        # Aprovação automática para inscrições online
+        if tipo_inscricao == 'online':
+            inscricao.aprovado = True
+            inscricao.data_resultado = timezone.now()
         
         inscricao.save()
         
