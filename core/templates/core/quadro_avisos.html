@@ -22,11 +22,6 @@
                         <a href="{% url 'quadro_avisos' %}" class="list-group-item list-group-item-action active d-flex align-items-center">
                             <i class="bi bi-megaphone me-3 fs-5"></i> Quadro de Avisos
                         </a>
-                        {% if user.perfil.nivel_acesso == 'admin' %}
-                        <a href="{% url 'painel_admin' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
-                            <i class="bi bi-gear me-3 fs-5"></i> Configurações do Sistema
-                        </a>
-                        {% endif %}
                     </div>
                 </div>
             </div>

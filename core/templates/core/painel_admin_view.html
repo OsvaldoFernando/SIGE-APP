@@ -1,243 +1,46 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Configurações do Sistema - SIGE{% endblock %}
+{% block title %}Gestão de Documentos Académicos - SIGE{% endblock %}
 
 {% block content %}
 <div class="container my-5">
     <div class="row g-4">
-        <!-- Sidebar Navigation -->
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-                <div class="card-body p-0">
-                    <div class="list-group list-group-flush">
-                        <a href="{% url 'painel_principal' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
-                            <i class="bi bi-speedometer2 me-3 fs-5"></i> Painel Principal
-                        </a>
-                        <a href="{% url 'perfil_usuario' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
-                            <i class="bi bi-person me-3 fs-5"></i> Perfil do Usuário
-                        </a>
-                        <a href="{% url 'notificacoes' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
-                            <i class="bi bi-bell me-3 fs-5"></i> Notificações
-                        </a>
-                        <a href="{% url 'quadro_avisos' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
-                            <i class="bi bi-megaphone me-3 fs-5"></i> Quadro de Avisos
-                        </a>
-                        <a href="{% url 'painel_admin' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center active bg-primary border-primary">
-                            <i class="bi bi-gear me-3 fs-5"></i> Configurações do Sistema
-                        </a>
-                    </div>
-                </div>
-            </div>
-            
-        </div>
-
         <!-- Main Content -->
-        <div class="col-md-9">
+        <div class="col-md-12">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                 <div class="card-header bg-white border-bottom-0 pt-4 px-4">
-                    <h2 class="fw-bold mb-0 text-primary">Configurações do Sistema</h2>
-                    <p class="text-muted small">Gerencie a identidade visual e configurações gerais da escola</p>
+                    <h2 class="fw-bold mb-0 text-primary">Gestão de Documentos Académicos</h2>
+                    <p class="text-muted small">Gerencie os templates de documentos da instituição</p>
                 </div>
                 <div class="card-body p-4">
-                    <!-- Nav Tabs -->
-                    <ul class="nav nav-pills mb-4 gap-2" id="adminSettingsTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active rounded-pill px-4" id="visual-tab" data-bs-toggle="pill" data-bs-target="#visual" type="button" role="tab">Identidade Visual</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link rounded-pill px-4" id="general-tab" data-bs-toggle="pill" data-bs-target="#general" type="button" role="tab">Informações Gerais</button>
-                        </li>
-                    </ul>
-
-                    <form method="POST" enctype="multipart/form-data" id="adminSettingsForm" novalidate>
-                        {% csrf_token %}
-                        <!-- Hidden File Inputs -->
-                        <input type="file" name="logo" id="logo-input-hidden" class="d-none" accept="image/*" onchange="previewImage(this, 'logo-modal-preview', 'logo-preview-main', 'logo-placeholder-main')">
-                        <input type="file" name="favicon" id="favicon-input-hidden" class="d-none" accept="image/*" onchange="previewImage(this, 'favicon-modal-preview', 'favicon-preview-main', 'favicon-placeholder-main')">
-
-                        <div class="tab-content" id="adminSettingsTabsContent">
-                            <!-- Tab Identidade Visual -->
-                            <div class="tab-pane fade show active" id="visual" role="tabpanel">
-                                <div class="row g-4">
-                                    <div class="col-md-6 text-center border-end">
-                                        <label class="form-label d-block fw-bold small text-muted text-uppercase mb-3">Logotipo Atual</label>
-                                        <div class="mb-3 position-relative d-inline-block">
-                                            {% if config.logo %}
-                                            <img src="{{ config.logo.url }}" id="logo-preview-main" alt="Logo" class="img-fluid rounded border p-2 bg-light" style="max-height: 120px; width: auto;">
-                                            {% else %}
-                                            <div id="logo-placeholder-main" class="bg-light rounded border p-4 text-muted" style="width: 200px; height: 120px; display: flex; align-items: center; justify-content: center;">Sem Logo</div>
-                                            {% endif %}
-                                            <button type="button" class="btn btn-primary btn-sm rounded-circle position-absolute bottom-0 end-0 shadow" title="Alterar Logo" data-bs-toggle="modal" data-bs-target="#modalAlterarLogo">
-                                                <i class="bi bi-camera"></i>
-                                            </button>
+                    <!-- Cards de Configuração -->
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-4">
+                            <a href="{% url 'documento_criar' %}" class="text-decoration-none">
+                                <div class="card border-0 shadow-sm rounded-4 h-100 card-menu transition-hover bg-light">
+                                    <div class="card-body p-4 text-center">
+                                        <div class="bg-white rounded-4 p-3 d-inline-block mb-3 shadow-sm">
+                                            <i class="bi bi-file-earmark-plus text-primary" style="font-size: 2rem;"></i>
                                         </div>
-                                    </div>
-
-                                    <div class="col-md-6 text-center">
-                                        <label class="form-label d-block fw-bold small text-muted text-uppercase mb-3">Favicon Atual</label>
-                                        <div class="mb-3 position-relative d-inline-block">
-                                            {% if config.favicon %}
-                                            <img src="{{ config.favicon.url }}" id="favicon-preview-main" alt="Favicon" class="img-fluid rounded border p-2 bg-light" style="max-height: 48px; width: auto;">
-                                            {% else %}
-                                            <div id="favicon-placeholder-main" class="bg-light rounded border p-4 text-muted" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-image small"></i></div>
-                                            {% endif %}
-                                            <button type="button" class="btn btn-primary btn-sm rounded-circle position-absolute bottom-0 end-0 shadow" title="Alterar Favicon" data-bs-toggle="modal" data-bs-target="#modalAlterarFavicon">
-                                                <i class="bi bi-camera"></i>
-                                            </button>
-                                        </div>
+                                        <h5 class="fw-bold text-dark mb-1">Novo Documento</h5>
+                                        <p class="text-muted small mb-0">Criar um novo template académico</p>
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- Tab Informações Gerais -->
-                            <div class="tab-pane fade" id="general" role="tabpanel">
-                                <div class="row g-4">
-                                    <div class="col-md-12">
-                                        <label class="form-label small fw-bold">Nome da Escola</label>
-                                        <input type="text" name="nome_escola" class="form-control rounded-3" value="{{ config.nome_escola }}">
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="form-label small fw-bold">Email de Contato</label>
-                                        <input type="email" name="email" class="form-control rounded-3" value="{{ config.email }}">
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label class="form-label small fw-bold">Telefone</label>
-                                        <input type="text" name="telefone" class="form-control rounded-3" value="{{ config.telefone }}">
-                                    </div>
-
-                                    <div class="col-md-12">
-                                        <label class="form-label small fw-bold">Endereço</label>
-                                        <textarea name="endereco" class="form-control rounded-3" rows="2">{{ config.endereco }}</textarea>
-                                    </div>
-                                </div>
-                            </div>
+                            </a>
                         </div>
-
-                        <div class="col-md-12 text-end mt-5">
-                            <button type="submit" class="btn btn-primary rounded-pill px-5 py-2" id="btn-save-main">
-                                <i class="bi bi-save me-2"></i> Salvar Configurações
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Alterar Logotipo -->
-<div class="modal fade" id="modalAlterarLogo" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
-            <div class="modal-header border-bottom-0">
-                <h5 class="modal-title fw-bold">Alterar Logotipo</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3 text-center">
-                    <div class="mb-3">
-                        <img id="logo-modal-preview" src="{% if config.logo %}{{ config.logo.url }}{% endif %}" class="img-fluid rounded border {% if not config.logo %}d-none{% endif %}" style="max-height: 150px;">
                     </div>
-                    <p class="text-muted small mb-4">Selecione uma imagem para o logotipo da escola</p>
-                    <button type="button" class="btn btn-primary rounded-pill px-4" onclick="document.getElementById('logo-input-hidden').click()">Escolher Logotipo</button>
-                    <div id="logo-filename" class="small text-muted mt-2">Nenhum ficheiro selecionado</div>
                 </div>
-            </div>
-            <div class="modal-footer border-top-0 pt-0 d-none">
-                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary rounded-pill px-4" onclick="document.getElementById('adminSettingsForm').submit()">Salvar Configurações</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal Alterar Favicon -->
-<div class="modal fade" id="modalAlterarFavicon" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
-            <div class="modal-header border-bottom-0">
-                <h5 class="modal-title fw-bold">Alterar Favicon</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3 text-center">
-                    <div class="mb-3">
-                        <img id="favicon-modal-preview" src="{% if config.favicon %}{{ config.favicon.url }}{% endif %}" class="img-fluid rounded border {% if not config.favicon %}d-none{% endif %}" style="max-height: 64px;">
-                    </div>
-                    <p class="text-muted small mb-4">Selecione uma imagem quadrada (ícone) para o navegador</p>
-                    <button type="button" class="btn btn-primary rounded-pill px-4" onclick="document.getElementById('favicon-input-hidden').click()">Escolher Favicon</button>
-                    <div id="favicon-filename" class="small text-muted mt-2">Nenhum ficheiro selecionado</div>
-                </div>
-            </div>
-            <div class="modal-footer border-top-0 pt-0 d-none">
-                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary rounded-pill px-4" onclick="document.getElementById('adminSettingsForm').submit()">Salvar Configurações</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-function previewImage(input, modalPreviewId, mainPreviewId, placeholderId) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const modalPreview = document.getElementById(modalPreviewId);
-            const mainPreview = document.getElementById(mainPreviewId);
-            const placeholder = document.getElementById(placeholderId);
-            
-            if (modalPreview) {
-                modalPreview.src = e.target.result;
-                modalPreview.classList.remove('d-none');
-            }
-            
-            if (mainPreview) {
-                mainPreview.src = e.target.result;
-                mainPreview.classList.remove('d-none');
-                mainPreview.style.display = 'block';
-            }
-            
-            if (placeholder) {
-                placeholder.classList.add('d-none');
-            }
-
-            // Aguardar um pouco para o usuário ver o preview antes de salvar
-            setTimeout(() => {
-                const form = document.getElementById('adminSettingsForm');
-                if (form) {
-                    // Feedback visual de salvamento
-                    const btnSave = document.getElementById('btn-save-main');
-                    if (btnSave) {
-                        btnSave.disabled = true;
-                        btnSave.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Gravando...';
-                    }
-                    
-                    // Fechar modais abertos
-                    const modalEl = input.closest('.modal');
-                    if (modalEl) {
-                        const modalInstance = bootstrap.Modal.getInstance(modalEl);
-                        if (modalInstance) {
-                            modalInstance.hide();
-                            const backdrop = document.querySelector('.modal-backdrop');
-                            if (backdrop) backdrop.remove();
-                            document.body.classList.remove('modal-open');
-                            document.body.style.overflow = '';
-                        }
-                    }
-                    
-                    // Forçar o envio do formulário de forma robusta
-                    if (typeof form.submit === 'function') {
-                        form.submit();
-                    } else {
-                        HTMLFormElement.prototype.submit.call(form);
-                    }
-                }
-            }, 600);
-        }
-        reader.readAsDataURL(input.files[0]);
+<style>
+    .card-menu { transition: all 0.3s ease; border: 1px solid transparent !important; }
+    .card-menu:hover { 
+        transform: translateY(-5px); 
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        border-color: rgba(30, 58, 138, 0.1) !important;
     }
-}
-</script>
+</style>
 {% endblock %}

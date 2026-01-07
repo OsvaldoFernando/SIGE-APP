@@ -137,16 +137,21 @@ class EscolaAdmin(admin.ModelAdmin):
 
 @admin.register(Inscricao)
 class InscricaoAdmin(admin.ModelAdmin):
-    list_display = ['numero_inscricao', 'nome_completo', 'curso', 'nota_teste', 'aprovado', 'data_inscricao']
+    list_display = ['numero_inscricao', 'get_nome_completo', 'curso', 'nota_teste', 'aprovado', 'data_inscricao']
+    
+    def get_nome_completo(self, obj):
+        return obj.nome_completo
+    get_nome_completo.short_description = 'Nome Completo'
+    get_nome_completo.admin_order_field = 'primeiro_nome'
     list_filter = ['curso', 'aprovado', 'data_inscricao']
-    search_fields = ['numero_inscricao', 'nome_completo', 'bilhete_identidade', 'email']
+    search_fields = ['numero_inscricao', 'primeiro_nome', 'apelido', 'bilhete_identidade', 'email']
     readonly_fields = ['numero_inscricao', 'data_inscricao', 'data_resultado']
     fieldsets = (
         ('Informações da Inscrição', {
             'fields': ('numero_inscricao', 'curso', 'data_inscricao')
         }),
         ('Dados Pessoais', {
-            'fields': ('nome_completo', 'data_nascimento', 'sexo', 'bilhete_identidade')
+            'fields': ('primeiro_nome', 'nomes_meio', 'apelido', 'data_nascimento', 'sexo', 'bilhete_identidade')
         }),
         ('Contato', {
             'fields': ('telefone', 'email', 'endereco')

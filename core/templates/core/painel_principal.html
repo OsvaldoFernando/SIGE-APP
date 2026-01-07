@@ -66,69 +66,32 @@
             </div>
         </div>
 
-        <!-- OUTRAS SEÇÕES (REPLICAÇÃO DO ESTILO) -->
+        <!-- SEÇÃO DE CONFIGURAÇÕES -->
+        {% if user.perfil.nivel_acesso == 'admin' or user.perfil.nivel_acesso == 'super_admin' %}
         <div class="menu-section mb-5">
             <div class="d-flex align-items-center mb-4">
                 <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
-                    <i class="bi bi-mortarboard text-primary fs-4"></i>
+                    <i class="bi bi-gear text-primary fs-4"></i>
                 </div>
-                <h3 class="mb-0 fw-bold text-dark">Área de Trabalho</h3>
+                <h3 class="mb-0 fw-bold text-dark">Configurações</h3>
             </div>
             <div class="row g-4 menu-items">
                 <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
-                    <a href="{% url 'cursos_disciplinas' %}" class="text-decoration-none h-100 d-block">
+                    <a href="{% url 'painel_admin' %}" class="text-decoration-none h-100 d-block">
                         <div class="card border-0 shadow-sm rounded-4 h-100 card-menu transition-hover">
                             <div class="card-body p-4 text-center">
                                 <div class="bg-light rounded-4 p-4 d-inline-block mb-3">
-                                    <span style="font-size: 2.5rem;">📚</span>
+                                    <i class="bi bi-file-earmark-text text-primary" style="font-size: 2.5rem;"></i>
                                 </div>
-                                <h5 class="fw-bold text-dark mb-1">Cursos e Disciplinas</h5>
-                                <p class="text-muted small mb-0">Estrutura acadêmica</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
-                    <a href="{% url 'ano_academico_lista' %}" class="text-decoration-none h-100 d-block">
-                        <div class="card border-0 shadow-sm rounded-4 h-100 card-menu transition-hover">
-                            <div class="card-body p-4 text-center">
-                                <div class="bg-light rounded-4 p-4 d-inline-block mb-3">
-                                    <span style="font-size: 2.5rem;">🗓️</span>
-                                </div>
-                                <h5 class="fw-bold text-dark mb-1">Anos Académicos</h5>
-                                <p class="text-muted small mb-0">Gestão de períodos</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
-                    <a href="{% url 'grelha_curricular' %}" class="text-decoration-none h-100 d-block">
-                        <div class="card border-0 shadow-sm rounded-4 h-100 card-menu transition-hover">
-                            <div class="card-body p-4 text-center">
-                                <div class="bg-light rounded-4 p-4 d-inline-block mb-3">
-                                    <span style="font-size: 2.5rem;">📋</span>
-                                </div>
-                                <h5 class="fw-bold text-dark mb-1">Grelha Curricular</h5>
-                                <p class="text-muted small mb-0">Matriz de ensino</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
-                    <a href="{% url 'cronograma_academico' %}" class="text-decoration-none h-100 d-block">
-                        <div class="card border-0 shadow-sm rounded-4 h-100 card-menu transition-hover">
-                            <div class="card-body p-4 text-center">
-                                <div class="bg-light rounded-4 p-4 d-inline-block mb-3">
-                                    <span style="font-size: 2.5rem;">📅</span>
-                                </div>
-                                <h5 class="fw-bold text-dark mb-1">Cronograma</h5>
-                                <p class="text-muted small mb-0">Calendário de eventos</p>
+                                <h5 class="fw-bold text-dark mb-1">Gestão de Documentos Académicos</h5>
+                                <p class="text-muted small mb-0">Módulo de gestão de arquivos</p>
                             </div>
                         </div>
                     </a>
                 </div>
             </div>
         </div>
+        {% endif %}
     </div>
 </div>
 

@@ -235,7 +235,9 @@ class Inscricao(models.Model):
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='inscricoes', verbose_name="Curso")
     
     # 1. Identificação
-    nome_completo = models.CharField(max_length=200, verbose_name="Nome Completo")
+    primeiro_nome = models.CharField(max_length=50, verbose_name="Primeiro Nome", default="")
+    nomes_meio = models.CharField(max_length=100, verbose_name="Nomes do Meio", blank=True, default="")
+    apelido = models.CharField(max_length=50, verbose_name="Apelido", default="")
     foto = models.ImageField(upload_to='estudantes/fotos/', blank=True, null=True, verbose_name="Foto do Estudante")
     data_nascimento = models.DateField(verbose_name="Data de Nascimento")
     local_nascimento = models.CharField(max_length=200, verbose_name="Local de Nascimento", default="Luanda")
@@ -246,7 +248,36 @@ class Inscricao(models.Model):
     estado_civil = models.CharField(max_length=1, choices=ESTADO_CIVIL_CHOICES, default='S', verbose_name="Estado Civil")
     endereco = models.TextField(verbose_name="Endereço Completo")
     telefone = models.CharField(max_length=20, verbose_name="Telefone")
-    email = models.EmailField(verbose_name="Email")
+    # Status da Inscrição
+    STATUS_INSCRICAO_CHOICES = [
+        ('submetida', 'Submetida'),
+        ('em_analise', 'Em Análise'),
+        ('aprovada', 'Aprovada'),
+        ('rejeitada', 'Rejeitada'),
+    ]
+    status_inscricao = models.CharField(
+        max_length=20, 
+        choices=STATUS_INSCRICAO_CHOICES, 
+        default='submetida', 
+        verbose_name="Estado da Inscrição"
+    )
+    
+    # Documentos
+    arquivo_bi = models.FileField(
+        upload_to='estudantes/documentos/bi/', 
+        blank=True, 
+        null=True, 
+        verbose_name="Cópia do BI (PDF ou Imagem)",
+        help_text="Tamanho máximo: 5MB"
+    )
+    arquivo_certificado = models.FileField(
+        upload_to='estudantes/documentos/certificados/', 
+        blank=True, 
+        null=True, 
+        verbose_name="Certificado/Habilitação (PDF ou Imagem)",
+        help_text="Tamanho máximo: 5MB"
+    )
+
     data_cadastro = models.DateTimeField(default=timezone.now, verbose_name="Data de Cadastro")
     status = models.CharField(max_length=20, default='Ativo', verbose_name="Status")
     matricula_bloqueada = models.BooleanField(default=False, verbose_name="Matrícula Bloqueada?")
@@ -295,6 +326,12 @@ class Inscricao(models.Model):
         verbose_name_plural = "Inscrições"
         ordering = ['-data_inscricao']
     
+    @property
+    def nome_completo(self):
+        """Retorna o nome completo concatenado"""
+        nomes = [self.primeiro_nome, self.nomes_meio, self.apelido]
+        return " ".join(filter(None, nomes))
+
     def __str__(self):
         return f"{self.numero_inscricao} - {self.nome_completo}"
     

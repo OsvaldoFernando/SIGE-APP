@@ -110,10 +110,12 @@ def inscricao_create(request, curso_id):
             except Escola.DoesNotExist:
                 pass
         
+        # 1. Informações Pessoais
         inscricao = Inscricao(
             curso=curso,
-            # 1. Informações Pessoais
-            nome_completo=request.POST['nome_completo'],
+            primeiro_nome=request.POST['primeiro_nome'],
+            nomes_meio=request.POST.get('nomes_meio', ''),
+            apelido=request.POST['apelido'],
             data_nascimento=request.POST['data_nascimento'],
             local_nascimento=request.POST['local_nascimento'],
             nacionalidade=request.POST['nacionalidade'],
@@ -124,6 +126,10 @@ def inscricao_create(request, curso_id):
             endereco=request.POST['endereco'],
             telefone=request.POST['telefone'],
             email=request.POST['email'],
+            # Documentos
+            arquivo_bi=request.FILES.get('arquivo_bi'),
+            arquivo_certificado=request.FILES.get('arquivo_certificado'),
+            status_inscricao='submetida',
             # 2. Informações Académicas
             escola=escola,
             ano_conclusao=request.POST['ano_conclusao'],

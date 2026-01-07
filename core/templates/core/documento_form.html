@@ -1,76 +1,123 @@
 {% extends 'core/base.html' %}
 
-{% block title %}{% if documento %}Editar{% else %}Criar{% endif %} Documento - SIGE{% endblock %}
+{% block title %}{% if documento %}Editar{% else %}Criar{% endif %} Documento Académico - SIGE{% endblock %}
 
 {% block content %}
-<div style="margin-top: 80px; background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); color: white; padding: 40px 0;">
+<div class="container-fluid py-4" style="background-color: #f0f2f5; min-height: 100vh;">
     <div class="container">
-        <h1 style="margin: 0;">{% if documento %}Editar Documento{% else %}Criar Novo Documento{% endif %}</h1>
-        <p style="margin: 10px 0 0 0; opacity: 0.9;">Templates com variáveis dinâmicas</p>
-    </div>
-</div>
-
-<div class="container py-5">
-    <div class="row">
-        <div class="col-lg-8">
-            <form method="POST" class="card p-4">
-                {% csrf_token %}
-                
-                <div class="mb-3">
-                    <label for="titulo" class="form-label">Título do Documento *</label>
-                    <input type="text" id="titulo" name="titulo" class="form-control" value="{{ documento.titulo|default:'' }}" required>
+        <!-- Word Style Header/Toolbar -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+            <div class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
+                        <i class="bi bi-file-earmark-word text-primary fs-4"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0">{% if documento %}Editar Template Académico{% else %}Novo Template Académico{% endif %}</h5>
+                        <p class="text-muted small mb-0">Editor de documentos oficiais</p>
+                    </div>
                 </div>
-
-                <div class="mb-3">
-                    <label for="secao" class="form-label">Seção/Módulo *</label>
-                    <select id="secao" name="secao" class="form-control" required>
-                        <option value="">-- Selecione uma seção --</option>
-                        {% for valor, label in secoes %}
-                            <option value="{{ valor }}" {% if documento.secao == valor %}selected{% endif %}>{{ label }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="mb-3">
-                    <label for="conteudo" class="form-label">Conteúdo do Documento *</label>
-                    <textarea id="conteudo" name="conteudo" class="form-control" rows="15" required>{{ documento.conteudo|default:'' }}</textarea>
-                    <small class="form-text text-muted">Use variáveis como {nome}, {bilhete_identidade}, {email}, {telefone}, etc.</small>
-                </div>
-
-                <div class="mb-3">
-                    <label for="descricao" class="form-label">Descrição</label>
-                    <textarea id="descricao" name="descricao" class="form-control" rows="3">{{ documento.descricao|default:'' }}</textarea>
-                </div>
-
-                <div class="form-check mb-3">
-                    <input type="checkbox" id="ativo" name="ativo" class="form-check-input" {% if documento.ativo %}checked{% endif %}>
-                    <label class="form-check-label" for="ativo">Ativo</label>
-                </div>
-
                 <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-success">
-                        {% if documento %}Atualizar{% else %}Criar{% endif %} Documento
+                    <a href="{% url 'gestao_documentos' %}" class="btn btn-light rounded-pill px-4">Cancelar</a>
+                    <button type="button" class="btn btn-primary rounded-pill px-4" onclick="document.getElementById('docForm').submit()">
+                        <i class="bi bi-save me-2"></i> Salvar Template
                     </button>
-                    <a href="{% url 'gestao_documentos' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </div>
+            
+            <form method="POST" id="docForm" class="card-body p-4">
+                {% csrf_token %}
+                <div class="row g-4">
+                    <!-- Configurações do Documento -->
+                    <div class="col-lg-4">
+                        <div class="p-4 bg-light rounded-4 h-100">
+                            <h6 class="fw-bold text-uppercase small text-muted mb-4">Propriedades</h6>
+                            
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-dark">Título do Documento</label>
+                                <input type="text" name="titulo" class="form-control border-0 shadow-sm rounded-3" 
+                                       placeholder="Ex: Certificado de Matrícula" value="{{ documento.titulo|default:'' }}" required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-dark">Seção/Módulo</label>
+                                <select name="secao" class="form-select border-0 shadow-sm rounded-3" required>
+                                    <option value="">-- Selecione --</option>
+                                    {% for valor, label in secoes %}
+                                        <option value="{{ valor }}" {% if documento.secao == valor %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small fw-bold text-dark">Descrição Curta</label>
+                                <textarea name="descricao" class="form-control border-0 shadow-sm rounded-3" rows="3" 
+                                          placeholder="Descreva a finalidade deste documento...">{{ documento.descricao|default:'' }}</textarea>
+                            </div>
+
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" name="ativo" id="ativoSwitch" {% if documento.ativo %}checked{% endif %}>
+                                <label class="form-check-label small fw-bold" for="ativoSwitch">Template Ativo</label>
+                            </div>
+
+                            <hr class="my-4 opacity-5">
+
+                            <h6 class="fw-bold text-uppercase small text-muted mb-3">Dica de Variáveis</h6>
+                            <p class="x-small text-muted mb-0">Use as chaves para dados dinâmicos:</p>
+                            <div class="d-flex flex-wrap gap-2 mt-2">
+                                <span class="badge bg-white text-dark shadow-sm py-2 px-3">{nome}</span>
+                                <span class="badge bg-white text-dark shadow-sm py-2 px-3">{bi}</span>
+                                <span class="badge bg-white text-dark shadow-sm py-2 px-3">{curso}</span>
+                                <span class="badge bg-white text-dark shadow-sm py-2 px-3">{data}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Editor "Word" -->
+                    <div class="col-lg-8">
+                        <div class="word-editor-container shadow-sm">
+                            <div class="word-toolbar bg-light border-bottom p-2 d-flex flex-wrap gap-1">
+                                <button type="button" class="btn btn-sm btn-white border shadow-sm" title="Negrito"><i class="bi bi-type-bold"></i></button>
+                                <button type="button" class="btn btn-sm btn-white border shadow-sm" title="Itálico"><i class="bi bi-type-italic"></i></button>
+                                <button type="button" class="btn btn-sm btn-white border shadow-sm" title="Sublinhado"><i class="bi bi-type-underline"></i></button>
+                                <div class="vr mx-1"></div>
+                                <button type="button" class="btn btn-sm btn-white border shadow-sm" title="Alinhar à Esquerda"><i class="bi bi-text-left"></i></button>
+                                <button type="button" class="btn btn-sm btn-white border shadow-sm" title="Centralizar"><i class="bi bi-text-center"></i></button>
+                                <button type="button" class="btn btn-sm btn-white border shadow-sm" title="Alinhar à Direita"><i class="bi bi-text-right"></i></button>
+                                <div class="vr mx-1"></div>
+                                <button type="button" class="btn btn-sm btn-white border shadow-sm" title="Inserir Variável"><i class="bi bi-braces"></i></button>
+                            </div>
+                            <div class="word-page-container p-5 bg-secondary bg-opacity-10">
+                                <div class="word-page bg-white shadow mx-auto p-5" style="min-height: 842px; width: 100%; max-width: 595px;">
+                                    <textarea name="conteudo" class="word-textarea w-100 border-0" rows="30" 
+                                              placeholder="Comece a digitar o conteúdo do seu documento aqui..." required>{{ documento.conteudo|default:'' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
-
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Variáveis Disponíveis</h5>
-                </div>
-                <div class="card-body" style="font-size: 0.9rem; max-height: 600px; overflow-y: auto;">
-                    {% for var, desc in variaveis.items %}
-                        <div class="mb-2">
-                            <code class="bg-light p-1 d-block">{{{ var }}}</code>
-                            <small class="text-muted">{{ desc }}</small>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
     </div>
 </div>
+
+<style>
+    .btn-white { background-color: white; color: #444; }
+    .btn-white:hover { background-color: #f8f9fa; }
+    .word-editor-container { background-color: white; border-radius: 12px; overflow: hidden; border: 1px solid #e0e0e0; }
+    .word-page { border: 1px solid #ddd; }
+    .word-textarea { 
+        resize: none; 
+        outline: none; 
+        font-family: 'Times New Roman', Times, serif; 
+        font-size: 14pt; 
+        line-height: 1.5;
+        color: #333;
+    }
+    .x-small { font-size: 0.75rem; }
+    .form-control:focus, .form-select:focus { 
+        background-color: white; 
+        box-shadow: 0 0 0 0.25rem rgba(30, 58, 138, 0.1); 
+    }
+</style>
 {% endblock %}
