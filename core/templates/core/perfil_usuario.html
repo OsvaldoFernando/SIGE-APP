@@ -22,7 +22,7 @@
                         <a href="{% url 'quadro_avisos' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
                             <i class="bi bi-megaphone me-3 fs-5"></i> Quadro de Avisos
                         </a>
-                        {% if user.perfil.nivel_acesso == 'admin' %}
+                        {% if user.perfil.nivel_acesso == 'admin' or user.perfil.nivel_acesso == 'super_admin' %}
                         <a href="{% url 'painel_admin' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
                             <i class="bi bi-gear me-3 fs-5"></i> Configurações do Sistema
                         </a>
@@ -31,9 +31,6 @@
                 </div>
             </div>
             
-            <a href="{% url 'logout' %}" class="btn btn-outline-danger w-100 rounded-pill py-2 d-flex align-items-center justify-content-center">
-                <i class="bi bi-box-arrow-right me-2"></i> Sair do Sistema
-            </a>
         </div>
 
         <!-- Main Content -->

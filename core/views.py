@@ -1105,7 +1105,7 @@ def trocar_ano(request):
 @login_required
 def painel_admin_view(request):
     """View para configurações gerais do sistema (Super Admin)"""
-    if request.user.perfil.nivel_acesso != 'admin':
+    if request.user.perfil.nivel_acesso not in ['admin', 'super_admin']:
         messages.error(request, 'Acesso negado. Apenas administradores podem acessar esta página.')
         return redirect('painel_principal')
     
@@ -1114,20 +1114,29 @@ def painel_admin_view(request):
     
     if request.method == 'POST':
         if not config:
-            config = ConfiguracaoEscola()
+            config = ConfiguracaoEscola.objects.create(nome_escola="SIGE - Sistema Escolar")
         
-        config.nome_escola = request.POST.get('nome_escola')
-        config.email = request.POST.get('email')
-        config.telefone = request.POST.get('telefone')
-        config.endereco = request.POST.get('endereco')
+        # Só atualiza se o campo estiver presente no POST
+        if 'nome_escola' in request.POST:
+            config.nome_escola = request.POST.get('nome_escola')
+        if 'email' in request.POST:
+            config.email = request.POST.get('email')
+        if 'telefone' in request.POST:
+            config.telefone = request.POST.get('telefone')
+        if 'endereco' in request.POST:
+            config.endereco = request.POST.get('endereco')
         
+        # Limpar campos de arquivo se for solicitado via POST (opcional, para resetar)
         if 'logo' in request.FILES:
             config.logo = request.FILES['logo']
         if 'favicon' in request.FILES:
             config.favicon = request.FILES['favicon']
             
         config.save()
-        messages.success(request, 'Configurações do sistema atualizadas com sucesso!')
+        messages.success(request, 'Configurações atualizadas com sucesso!')
+        
+        # Garantir persistência antes do redirect
+        config.refresh_from_db()
         return redirect('painel_admin')
 
     context = {
