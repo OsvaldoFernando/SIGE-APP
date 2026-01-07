@@ -6,64 +6,13 @@
 {% block content %}
 <div class="container-fluid mt-4">
     <div class="row g-0">
-        <!-- Painel Esquerdo - Módulos de Acesso -->
-        <div class="col-lg-4 d-none d-lg-block" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); padding: 3rem 2rem;">
-            <div class="text-white">
-                <h2 class="mb-4"><i class="bi bi-door-open"></i> Escolha seu Módulo</h2>
-                <p class="lead mb-5">Selecione o tipo de acesso para continuar</p>
-                
-                <!-- Módulo Universidade -->
-                <div class="card bg-white text-dark mb-4 shadow-lg border-0 module-card" id="module-universidade" onclick="selectModule('universidade')" style="cursor: pointer; transition: all 0.3s ease; border: 3px solid transparent;">
-                    <div class="card-body p-4">
-                        <div class="d-flex align-items-center">
-                            <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; margin-right: 1rem;">
-                                <i class="bi bi-building" style="font-size: 1.8rem;"></i>
-                            </div>
-                            <div>
-                                <h5 class="card-title mb-1">Universidade</h5>
-                                <p class="card-text mb-0 small text-muted">Licenciatura, Mestrado, Doutoramento</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Módulo Ensino Geral -->
-                <div class="card bg-white text-dark mb-4 shadow-lg border-0 module-card" id="module-geral" onclick="selectModule('geral')" style="cursor: pointer; transition: all 0.3s ease; border: 3px solid transparent;">
-                    <div class="card-body p-4">
-                        <div class="d-flex align-items-center">
-                            <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; margin-right: 1rem;">
-                                <i class="bi bi-book" style="font-size: 1.8rem;"></i>
-                            </div>
-                            <div>
-                                <h5 class="card-title mb-1">Ensino Geral</h5>
-                                <p class="card-text mb-0 small text-muted">10ª, 11ª, 12ª e 13ª Classe</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <hr class="bg-white my-4">
-                
-                <!-- Informações Importantes -->
-                <div class="alert alert-light mb-0">
-                    <h6 class="text-dark"><i class="bi bi-info-circle"></i> Informações</h6>
-                    <small class="text-muted d-block">
-                        <i class="bi bi-check-circle"></i> Sistema seguro e confiável<br>
-                        <i class="bi bi-check-circle"></i> Suporte técnico 24/7<br>
-                        <i class="bi bi-check-circle"></i> Dados protegidos e criptografados
-                    </small>
-                </div>
-            </div>
-        </div>
-        
         <!-- Painel Direito - Formulário de Login -->
-        <div class="col-lg-8">
+        <div class="col-lg-12">
             <div class="d-flex align-items-center justify-content-center" style="min-height: 100vh;">
                 <div class="w-100" style="max-width: 500px; padding: 2rem;">
                     <div class="card shadow-lg border-0">
                         <div class="card-header text-white text-center py-4" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);">
                             <h3 class="mb-0"><i class="bi bi-person-circle me-2"></i>Login</h3>
-                            <p id="moduleSelected" class="mb-0 mt-2" style="font-size: 0.9rem; opacity: 0.9;"></p>
                         </div>
                         <div class="card-body p-4">
                             <form method="post" id="loginForm">
@@ -76,7 +25,7 @@
                                     </div>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                        <input type="text" class="form-control validation-input" id="username" name="username" required autofocus placeholder="Digite seu usuário (3+ caracteres)" disabled>
+                                        <input type="text" class="form-control validation-input" id="username" name="username" required autofocus placeholder="Digite seu usuário (3+ caracteres)">
                                         <span class="input-group-text" id="usernameIcon" style="display: none;"></span>
                                     </div>
                                     <div id="usernameHelp" class="form-text mt-2" style="display: none;"></div>
@@ -90,8 +39,8 @@
                                     </div>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                        <input type="password" class="form-control validation-input" id="password" name="password" required placeholder="Digite sua senha (8+ caracteres)" autocomplete="current-password" disabled>
-                                        <button type="button" class="btn btn-outline-secondary" id="togglePassword" style="border-left: 0;" disabled>
+                                        <input type="password" class="form-control validation-input" id="password" name="password" required placeholder="Digite sua senha (8+ caracteres)" autocomplete="current-password">
+                                        <button type="button" class="btn btn-outline-secondary" id="togglePassword" style="border-left: 0;">
                                             <i class="bi bi-eye-slash"></i>
                                         </button>
                                         <span class="input-group-text" id="passwordIcon" style="display: none;"></span>
@@ -120,19 +69,7 @@
                                 </div>
 
                                 <!-- Botão Login -->
-                                {% if messages %}
-                                    {% for message in messages %}
-                                        <div class="alert alert-danger d-flex align-items-center mb-4 border-0 shadow-sm" role="alert" style="background-color: rgba(220, 53, 69, 0.1); border-left: 4px solid #dc3545 !important;">
-                                            <i class="bi bi-exclamation-triangle-fill me-2" style="color: #dc3545;"></i>
-                                            <div class="small text-danger fw-bold">
-                                                {{ message }}
-                                            </div>
-                                            <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.7rem;"></button>
-                                        </div>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <button type="submit" id="loginBtn" class="btn btn-primary w-100 py-2" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); border: none; cursor: not-allowed; opacity: 0.5;" disabled>
+                                <button type="submit" id="loginBtn" class="btn btn-primary w-100 py-2" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); border: none;">
                                     <span id="btnText"><i class="bi bi-box-arrow-in-right me-2"></i>Entrar</span>
                                     <span id="btnLoader" style="display: none;">
                                         <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
@@ -142,54 +79,6 @@
                             </form>
                             
                             <script>
-                            let selectedModule = null;
-
-                            // Selecionar Módulo
-                            function selectModule(module) {
-                                selectedModule = module;
-                                
-                                // Atualizar visual do cartão selecionado
-                                document.querySelectorAll('.module-card').forEach(card => {
-                                    card.style.borderColor = 'transparent';
-                                    card.style.backgroundColor = '#ffffff';
-                                });
-                                
-                                const selected = document.getElementById(`module-${module}`);
-                                selected.style.borderColor = '#059669';
-                                selected.style.backgroundColor = '#e8f5e9';
-                                
-                                const moduleName = module === 'universidade' ? 'Universidade' : 'Ensino Geral';
-                                document.getElementById('moduleSelected').textContent = `Módulo: ${moduleName}`;
-                                
-                                // Ativar campos de login automaticamente
-                                enableLoginForm();
-                            }
-
-                            // Pré-selecionar Módulo Universidade ao carregar a página
-                            document.addEventListener('DOMContentLoaded', function() {
-                                selectModule('universidade');
-                            });
-
-                            // Ativar Formulário de Login
-                            function enableLoginForm() {
-                                document.getElementById('username').disabled = false;
-                                document.getElementById('password').disabled = false;
-                                document.getElementById('togglePassword').disabled = false;
-                                document.getElementById('username').focus();
-                            }
-
-                            // Desativar Formulário de Login
-                            function disableLoginForm() {
-                                document.getElementById('username').disabled = true;
-                                document.getElementById('password').disabled = true;
-                                document.getElementById('togglePassword').disabled = true;
-                                document.getElementById('username').value = '';
-                                document.getElementById('password').value = '';
-                                document.getElementById('loginBtn').disabled = true;
-                                document.getElementById('loginBtn').style.opacity = '0.5';
-                                document.getElementById('loginBtn').style.cursor = 'not-allowed';
-                            }
-
                             const usernameInput = document.getElementById('username');
                             const passwordInput = document.getElementById('password');
                             const loginBtn = document.getElementById('loginBtn');
@@ -312,7 +201,7 @@
                                 const usernameValid = validations.username.validate(usernameInput.value) && usernameInput.value !== '';
                                 const passwordValid = validations.password.validate(passwordInput.value) && passwordInput.value !== '';
                                 
-                                if (usernameValid && passwordValid && selectedModule) {
+                                if (usernameValid && passwordValid) {
                                     loginBtn.disabled = false;
                                     loginBtn.style.cursor = 'pointer';
                                     loginBtn.style.opacity = '1';

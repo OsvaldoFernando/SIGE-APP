@@ -648,7 +648,6 @@ def login_view(request):
                 return render(request, 'core/login.html')
             
             auth_login(request, user)
-            messages.success(request, f'Bem-vindo, {user.get_full_name() or user.username}!')
             next_url = request.GET.get('next', 'painel_principal')
             return redirect(next_url)
         else:
@@ -722,7 +721,6 @@ def registro_view(request):
 def logout_view(request):
     """View de logout"""
     auth_logout(request)
-    messages.success(request, 'Você saiu do sistema com sucesso!')
     return redirect('login')
 
 @login_required
@@ -735,9 +733,18 @@ def notificacoes_view(request):
     
     nao_lidas = notificacoes.exclude(lida_por=request.user)
     
+    # Ao marcar como lida ou voltar, redireciona para o perfil
+    if request.GET.get('action') == 'marcar_lida':
+        notificacao_id = request.GET.get('id')
+        if notificacao_id:
+            notificacao = get_object_or_404(Notificacao, id=notificacao_id)
+            notificacao.marcar_como_lida(request.user)
+            return redirect('perfil_usuario')
+
     context = {
         'notificacoes': notificacoes,
-        'nao_lidas_count': nao_lidas.count()
+        'nao_lidas_count': nao_lidas.count(),
+        'active_tab': 'notificacoes'
     }
     return render(request, 'core/notificacoes.html', context)
 
@@ -1094,6 +1101,40 @@ def trocar_ano(request):
         'ano_atual': ano_atual
     }
     return render(request, 'core/trocar_ano.html', context)
+
+@login_required
+def painel_admin_view(request):
+    """View para configurações gerais do sistema (Super Admin)"""
+    if request.user.perfil.nivel_acesso != 'admin':
+        messages.error(request, 'Acesso negado. Apenas administradores podem acessar esta página.')
+        return redirect('painel_principal')
+    
+    from .models import ConfiguracaoEscola
+    config = ConfiguracaoEscola.objects.first()
+    
+    if request.method == 'POST':
+        if not config:
+            config = ConfiguracaoEscola()
+        
+        config.nome_escola = request.POST.get('nome_escola')
+        config.email = request.POST.get('email')
+        config.telefone = request.POST.get('telefone')
+        config.endereco = request.POST.get('endereco')
+        
+        if 'logo' in request.FILES:
+            config.logo = request.FILES['logo']
+        if 'favicon' in request.FILES:
+            config.favicon = request.FILES['favicon']
+            
+        config.save()
+        messages.success(request, 'Configurações do sistema atualizadas com sucesso!')
+        return redirect('painel_admin')
+
+    context = {
+        'config': config,
+        'active_tab': 'admin'
+    }
+    return render(request, 'core/painel_admin_view.html', context)
 
 @login_required
 def perfil_usuario(request):

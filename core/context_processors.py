@@ -1,4 +1,4 @@
-from .models import AnoAcademico, Subscricao
+from .models import AnoAcademico, Subscricao, ConfiguracaoEscola
 
 def subscricao_context(request):
     if not request.user.is_authenticated:
@@ -7,8 +7,10 @@ def subscricao_context(request):
     return {'subscricao': subscricao}
 
 def global_academic_context(request):
+    config = ConfiguracaoEscola.objects.first()
+    
     if not request.user.is_authenticated:
-        return {}
+        return {'config': config}
     
     ano_atual = AnoAcademico.objects.filter(ativo=True).first()
     semestre_atual = None
@@ -17,5 +19,6 @@ def global_academic_context(request):
         
     return {
         'ano_atual': ano_atual,
-        'semestre_atual': semestre_atual
+        'semestre_atual': semestre_atual,
+        'config': config
     }

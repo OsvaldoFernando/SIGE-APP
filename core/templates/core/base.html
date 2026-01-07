@@ -4,11 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}SIGE - Sistema Integrado de Gestão Educacional{% endblock %}</title>
+    <title>{% if config.nome_escola %}{{ config.nome_escola }}{% else %}SIGE{% endif %} - {% block title %}Sistema Integrado de Gestão Educacional{% endblock %}</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    
+    {% if config.favicon %}
+    <link rel="icon" type="image/x-icon" href="{{ config.favicon.url }}">
+    {% endif %}
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -25,6 +29,79 @@
             display: flex;
             flex-direction: column;
         }
+
+        /* Melhorias nas Abas (Tabs) */
+        .list-group-item {
+            border: none;
+            margin-bottom: 5px;
+            border-radius: 12px !important;
+            transition: all 0.3s ease;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .list-group-item:hover {
+            background-color: #f1f5f9;
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+        .list-group-item.active {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+            border: none !important;
+            color: white !important;
+            box-shadow: 0 10px 15px -3px rgba(30, 58, 138, 0.2) !important;
+        }
+        
+        /* Toast Notification Styles */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1060;
+        }
+        .custom-toast {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border-left: 5px solid #ccc;
+        }
+        .custom-toast.show {
+            transform: translateX(0);
+        }
+        .custom-toast.success { border-left-color: #10b981; }
+        .custom-toast.error { border-left-color: #ef4444; }
+        .custom-toast.warning { border-left-color: #f59e0b; }
+        .custom-toast.info { border-left-color: #3b82f6; }
+        
+        .toast-icon {
+            font-size: 1.5rem;
+        }
+        .toast-content {
+            flex: 1;
+        }
+        .toast-title {
+            font-weight: 700;
+            margin-bottom: 2px;
+            color: #1e293b;
+        }
+        .toast-message {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+        .toast-close {
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+        .toast-close:hover { opacity: 1; }
+
         .navbar-top {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             height: 70px;
@@ -99,11 +176,13 @@
         <div class="navbar-content d-flex justify-content-between align-items-center w-100">
             <div class="d-flex align-items-center gap-4">
                 <div class="user-info">
-                    <div class="user-avatar">
-                        {% if user.perfil.foto %}
+                    <div class="user-avatar" style="background: white; border: 1px solid rgba(0,0,0,0.1);">
+                        {% if config.logo %}
+                            <img src="{{ config.logo.url }}" alt="Logo" style="width: 100%; height: 100%; object-fit: contain; padding: 2px;">
+                        {% elif user.perfil.foto %}
                             <img src="{{ user.perfil.foto.url }}" alt="{{ user.username }}">
                         {% else %}
-                            <i class="bi bi-person-circle fs-2"></i>
+                            <i class="bi bi-person-circle fs-2 text-primary"></i>
                         {% endif %}
                     </div>
                     <div class="user-greeting d-none d-md-block">
@@ -114,6 +193,7 @@
                 {% if ano_atual %}
                 <div class="academic-badge d-none d-lg-flex">
                     <span><i class="bi bi-calendar3"></i> {{ ano_atual }}</span>
+                    <span class="ms-2 border-start ps-2"><i class="bi bi-clock"></i> <span id="real-time-clock">--:--:--</span></span>
                 </div>
                 {% endif %}
             </div>
@@ -122,16 +202,10 @@
                 <a href="{% url 'painel_principal' %}" title="Início" class="btn btn-link text-white p-2">
                     <i class="bi bi-house-door fs-4"></i>
                 </a>
-                <a href="{% url 'listar_cursos' %}" title="Cursos" class="btn btn-link text-white p-2">
-                    <i class="bi bi-mortarboard fs-4"></i>
-                </a>
-                <a href="{% url 'matricula' %}" title="Matrículas" class="btn btn-link text-white p-2">
-                    <i class="bi bi-people fs-4"></i>
-                </a>
                 <a href="{% url 'perfil_usuario' %}" title="Meu Perfil" class="btn btn-link text-white p-2">
                     <i class="bi bi-person-gear fs-4"></i>
                 </a>
-                <a href="{% url 'logout' %}" title="Sair" class="btn btn-link text-white p-2">
+                <a href="#" onclick="confirmLogout(event)" title="Sair" class="btn btn-link text-white p-2">
                     <i class="bi bi-box-arrow-right fs-4"></i>
                 </a>
             </div>
@@ -139,13 +213,45 @@
     </div>
     {% endif %}
 
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Modal de Confirmação de Logout -->
+    <div class="modal fade" id="logoutConfirmModal" tabindex="-1" aria-labelledby="logoutConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="logoutConfirmModalLabel">Confirmar Saída</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-danger bg-opacity-10 p-3 rounded-circle text-danger">
+                            <i class="bi bi-box-arrow-right fs-3"></i>
+                        </div>
+                        <div>
+                            <p class="mb-0 fw-medium">Tem certeza que deseja sair do sistema?</p>
+                            <small class="text-muted">Você precisará fazer login novamente para acessar seus dados.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <a href="{% url 'logout' %}" class="btn btn-danger rounded-3 px-4">Sair do Sistema</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <main class="container">
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 shadow-sm border-0 mb-4" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const type = "{{ message.tags }}";
+                        const msg = "{{ message }}";
+                        showToast(msg, type);
+                    });
+                </script>
             {% endfor %}
         {% endif %}
         
@@ -160,5 +266,72 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let icon = 'bi-info-circle-fill';
+            let title = 'Informação';
+            let colorClass = 'info';
+            
+            if (type.includes('success')) {
+                icon = 'bi-check-circle-fill';
+                title = 'Sucesso';
+                colorClass = 'success';
+            } else if (type.includes('error') || type.includes('danger')) {
+                icon = 'bi-exclamation-octagon-fill';
+                title = 'Erro';
+                colorClass = 'error';
+            } else if (type.includes('warning')) {
+                icon = 'bi-exclamation-triangle-fill';
+                title = 'Aviso';
+                colorClass = 'warning';
+            }
+            
+            toast.className = `custom-toast ${colorClass}`;
+            toast.innerHTML = `
+                <div class="toast-icon text-${type.replace('error', 'danger')}">
+                    <i class="bi ${icon}"></i>
+                </div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <div class="toast-close" onclick="this.parentElement.classList.remove('show'); setTimeout(() => this.parentElement.remove(), 300);">
+                    <i class="bi bi-x-lg"></i>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Forçar reflow para animação
+            toast.offsetHeight;
+            toast.classList.add('show');
+            
+            // Auto-remover após 5 segundos
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 5000);
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('pt-BR', { hour12: false });
+            const clockElement = document.getElementById('real-time-clock');
+            if (clockElement) {
+                clockElement.textContent = timeString;
+            }
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        function confirmLogout(event) {
+            event.preventDefault();
+            const logoutModal = new bootstrap.Modal(document.getElementById('logoutConfirmModal'));
+            logoutModal.show();
+        }
+    </script>
 </body>
 </html>

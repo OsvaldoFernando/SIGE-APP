@@ -1,16 +1,132 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Painel Admin - SIGE{% endblock %}
+{% block title %}Configurações do Sistema - SIGE{% endblock %}
 
 {% block content %}
 <div class="container my-5">
-    <a href="{% url 'gestao_administrativa' %}" style="text-decoration: none; color: #666; margin-bottom: 15px; display: inline-block;">← Voltar</a>
-    <h2>Painel Admin</h2>
-    <hr>
+    <div class="row g-4">
+        <!-- Sidebar Navigation -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'painel_principal' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
+                            <i class="bi bi-speedometer2 me-3 fs-5"></i> Painel Principal
+                        </a>
+                        <a href="{% url 'perfil_usuario' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
+                            <i class="bi bi-person me-3 fs-5"></i> Perfil do Usuário
+                        </a>
+                        <a href="{% url 'notificacoes' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
+                            <i class="bi bi-bell me-3 fs-5"></i> Notificações
+                        </a>
+                        <a href="{% url 'quadro_avisos' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
+                            <i class="bi bi-megaphone me-3 fs-5"></i> Quadro de Avisos
+                        </a>
+                        <a href="{% url 'painel_admin' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center active bg-primary border-primary">
+                            <i class="bi bi-gear me-3 fs-5"></i> Configurações do Sistema
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <a href="{% url 'logout' %}" class="btn btn-outline-danger w-100 rounded-pill py-2 d-flex align-items-center justify-content-center">
+                <i class="bi bi-box-arrow-right me-2"></i> Sair do Sistema
+            </a>
+        </div>
 
-    <div class="card">
-        <div class="card-body">
-            <p class="text-muted">Dashboard com estatísticas e informações administrativas gerais.</p>
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                    <h2 class="fw-bold mb-0 text-primary">Configurações do Sistema</h2>
+                    <p class="text-muted small">Gerencie a identidade visual e configurações gerais da escola</p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row g-4">
+                            <div class="col-md-12">
+                                <h5 class="fw-bold mb-3 border-bottom pb-2">Identidade Visual</h5>
+                            </div>
+                            
+                            <div class="col-md-6 text-center border-end">
+                                <label class="form-label d-block fw-bold small text-muted text-uppercase mb-3">Logotipo Atual</label>
+                                <div class="mb-3 position-relative d-inline-block">
+                                    {% if config.logo %}
+                                        <img src="{{ config.logo.url }}" id="logo-preview" alt="Logo" class="img-fluid rounded border p-2 bg-light" style="max-height: 120px;">
+                                    {% else %}
+                                        <div id="logo-placeholder" class="bg-light rounded border p-4 text-muted" style="width: 200px; height: 120px; display: flex; align-items: center; justify-content: center;">Sem Logo</div>
+                                        <img src="" id="logo-preview" alt="Logo" class="img-fluid rounded border p-2 bg-light d-none" style="max-height: 120px;">
+                                    {% endif %}
+                                </div>
+                                <input type="file" name="logo" id="logo-input" class="form-control form-control-sm rounded-pill" accept="image/*" onchange="previewImage(this, 'logo-preview', 'logo-placeholder')">
+                            </div>
+
+                            <div class="col-md-6 text-center">
+                                <label class="form-label d-block fw-bold small text-muted text-uppercase mb-3">Favicon Atual</label>
+                                <div class="mb-3 position-relative d-inline-block">
+                                    {% if config.favicon %}
+                                        <img src="{{ config.favicon.url }}" id="favicon-preview" alt="Favicon" class="img-fluid rounded border p-2 bg-light" style="max-height: 48px;">
+                                    {% else %}
+                                        <div id="favicon-placeholder" class="bg-light rounded border p-4 text-muted" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;"><i class="bi bi-image small"></i></div>
+                                        <img src="" id="favicon-preview" alt="Favicon" class="img-fluid rounded border p-2 bg-light d-none" style="max-height: 48px;">
+                                    {% endif %}
+                                </div>
+                                <input type="file" name="favicon" id="favicon-input" class="form-control form-control-sm rounded-pill" accept="image/*" onchange="previewImage(this, 'favicon-preview', 'favicon-placeholder')">
+                            </div>
+
+                            <script>
+                            function previewImage(input, previewId, placeholderId) {
+                                if (input.files && input.files[0]) {
+                                    const reader = new FileReader();
+                                    reader.onload = function(e) {
+                                        const preview = document.getElementById(previewId);
+                                        const placeholder = document.getElementById(placeholderId);
+                                        
+                                        preview.src = e.target.result;
+                                        preview.classList.remove('d-none');
+                                        if (placeholder) {
+                                            placeholder.classList.add('d-none');
+                                        }
+                                    }
+                                    reader.readAsDataURL(input.files[0]);
+                                }
+                            }
+                            </script>
+
+                            <div class="col-md-12 mt-5">
+                                <h5 class="fw-bold mb-3 border-bottom pb-2">Informações da Escola</h5>
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label small fw-bold">Nome da Escola</label>
+                                <input type="text" name="nome_escola" class="form-control rounded-3" value="{{ config.nome_escola }}" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Email de Contato</label>
+                                <input type="email" name="email" class="form-control rounded-3" value="{{ config.email }}">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Telefone</label>
+                                <input type="text" name="telefone" class="form-control rounded-3" value="{{ config.telefone }}">
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="form-label small fw-bold">Endereço</label>
+                                <textarea name="endereco" class="form-control rounded-3" rows="2">{{ config.endereco }}</textarea>
+                            </div>
+
+                            <div class="col-md-12 text-end mt-4">
+                                <button type="submit" class="btn btn-primary rounded-pill px-5 py-2">
+                                    <i class="bi bi-save me-2"></i> Salvar Configurações
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>

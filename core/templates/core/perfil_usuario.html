@@ -13,9 +13,6 @@
                         <a href="{% url 'painel_principal' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
                             <i class="bi bi-speedometer2 me-3 fs-5"></i> Painel Principal
                         </a>
-                        <a href="{% url 'trocar_ano' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
-                            <i class="bi bi-calendar-event me-3 fs-5"></i> Ano Acadêmico
-                        </a>
                         <a href="{% url 'perfil_usuario' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center active bg-primary border-primary">
                             <i class="bi bi-person me-3 fs-5"></i> Perfil do Usuário
                         </a>
@@ -25,6 +22,11 @@
                         <a href="{% url 'quadro_avisos' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
                             <i class="bi bi-megaphone me-3 fs-5"></i> Quadro de Avisos
                         </a>
+                        {% if user.perfil.nivel_acesso == 'admin' %}
+                        <a href="{% url 'painel_admin' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
+                            <i class="bi bi-gear me-3 fs-5"></i> Configurações do Sistema
+                        </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
