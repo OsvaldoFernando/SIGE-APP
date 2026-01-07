@@ -1,10 +1,16 @@
-from .models import AnoAcademico, Subscricao
+from django.utils import timezone
+from .models import AnoAcademico, Subscricao, ConfiguracaoEscola
 
 def subscricao_context(request):
     if not request.user.is_authenticated:
         return {}
     subscricao = Subscricao.objects.filter(estado__in=['ativo', 'teste']).first()
-    return {'subscricao': subscricao}
+    config = ConfiguracaoEscola.objects.first()
+    return {
+        'subscricao': subscricao,
+        'config': config,
+        'now': timezone.now()
+    }
 
 def global_academic_context(request):
     if not request.user.is_authenticated:

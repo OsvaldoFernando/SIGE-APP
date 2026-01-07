@@ -36,6 +36,7 @@ urlpatterns = [
     
     # URLs para Menus do Painel Principal
     path('nova-matricula/', views.selecionar_tipo_matricula, name='nova_matricula'),
+    path('matricula-online/', views.inscricao_online, name='inscricao_online'),
     path('consultar-aprovacao/', views.consultar_aprovacao, name='consultar_aprovacao'),
     path('admissao-estudantes/', views.admissao_estudantes, name='admissao_estudantes'),
     path('termo-renovacao/', views.termo_renovacao, name='termo_renovacao'),

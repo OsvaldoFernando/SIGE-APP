@@ -59,6 +59,7 @@ class ConfiguracaoEscola(models.Model):
     telefone = models.CharField(max_length=20, blank=True, verbose_name="Telefone")
     email = models.EmailField(blank=True, verbose_name="Email")
     logo = models.ImageField(upload_to='escola/', blank=True, null=True, verbose_name="Logo da Escola")
+    favicon = models.ImageField(upload_to='escola/', blank=True, null=True, verbose_name="Favicon")
     
     template_confirmacao_inscricao = models.TextField(
         default="CONFIRMAÇÃO DE INSCRIÇÃO\n\nNome: {nome}\nCurso: {curso}\nNúmero de Inscrição: {numero}\nData: {data}",
