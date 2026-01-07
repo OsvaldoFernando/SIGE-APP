@@ -4,149 +4,77 @@
 
 {% block content %}
 <div class="container my-5">
-    <div class="row g-4">
-        <!-- Sidebar Navigation -->
+    <div class="row">
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-                <div class="card-body p-0">
-                    <div class="list-group list-group-flush">
-                        <a href="{% url 'painel_principal' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
-                            <i class="bi bi-speedometer2 me-3 fs-5"></i> Painel Principal
-                        </a>
-                        <a href="{% url 'trocar_ano' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center active bg-primary border-primary">
-                            <i class="bi bi-calendar-event me-3 fs-5"></i> Ano Acadêmico
-                        </a>
-                        <a href="{% url 'perfil_usuario' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
-                            <i class="bi bi-person me-3 fs-5"></i> Perfil do Usuário
-                        </a>
-                        <a href="{% url 'notificacoes' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
-                            <i class="bi bi-bell me-3 fs-5"></i> Notificações
-                        </a>
-                        <a href="{% url 'quadro_avisos' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
-                            <i class="bi bi-megaphone me-3 fs-5"></i> Quadro de Avisos
-                        </a>
-                    </div>
-                </div>
+            <div class="list-group">
+                <a href="{% url 'painel_principal' %}" class="list-group-item list-group-item-action">Painel Principal</a>
+                <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action">Dashboard</a>
+                <a href="{% url 'trocar_ano' %}" class="list-group-item list-group-item-action active">Ano Acadêmico</a>
+                <a href="{% url 'perfil_usuario' %}" class="list-group-item list-group-item-action">Perfil do Usuário</a>
+                <a href="{% url 'notificacoes' %}" class="list-group-item list-group-item-action">Notificações</a>
+                <a href="{% url 'quadro_avisos' %}" class="list-group-item list-group-item-action">Quadro de Avisos</a>
             </div>
-            <a href="{% url 'painel_principal' %}" class="btn btn-outline-primary w-100 rounded-pill py-2 d-flex align-items-center justify-content-center">
-                <i class="bi bi-arrow-left me-2"></i> Voltar ao Início
-            </a>
         </div>
 
-        <!-- Main Content -->
         <div class="col-md-9">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
-                <div class="card-header bg-white border-bottom-0 pt-4 px-4">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <div>
-                            <h2 class="fw-bold mb-0 text-primary">Gestão de Anos Acadêmicos</h2>
-                            <p class="text-muted small">Selecione o ano letivo de trabalho atual</p>
-                        </div>
-                        <a href="{% url 'ano_academico_lista' %}" class="btn btn-primary rounded-pill px-4">
-                            <i class="bi bi-plus-lg me-2"></i> Gerenciar Todos
-                        </a>
-                    </div>
-                </div>
-                <div class="card-body p-4">
-                    {% if ano_atual %}
-                    <div class="alert alert-primary border-0 rounded-4 p-4 mb-5 d-flex align-items-center">
-                        <div class="bg-primary text-white rounded-circle p-3 me-4 shadow-sm">
-                            <i class="bi bi-calendar-check fs-2"></i>
-                        </div>
-                        <div>
-                            <h5 class="fw-bold mb-1">Ano Acadêmico Atualmente Ativo</h5>
-                            <p class="mb-0 fs-5 text-primary-emphasis fw-semibold">{{ ano_atual.ano_inicio }} / {{ ano_atual.ano_fim }}</p>
-                        </div>
-                    </div>
-                    {% endif %}
+            <h2>Seleção de Ano Acadêmico</h2>
+            <hr>
 
-                    <h5 class="fw-bold mb-4 px-2">Anos Disponíveis</h5>
-                    <div class="row g-4">
-                        {% for ano in anos_academicos %}
-                        <div class="col-md-6">
-                            <div class="card h-100 border-0 shadow-sm rounded-4 year-card {% if ano.ativo %}active-year{% endif %}" style="transition: all 0.3s ease;">
-                                <div class="card-body p-4">
-                                    <div class="d-flex justify-content-between align-items-start mb-3">
-                                        <div class="bg-light rounded-3 p-3">
-                                            <i class="bi bi-calendar3 fs-3 text-primary"></i>
-                                        </div>
-                                        <span class="badge {% if ano.ativo %}bg-success{% else %}bg-secondary-subtle text-secondary{% endif %} rounded-pill px-3 py-2">
-                                            {% if ano.ativo %}
-                                                <i class="bi bi-check-circle-fill me-1"></i> ATIVO
-                                            {% else %}
-                                                <i class="bi bi-circle me-1"></i> INATIVO
-                                            {% endif %}
-                                        </span>
-                                    </div>
-                                    <h3 class="fw-bold mb-1">{{ ano.ano_inicio }} / {{ ano.ano_fim }}</h3>
-                                    <p class="text-muted small mb-4">Status: {{ ano.get_status_display }}</p>
-                                    
-                                    {% if not ano.ativo %}
-                                    <button class="btn btn-outline-primary w-100 rounded-pill py-2 fw-semibold" onclick="ativarAno({{ ano.id }}, '{{ ano.ano_inicio }}/{{ ano.ano_fim }}')">
-                                        <i class="bi bi-check2-circle me-2"></i> Ativar este Ano
-                                    </button>
-                                    {% else %}
-                                    <button class="btn btn-success w-100 rounded-pill py-2 fw-semibold disabled opacity-75">
-                                        <i class="bi bi-check-all me-2"></i> Ano Atual
-                                    </button>
-                                    {% endif %}
-                                </div>
-                            </div>
+            {% if ano_atual %}
+            <div class="alert alert-info">
+                <strong>Ano Acadêmico Ativo:</strong> {{ ano_atual.ano_inicio }}/{{ ano_atual.ano_fim }}
+            </div>
+            {% endif %}
+
+            <div class="row">
+                {% for ano in anos_academicos %}
+                <div class="col-md-6 mb-3">
+                    <div class="card {% if ano.ativo %}border-success{% endif %}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ ano.ano_inicio }}/{{ ano.ano_fim }}</h5>
+                            <p class="card-text">
+                                Status: 
+                                <span class="badge {% if ano.ativo %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {% if ano.ativo %}Ativo{% else %}Inativo{% endif %}
+                                </span>
+                            </p>
+                            {% if not ano.ativo %}
+                            <button class="btn btn-sm btn-primary" onclick="ativarAno({{ ano.id }})">
+                                Ativar
+                            </button>
+                            {% endif %}
                         </div>
-                        {% empty %}
-                        <div class="col-12">
-                            <div class="text-center py-5 bg-light rounded-4">
-                                <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
-                                <h5 class="mt-3 fw-bold text-muted">Nenhum ano acadêmico encontrado</h5>
-                                <p class="text-muted">Cadastre um novo ano letivo para começar.</p>
-                            </div>
-                        </div>
-                        {% endfor %}
                     </div>
                 </div>
+                {% empty %}
+                <div class="col-12">
+                    <p class="text-muted">Nenhum ano acadêmico cadastrado.</p>
+                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
 </div>
 
-<style>
-    .year-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
-    }
-    .active-year {
-        background: linear-gradient(145deg, #ffffff 0%, #f0f7ff 100%);
-        border: 2px solid #0d6efd !important;
-    }
-    .list-group-item.active {
-        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
-    }
-</style>
-
 <script>
-function ativarAno(anoId, anoTexto) {
-    if(!confirm(`Deseja realmente ativar o ano acadêmico ${anoTexto}?`)) return;
-
+function ativarAno(anoId) {
     fetch('{% url "trocar_ano_academico" %}', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
             'X-CSRFToken': '{{ csrf_token }}'
         },
-        body: `ano_id=${anoId}`
+        body: JSON.stringify({ ano_academico_id: anoId })
     })
     .then(response => response.json())
     .then(data => {
         if(data.success) {
-            window.location.reload();
+            location.reload();
         } else {
-            alert('Erro: ' + (data.error || 'Não foi possível ativar o ano acadêmico.'));
+            alert('Erro ao ativar ano acadêmico');
         }
-    })
-    .catch(error => {
-        console.error('Erro:', error);
-        alert('Erro ao processar a requisição.');
     });
 }
 </script>
+
 {% endblock %}

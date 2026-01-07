@@ -21,9 +21,6 @@
                         </a>
                         <a href="{% url 'notificacoes' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
                             <i class="bi bi-bell me-3 fs-5"></i> Notificações
-                            {% if user.notificacoes_recebidas.filter_esta_lida_False.exists %}
-                                <span class="badge bg-danger rounded-pill ms-auto">!</span>
-                            {% endif %}
                         </a>
                         <a href="{% url 'quadro_avisos' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
                             <i class="bi bi-megaphone me-3 fs-5"></i> Quadro de Avisos
@@ -114,27 +111,7 @@
                                 <button class="btn btn-outline-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#modalEditarPerfil">
                                     <i class="bi bi-pencil me-2"></i> Editar Perfil
                                 </button>
-                                {% if user.perfil.nivel_acesso == 'super_admin' %}
-                                <button class="btn btn-outline-dark rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#modalConfiguracaoEscola">
-                                    <i class="bi bi-gear me-2"></i> Configurações Visuais
-                                </button>
-                                {% endif %}
                             </div>
-
-                            {% if subscricao %}
-                            <div class="mt-5 p-4 bg-light rounded-4 border">
-                                <h6 class="fw-bold text-uppercase small text-muted mb-3">Status da Subscrição</h6>
-                                <div class="d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <p class="mb-1 fw-bold">Plano Atual: {{ subscricao.get_tipo_display|default:"Padrão" }}</p>
-                                        <p class="mb-0 text-muted small">Vence em: {{ subscricao.data_fim|date:"d/m/Y" }}</p>
-                                    </div>
-                                    <span class="badge {% if subscricao.estado == 'ativo' %}bg-success{% else %}bg-warning{% endif %} rounded-pill px-3">
-                                        {{ subscricao.get_estado_display|upper }}
-                                    </span>
-                                </div>
-                            </div>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -228,45 +205,6 @@
                 <div class="modal-footer border-top-0 pt-0">
                     <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" name="action" value="update_profile" class="btn btn-primary rounded-pill px-4">Salvar Alterações</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Configuração Escola -->
-<div class="modal fade" id="modalConfiguracaoEscola" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
-            <div class="modal-header border-bottom-0">
-                <h5 class="modal-title fw-bold">Configurações Visuais da Escola</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="POST" enctype="multipart/form-data" action="{% url 'perfil_usuario' %}">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <div class="mb-4">
-                        <label class="form-label small fw-bold">Logotipo da Escola</label>
-                        {% if config.logo %}
-                        <div class="mb-2">
-                            <img src="{{ config.logo.url }}" alt="Logo atual" style="max-height: 50px;">
-                        </div>
-                        {% endif %}
-                        <input type="file" class="form-control rounded-3" name="logo" accept="image/*">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold">Favicon (Ícone do Navegador)</label>
-                        {% if config.favicon %}
-                        <div class="mb-2">
-                            <img src="{{ config.favicon.url }}" alt="Favicon atual" style="max-height: 32px;">
-                        </div>
-                        {% endif %}
-                        <input type="file" class="form-control rounded-3" name="favicon" accept="image/*">
-                    </div>
-                </div>
-                <div class="modal-footer border-top-0 pt-0">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" name="action" value="update_school_config" class="btn btn-primary rounded-pill px-4">Salvar Alterações</button>
                 </div>
             </form>
         </div>

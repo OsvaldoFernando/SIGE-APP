@@ -3,72 +3,146 @@
 {% block title %}Nova Matrícula - SIGE{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-md-10 text-center mb-5">
-            <h1 class="fw-bold text-primary">Portal de Matrícula</h1>
-            <p class="text-muted fs-5">Escolha o canal de inscrição mais adequado para você</p>
-        </div>
+<div class="container-fluid px-4 my-4" style="font-family: Arial, sans-serif;">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb mb-3" style="font-size: 13px; color: #666; background: transparent; padding: 0;">
+        <i class="bi bi-pencil-square me-1"></i> Matrícula <span class="mx-1">&gt;</span> <span class="text-muted">Nova matrícula</span>
     </div>
 
-    <div class="row g-4 justify-content-center">
-        <!-- Online Option -->
-        <div class="col-md-5">
-            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden selection-card">
-                <div class="card-body p-5 text-center">
-                    <div class="bg-primary-subtle text-primary rounded-circle p-4 d-inline-block mb-4">
-                        <i class="bi bi-laptop fs-1"></i>
+    <!-- Red Header Bar -->
+    <div class="d-flex align-items-center mb-4" style="background-color: #E74C3C; color: white; padding: 10px 15px; border-radius: 2px;">
+        <i class="bi bi-list me-2" style="font-size: 18px;"></i>
+        <span style="font-size: 16px;">Escolha um tipo de matrícula:</span>
+    </div>
+
+    <div class="row g-4">
+        <!-- Botão Voltar -->
+        <div class="col-12 mb-2">
+            <a href="{% url 'painel_principal' %}" class="btn btn-sm btn-outline-secondary d-inline-flex align-items-center" style="border-radius: 2px;">
+                <i class="bi bi-arrow-left me-2"></i>
+                <span>Voltar ao Painel</span>
+            </a>
+        </div>
+        
+        <!-- Aluno Novato (Blue) -->
+        <div class="col-md-6">
+            <a href="/inscricao/1/" class="text-decoration-none">
+                <div class="card border-0 h-100" style="background-color: #3498DB; color: white; border-radius: 2px; overflow: hidden; min-height: 160px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div class="card-body p-4 d-flex">
+                        <div class="flex-shrink-0 me-4">
+                            <i class="bi bi-person-fill" style="font-size: 80px; line-height: 1; opacity: 1;"></i>
+                        </div>
+                        <div class="flex-grow-1 text-end">
+                            <h2 style="font-weight: 300; font-size: 38px; margin-bottom: 5px; letter-spacing: -1px;">Aluno Novato</h2>
+                            <p style="font-size: 13px; opacity: 0.9; margin: 0; line-height: 1.4;">Aluno recém-chegado à instituição, ou que<br>ainda não tem cadastro neste sistema.</p>
+                        </div>
                     </div>
-                    <h3 class="fw-bold mb-3">Inscrição Online</h3>
-                    <p class="text-muted mb-4">
-                        Ideal para novos candidatos. Processo rápido e simplificado para garantir sua vaga sem sair de casa.
-                    </p>
-                    <ul class="text-start mb-4 small text-muted list-unstyled">
-                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Cadastro básico de dados</li>
-                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Upload de documentos principais</li>
-                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i> Acompanhamento do status</li>
-                    </ul>
-                    <a href="/matricula-online/" class="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-sm">
-                        Iniciar Inscrição Online <i class="bi bi-arrow-right ms-2"></i>
-                    </a>
+                    <div class="card-footer border-0 py-2 px-3 d-flex justify-content-between align-items-center" style="background-color: rgba(0,0,0,0.15);">
+                        <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Iniciar cadastro do aluno</span>
+                        <i class="bi bi-arrow-right-circle" style="font-size: 18px;"></i>
+                    </div>
                 </div>
-            </div>
+            </a>
         </div>
 
-        <!-- Presential/Admin Option -->
-        <div class="col-md-5">
-            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden selection-card">
-                <div class="card-body p-5 text-center">
-                    <div class="bg-info-subtle text-info rounded-circle p-4 d-inline-block mb-4">
-                        <i class="bi bi-person-badge fs-1"></i>
+        <!-- Aluno Veterano (Green) -->
+        <div class="col-md-6">
+            <a href="#" class="text-decoration-none">
+                <div class="card border-0 h-100" style="background-color: #16A085; color: white; border-radius: 2px; overflow: hidden; min-height: 160px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div class="card-body p-4 d-flex">
+                        <div class="flex-shrink-0 me-4">
+                            <i class="bi bi-person-badge-fill" style="font-size: 80px; line-height: 1; opacity: 1;"></i>
+                        </div>
+                        <div class="flex-grow-1 text-end">
+                            <h2 style="font-weight: 300; font-size: 38px; margin-bottom: 5px; letter-spacing: -1px;">Aluno Veterano</h2>
+                            <p style="font-size: 13px; opacity: 0.9; margin: 0; line-height: 1.4;">Aluno já estudou nesta instituição e que<br>já tem cadastro neste sistema.</p>
+                        </div>
                     </div>
-                    <h3 class="fw-bold mb-3">Matrícula Presencial</h3>
-                    <p class="text-muted mb-4">
-                        Área restrita para a secretaria. Matrícula completa com validação de documentos e dados familiares.
-                    </p>
-                    <ul class="text-start mb-4 small text-muted list-unstyled">
-                        <li class="mb-2"><i class="bi bi-check-circle-fill text-info me-2"></i> Validação presencial de BI</li>
-                        <li class="mb-2"><i class="bi bi-check-circle-fill text-info me-2"></i> Dados detalhados de encarregados</li>
-                        <li class="mb-2"><i class="bi bi-check-circle-fill text-info me-2"></i> Emissão de guias de pagamento</li>
-                    </ul>
-                    <a href="{% url 'admissao_inscricao' %}" class="btn btn-outline-info w-100 rounded-pill py-3 fw-bold">
-                        Acesso Secretaria <i class="bi bi-lock-fill ms-2"></i>
-                    </a>
+                    <div class="card-footer border-0 py-2 px-3 d-flex justify-content-between align-items-center" style="background-color: rgba(0,0,0,0.15);">
+                        <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Encontrar o cadastro do aluno para realizar a matrícula</span>
+                        <i class="bi bi-arrow-right-circle" style="font-size: 18px;"></i>
+                    </div>
                 </div>
-            </div>
+            </a>
+        </div>
+
+        <!-- Rematrícula individual (Purple) -->
+        <div class="col-md-6">
+            <a href="{% url 'matricula' %}" class="text-decoration-none">
+                <div class="card border-0 h-100" style="background-color: #8E44AD; color: white; border-radius: 2px; overflow: hidden; min-height: 160px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div class="card-body p-4 d-flex">
+                        <div class="flex-shrink-0 me-4 d-flex align-items-center">
+                            <i class="bi bi-arrow-repeat" style="font-size: 80px; line-height: 1; opacity: 1;"></i>
+                            <i class="bi bi-person-fill ms-2" style="font-size: 40px;"></i>
+                        </div>
+                        <div class="flex-grow-1 text-end">
+                            <h2 style="font-weight: 300; font-size: 38px; margin-bottom: 5px; letter-spacing: -1px;">Rematrícula <span style="font-size: 24px;">individual</span></h2>
+                            <p style="font-size: 13px; opacity: 0.9; margin: 0; line-height: 1.4;">Aluno que estudou no ano atual<br>e que continuará no próximo ano.</p>
+                        </div>
+                    </div>
+                    <div class="card-footer border-0 py-2 px-3 d-flex justify-content-between align-items-center" style="background-color: rgba(0,0,0,0.15);">
+                        <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Buscar aluno</span>
+                        <i class="bi bi-arrow-right-circle" style="font-size: 18px;"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Consultar Aprovação (Purple) -->
+        <div class="col-md-6">
+            <a href="{% url 'consultar_aprovacao' %}" class="text-decoration-none">
+                <div class="card border-0 h-100" style="background-color: #8E44AD; color: white; border-radius: 2px; overflow: hidden; min-height: 160px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div class="card-body p-4 d-flex">
+                        <div class="flex-shrink-0 me-4 d-flex align-items-center">
+                            <i class="bi bi-search" style="font-size: 80px; line-height: 1; opacity: 1;"></i>
+                            <i class="bi bi-check-circle-fill ms-2" style="font-size: 40px;"></i>
+                        </div>
+                        <div class="flex-grow-1 text-end">
+                            <h2 style="font-weight: 300; font-size: 38px; margin-bottom: 5px; letter-spacing: -1px;">Consultar Aprovação</h2>
+                            <p style="font-size: 13px; opacity: 0.9; margin: 0; line-height: 1.4;">Verifique se foi aprovado no teste de<br>admissão para prosseguir com a matrícula.</p>
+                        </div>
+                    </div>
+                    <div class="card-footer border-0 py-2 px-3 d-flex justify-content-between align-items-center" style="background-color: rgba(0,0,0,0.15);">
+                        <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Verificar resultado do teste</span>
+                        <i class="bi bi-arrow-right-circle" style="font-size: 18px;"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Aluno Selecionado (Orange) -->
+        <div class="col-md-6">
+            <a href="#" class="text-decoration-none">
+                <div class="card border-0 h-100" style="background-color: #F39C12; color: white; border-radius: 2px; overflow: hidden; min-height: 160px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <div class="card-body p-4 d-flex">
+                        <div class="flex-shrink-0 me-4">
+                            <i class="bi bi-pencil-square" style="font-size: 80px; line-height: 1; opacity: 1;"></i>
+                        </div>
+                        <div class="flex-grow-1 text-end">
+                            <h2 style="font-weight: 300; font-size: 38px; margin-bottom: 5px; letter-spacing: -1px;">Aluno Selecionado</h2>
+                            <p style="font-size: 13px; opacity: 0.9; margin: 0; line-height: 1.4;">Aluno que foi sorteado ou aprovado em um<br>processo seletivo da instituição.</p>
+                        </div>
+                    </div>
+                    <div class="card-footer border-0 py-2 px-3 d-flex justify-content-between align-items-center" style="background-color: rgba(0,0,0,0.15);">
+                        <span style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Escolher o concurso e aluno para realizar a matrícula</span>
+                        <i class="bi bi-arrow-right-circle" style="font-size: 18px;"></i>
+                    </div>
+                </div>
+            </a>
         </div>
     </div>
 </div>
 
 <style>
-    .selection-card {
-        transition: all 0.3s ease;
-        border: 2px solid transparent !important;
+    body {
+        background-color: #f8f9fa !important;
     }
-    .selection-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
-        border-color: rgba(13, 110, 253, 0.1) !important;
+    .card {
+        transition: transform 0.1s ease, filter 0.1s ease;
+    }
+    .card:hover {
+        filter: brightness(1.05);
+        transform: translateY(-2px);
     }
 </style>
 {% endblock %}

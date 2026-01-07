@@ -83,9 +83,6 @@ def inscricao_create(request, curso_id):
         context['prerequisitos'] = curso.prerequisitos.all()
     
     if request.method == 'POST':
-        # Definir tipo de inscrição automaticamente com base na autenticação
-        tipo_inscricao = 'presencial' if request.user.is_authenticated else 'online'
-        
         # Validar BI único
         bilhete_identidade = request.POST.get('bilhete_identidade')
         if bilhete_identidade and Inscricao.objects.filter(bilhete_identidade=bilhete_identidade).exists():
@@ -115,7 +112,6 @@ def inscricao_create(request, curso_id):
         
         inscricao = Inscricao(
             curso=curso,
-            tipo_inscricao=tipo_inscricao,
             # 1. Informações Pessoais
             nome_completo=request.POST['nome_completo'],
             data_nascimento=request.POST['data_nascimento'],
@@ -146,16 +142,7 @@ def inscricao_create(request, curso_id):
             encarregado_email=request.POST.get('encarregado_email', ''),
             encarregado_profissao=request.POST.get('encarregado_profissao', ''),
             encarregado_local_trabalho=request.POST.get('encarregado_local_trabalho', ''),
-            # 7. Documentos
-            certificado_escolar=request.FILES.get('certificado_escolar'),
-            copia_bi=request.FILES.get('copia_bi'),
-            comprovativo_pagamento=request.FILES.get('comprovativo_pagamento'),
         )
-        
-        # Aprovação automática para inscrições online
-        if tipo_inscricao == 'online':
-            inscricao.aprovado = True
-            inscricao.data_resultado = timezone.now()
         
         inscricao.save()
         
@@ -1092,7 +1079,7 @@ def painel_principal(request):
         'notificacoes_nao_lidas': notificacoes_nao_lidas,
         'notificacoes_recentes': notificacoes_recentes,
         'subscricao': subscricao,
-        'now': timezone.now()
+        'now': date.today()
     }
     return render(request, 'core/painel_principal.html', context)
 
@@ -1115,10 +1102,7 @@ def perfil_usuario(request):
         perfil = request.user.perfil
     except Exception:
         from .models import PerfilUsuario
-        perfil = PerfilUsuario.objects.create(user=request.user)
-
-    config = ConfiguracaoEscola.objects.first()
-    subscricao = Subscricao.objects.filter(estado__in=['ativo', 'teste']).first()
+        perfil = PerfilUsuario.objects.create(usuario=request.user)
 
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -1140,17 +1124,6 @@ def perfil_usuario(request):
             perfil.telefone = request.POST.get('telefone')
             perfil.save()
             messages.success(request, 'Perfil atualizado com sucesso!')
-
-        elif action == 'update_school_config' and perfil.nivel_acesso == 'super_admin':
-            if not config:
-                config = ConfiguracaoEscola.objects.create(nome_escola="Minha Escola")
-            
-            if request.FILES.get('logo'):
-                config.logo = request.FILES.get('logo')
-            if request.FILES.get('favicon'):
-                config.favicon = request.FILES.get('favicon')
-            config.save()
-            messages.success(request, 'Configurações visuais da escola atualizadas!')
             
         elif action == 'change_password':
             from django.contrib.auth import update_session_auth_hash
@@ -1169,10 +1142,6 @@ def perfil_usuario(request):
 
     context = {
         'user': request.user,
-        'perfil': perfil,
-        'config': config,
-        'subscricao': subscricao,
-        'now': timezone.now(),
     }
     return render(request, 'core/perfil_usuario.html', context)
 
@@ -2089,56 +2058,6 @@ def editar_utilizador(request, user_id):
             'telefone': perfil.telefone,
             'is_active': user.is_active
         }
-    })
-
-@login_required
-def selecionar_tipo_matricula(request):
-    return render(request, 'core/selecionar_tipo_matricula.html')
-
-def inscricao_online(request):
-    """View simplificada para inscrição online de novos alunos"""
-    cursos = Curso.objects.filter(ativo=True)
-    escolas = Escola.objects.all()
-    
-    if request.method == 'POST':
-        curso_id = request.POST.get('curso')
-        curso = get_object_or_404(Curso, id=curso_id)
-        
-        # Validações básicas
-        bi = request.POST.get('bilhete_identidade')
-        if Inscricao.objects.filter(bilhete_identidade=bi).exists():
-            messages.error(request, 'Este Bilhete de Identidade já está registrado.')
-            return render(request, 'core/inscricao_online.html', {'cursos': cursos, 'escolas': escolas})
-
-        inscricao = Inscricao(
-            curso=curso,
-            tipo_inscricao='online',
-            nome_completo=request.POST.get('nome_completo'),
-            data_nascimento=request.POST.get('data_nascimento'),
-            bilhete_identidade=bi,
-            sexo=request.POST.get('sexo'),
-            telefone=request.POST.get('telefone'),
-            email=request.POST.get('email'),
-            endereco=request.POST.get('endereco', 'Não informado'),
-            nacionalidade='Angolana',
-            local_nascimento='Luanda',
-            # Campos obrigatórios no modelo com defaults se necessário
-            ano_conclusao=request.POST.get('ano_conclusao', '2024'),
-        )
-        
-        # Upload de arquivos se fornecidos
-        if 'certificado_escolar' in request.FILES:
-            inscricao.certificado_escolar = request.FILES['certificado_escolar']
-        if 'copia_bi' in request.FILES:
-            inscricao.copia_bi = request.FILES['copia_bi']
-            
-        inscricao.save()
-        messages.success(request, f'Sua inscrição foi enviada com sucesso! Número: {inscricao.numero_inscricao}')
-        return redirect('inscricao_consulta', numero=inscricao.numero_inscricao)
-
-    return render(request, 'core/inscricao_online.html', {
-        'cursos': cursos,
-        'escolas': escolas
     })
 
 @login_required
