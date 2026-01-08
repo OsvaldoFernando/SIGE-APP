@@ -34,6 +34,8 @@ def processar_aprovacoes_curso(curso_id):
             inscricao.aprovado = True
             inscricao.data_resultado = timezone.now()
             inscricao.save()
+    
+    messages.success(None, 'Processo de aprovação concluído com sucesso!')
 
 def index_redirect(request):
     """Redireciona para login se não autenticado, caso contrário para painel principal"""
@@ -125,7 +127,7 @@ def inscricao_create(request, curso_id):
             estado_civil=request.POST.get('estado_civil', 'S'),
             endereco=request.POST['endereco'],
             telefone=request.POST['telefone'],
-            email=request.POST['email'],
+            email=request.POST.get('email'),
             # Documentos
             arquivo_bi=request.FILES.get('arquivo_bi'),
             arquivo_certificado=request.FILES.get('arquivo_certificado'),
@@ -263,7 +265,8 @@ def gerar_pdf_confirmacao(request, numero):
     story.append(Paragraph(f"Data de Nascimento: {inscricao.data_nascimento.strftime('%d/%m/%Y')}", normal_style))
     story.append(Paragraph(f"Bilhete de Identidade: {inscricao.bilhete_identidade}", normal_style))
     story.append(Paragraph(f"Telefone: {inscricao.telefone}", normal_style))
-    story.append(Paragraph(f"Email: {inscricao.email}", normal_style))
+    if inscricao.email:
+        story.append(Paragraph(f"Email: {inscricao.email}", normal_style))
     
     if inscricao.nota_teste is not None:
         story.append(Spacer(1, 0.5*cm))
@@ -646,14 +649,15 @@ def login_view(request):
         
         if user is not None:
             if not hasattr(user, 'perfil'):
-                messages.error(request, 'Perfil de usuário não encontrado. Por favor, entre em contato com o administrador.')
-                return render(request, 'core/login.html')
+                from .models import PerfilUsuario
+                PerfilUsuario.objects.get_or_create(user=user)
             
             if user.perfil.nivel_acesso == 'pendente':
                 messages.warning(request, 'Sua conta está aguardando aprovação do administrador. Você receberá acesso assim que seu perfil for atribuído.')
                 return render(request, 'core/login.html')
             
             auth_login(request, user)
+            messages.success(request, f'Bem-vindo(a) de volta, {user.first_name or user.username}!')
             next_url = request.GET.get('next', 'painel_principal')
             return redirect(next_url)
         else:
@@ -1193,6 +1197,15 @@ def perfil_usuario(request):
                 for error_list in form.errors.values():
                     for error in error_list:
                         messages.error(request, error)
+        
+        elif action == 'update_system_logo' and request.user.perfil.nivel_acesso == 'super_admin' and request.FILES.get('logo'):
+            from .models import ConfiguracaoEscola
+            config = ConfiguracaoEscola.objects.first()
+            if not config:
+                config = ConfiguracaoEscola.objects.create(nome_escola="SIGA")
+            config.logo = request.FILES.get('logo')
+            config.save()
+            messages.success(request, 'Logotipo do sistema atualizado com sucesso!')
         
         return redirect('perfil_usuario')
 

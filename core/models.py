@@ -248,6 +248,7 @@ class Inscricao(models.Model):
     estado_civil = models.CharField(max_length=1, choices=ESTADO_CIVIL_CHOICES, default='S', verbose_name="Estado Civil")
     endereco = models.TextField(verbose_name="Endereço Completo")
     telefone = models.CharField(max_length=20, verbose_name="Telefone")
+    email = models.EmailField(verbose_name="Email", blank=True, null=True)
     # Status da Inscrição
     STATUS_INSCRICAO_CHOICES = [
         ('submetida', 'Submetida'),

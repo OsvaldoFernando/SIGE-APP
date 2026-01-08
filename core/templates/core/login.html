@@ -10,6 +10,15 @@
         <div class="col-lg-12">
             <div class="d-flex align-items-center justify-content-center" style="min-height: 100vh;">
                 <div class="w-100" style="max-width: 500px; padding: 2rem;">
+                    <!-- Logo do Sistema -->
+                    <div class="text-center mb-4">
+                        {% if config.logo %}
+                            <img src="{{ config.logo.url }}" alt="Logo {{ config.nome_escola }}" style="max-height: 100px; max-width: 250px; object-fit: contain;">
+                        {% else %}
+                            <img src="{% static 'core/images/siga-logo.png' %}" alt="SIGA Logo" style="max-height: 80px; object-fit: contain;">
+                        {% endif %}
+                    </div>
+
                     <div class="card shadow-lg border-0">
                         <div class="card-header text-white text-center py-4" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);">
                             <h3 class="mb-0"><i class="bi bi-person-circle me-2"></i>Login</h3>

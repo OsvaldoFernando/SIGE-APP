@@ -132,11 +132,16 @@
                                         </div>
                                         <div class="col-md-4 mb-3">
                                             <label class="form-label">Nacionalidade *</label>
-                                            <input type="text" name="nacionalidade" class="form-control" value="Angolana" required>
+                                            <select name="nacionalidade" id="id_nacionalidade" class="form-select" required>
+                                                <option value="Angolana" selected>Angolana</option>
+                                                <option value="Outra">Outra</option>
+                                            </select>
                                         </div>
-                                        <div class="col-md-6 mb-3">
+                                        
+                                        <!-- Seção Angola -->
+                                        <div class="col-md-4 mb-3" id="div_provincia_select">
                                             <label class="form-label">Província de Nascimento *</label>
-                                            <select id="provincia_nascimento" class="form-select" required>
+                                            <select id="provincia_nascimento_select" name="provincia_nascimento_angola" class="form-select">
                                                 <option value="">Selecione a província...</option>
                                                 <option value="Bengo">Bengo</option>
                                                 <option value="Benguela">Benguela</option>
@@ -158,12 +163,26 @@
                                                 <option value="Zaire">Zaire</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-6 mb-3">
+                                        <div class="col-md-4 mb-3" id="div_municipio_select">
                                             <label class="form-label">Município de Nascimento *</label>
-                                            <select name="local_nascimento" id="municipio_nascimento" class="form-select">
-                                                <option value="Luanda">Luanda</option>
+                                            <select id="municipio_nascimento_select" name="municipio_nascimento_angola" class="form-select">
+                                                <option value="">Selecione o município...</option>
                                             </select>
                                         </div>
+                                        
+                                        <!-- Seção Estrangeiro (Outra Nacionalidade) -->
+                                        <div class="col-md-4 mb-3 d-none" id="div_provincia_manual">
+                                            <label class="form-label">Província / Estado</label>
+                                            <input type="text" name="provincia_nascimento_manual" id="provincia_nascimento_manual" class="form-control" placeholder="Digite a província">
+                                        </div>
+                                        <div class="col-md-4 mb-3 d-none" id="div_municipio_manual">
+                                            <label class="form-label">Município / Cidade</label>
+                                            <input type="text" name="local_nascimento_manual" id="municipio_nascimento_manual" class="form-control" placeholder="Digite o município">
+                                        </div>
+                                        
+                                        <!-- Campos reais que serão enviados ao backend -->
+                                        <input type="hidden" name="local_nascimento" id="id_local_nascimento_final">
+                                        <input type="hidden" name="provincia_nascimento" id="id_provincia_nascimento_final">
                                     </div>
                                 </div>
 
@@ -172,12 +191,13 @@
                                     <textarea name="endereco" class="form-control" rows="2" required placeholder="Rua, Bairro, Município, Província"></textarea>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Telefone *</label>
-                                    <input type="tel" name="telefone" class="form-control" required placeholder="+244 000 000 000">
+                                    <label class="form-label">Telefone Secundário</label>
+                                    <input type="tel" name="telefone_secundario" class="form-control" placeholder="+244...">
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Email *</label>
                                     <input type="email" name="email" class="form-control" required>
+                                    <div class="invalid-feedback">O email é obrigatório para notificações do sistema.</div>
                                 </div>
                             </div>
                         </div>
@@ -229,16 +249,16 @@
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Telefone Principal *</label>
-                                    <input type="tel" name="telefone" class="form-control check-exists" data-campo="telefone" required>
-                                    <div class="warning-msg text-warning small mt-1 d-none"></div>
+                                    <input type="tel" name="telefone" class="form-control" required>
+                                    <div class="invalid-feedback">O telefone principal é obrigatório.</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Telefone Alternativo</label>
                                     <input type="tel" name="telefone_alternativo" class="form-control">
                                 </div>
                                 <div class="col-md-12 mb-3">
-                                    <label class="form-label">Email *</label>
-                                    <input type="email" name="email" class="form-control" required>
+                                    <label class="form-label">Email de Recuperação (Opcional)</label>
+                                    <input type="email" name="email_recuperacao" class="form-control">
                                 </div>
                             </div>
                         </div>
@@ -277,625 +297,270 @@
     </div>
 </div>
 
-<!-- Modal: Cadastrar Nova Escola -->
-<div class="modal fade" id="modalNovaEscola" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-custom text-white">
-                <h5 class="modal-title">Cadastrar Nova Escola</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label">Nome da Escola *</label>
-                    <input type="text" id="nova_escola_nome" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Município</label>
-                    <input type="text" id="nova_escola_municipio" class="form-control">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Província</label>
-                    <input type="text" id="nova_escola_provincia" class="form-control">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Tipo</label>
-                    <select id="nova_escola_tipo" class="form-select">
-                        <option value="Pública" selected>Pública</option>
-                        <option value="Privada">Privada</option>
-                    </select>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="btn_salvar_escola">Salvar Escola</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <style>
-    .bg-custom {
-        background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);
-    }
-    
-    .progress-wizard {
-        display: flex;
-        justify-content: space-between;
-        position: relative;
-    }
-    
-    .progress-wizard::before {
-        content: '';
-        position: absolute;
-        top: 25px;
-        left: 12.5%;
-        right: 12.5%;
-        height: 3px;
-        background: #e0e0e0;
-        z-index: 0;
-    }
-    
-    .wizard-step {
-        flex: 1;
-        text-align: center;
-        position: relative;
-        z-index: 1;
-    }
-    
-    .wizard-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background: #e0e0e0;
-        color: #666;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.3rem;
-        margin-bottom: 8px;
-        transition: all 0.3s;
-    }
-    
-    .wizard-step.active .wizard-icon {
-        background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);
-        color: white;
-        transform: scale(1.1);
-    }
-    
-    .wizard-step.completed .wizard-icon {
-        background: #059669;
-        color: white;
-    }
-    
-    .wizard-label {
-        font-size: 0.9rem;
-        color: #666;
-        font-weight: 500;
-    }
-    
-    .wizard-step.active .wizard-label {
-        color: #1e3a8a;
-        font-weight: 600;
-    }
-    
-    .form-step {
-        display: none;
-    }
-    
-    .form-step.active {
-        display: block;
-        animation: fadeIn 0.3s;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateX(20px); }
-        to { opacity: 1; transform: translateX(0); }
-    }
-    
-    .autocomplete-results {
-        position: absolute;
-        z-index: 1000;
-        background: white;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        max-height: 200px;
-        overflow-y: auto;
-        width: 100%;
-        display: none;
-    }
-    
-    .autocomplete-item {
-        padding: 10px;
-        cursor: pointer;
-        border-bottom: 1px solid #eee;
-    }
-    
-    .autocomplete-item:hover {
-        background: #f8f9fa;
-    }
-    
-    .btn-custom {
-        background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);
-        border: none;
-        color: white;
-    }
-    
-    .btn-custom:hover {
-        background: linear-gradient(135deg, #1e40af 0%, #10b981 100%);
-        color: white;
-    }
-    
-    @keyframes checkBounce {
-        0% {
-            transform: scale(0);
-            opacity: 0;
-        }
-        50% {
-            transform: scale(1.1);
-        }
-        100% {
-            transform: scale(1);
-            opacity: 1;
-        }
-    }
+    .bg-custom { background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); }
+    .progress-wizard { display: flex; justify-content: space-between; position: relative; }
+    .progress-wizard::before { content: ''; position: absolute; top: 25px; left: 12.5%; right: 12.5%; height: 3px; background: #e0e0e0; z-index: 0; }
+    .wizard-step { flex: 1; text-align: center; position: relative; z-index: 1; }
+    .wizard-icon { width: 50px; height: 50px; border-radius: 50%; background: #e0e0e0; color: #666; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 8px; transition: all 0.3s; }
+    .wizard-step.active .wizard-icon { background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); color: white; transform: scale(1.1); }
+    .wizard-step.completed .wizard-icon { background: #059669; color: white; }
+    .wizard-label { font-size: 0.9rem; color: #666; font-weight: 500; }
+    .wizard-step.active .wizard-label { color: #1e3a8a; font-weight: 600; }
+    .form-step { display: none; }
+    .form-step.active { display: block; animation: fadeIn 0.3s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+    .btn-custom { background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); border: none; color: white; }
+    .btn-custom:hover { background: linear-gradient(135deg, #1e40af 0%, #10b981 100%); color: white; }
 </style>
 
 <script>
-let currentStep = 1;
-        // Lógica de Bloqueio de Matrícula
-        const matriculaBloqueada = document.getElementById('id_matricula_bloqueada');
-        const bloqueioAjuda = document.getElementById('bloqueio_ajuda');
-
-        if (matriculaBloqueada) {
-            matriculaBloqueada.addEventListener('change', function() {
-                if (this.value === 'true') {
-                    bloqueioAjuda.textContent = 'O estudante não será permitido fazer a matrícula após finalizar o cadastro';
-                    bloqueioAjuda.classList.remove('text-muted');
-                    bloqueioAjuda.classList.add('text-danger');
-                } else {
-                    bloqueioAjuda.textContent = 'Requer ao finalizar este cadastro, um usuário com permissão libera a matrícula';
-                    bloqueioAjuda.classList.remove('text-danger');
-                    bloqueioAjuda.classList.add('text-muted');
-                }
-            });
-        }
-
-        // Preview de foto e Webcam
-        const idFoto = document.getElementById('id_foto');
-        const photoPreview = document.getElementById('photo_preview');
-        const placeholderIcon = document.getElementById('placeholder_icon');
-        const video = document.getElementById('webcam_video');
-        const canvas = document.getElementById('photo_canvas');
-        const btnWebcam = document.getElementById('btn_webcam');
-        const btnCapture = document.getElementById('btn_capture');
-        const btnCancelWebcam = document.getElementById('btn_cancel_webcam');
-        const idFotoBase64 = document.getElementById('id_foto_base64');
-        let stream = null;
-
-        if (idFoto) {
-            idFoto.addEventListener('change', function() {
-                const file = this.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        placeholderIcon.style.display = 'none';
-                        video.style.display = 'none';
-                        photoPreview.style.backgroundImage = `url(${e.target.result})`;
-                        photoPreview.style.backgroundSize = 'cover';
-                        photoPreview.style.backgroundPosition = 'center';
-                        idFotoBase64.value = e.target.result;
-                    }
-                    reader.readAsDataURL(file);
-                }
-            });
-        }
-
-        if (btnWebcam) {
-            btnWebcam.addEventListener('click', async function() {
-                try {
-                    stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                    video.srcObject = stream;
-                    video.style.display = 'block';
-                    placeholderIcon.style.display = 'none';
-                    photoPreview.style.backgroundImage = 'none';
-                    
-                    btnWebcam.classList.add('d-none');
-                    btnCapture.classList.remove('d-none');
-                    btnCancelWebcam.classList.remove('d-none');
-                } catch (err) {
-                    showToast('error', 'Não foi possível aceder à webcam: ' + err.message);
-                }
-            });
-
-            btnCapture.addEventListener('click', function() {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                canvas.getContext('2d').drawImage(video, 0, 0);
-                
-                const dataUrl = canvas.toDataURL('image/png');
-                photoPreview.style.backgroundImage = `url(${dataUrl})`;
-                photoPreview.style.backgroundSize = 'cover';
-                photoPreview.style.backgroundPosition = 'center';
-                idFotoBase64.value = dataUrl;
-                
-                stopWebcam();
-            });
-
-            btnCancelWebcam.addEventListener('click', stopWebcam);
-        }
-
-        function stopWebcam() {
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
-            video.style.display = 'none';
-            if (!idFotoBase64.value) {
-                placeholderIcon.style.display = 'block';
-            }
-            
-            btnWebcam.classList.remove('d-none');
-            btnCapture.classList.add('d-none');
-            btnCancelWebcam.classList.add('d-none');
-        }
-
-        // Verificação de duplicados em tempo real
-        const checkInputs = document.querySelectorAll('.check-exists');
-        let checkTimeout = null;
-
-        checkInputs.forEach(input => {
-            input.addEventListener('input', function() {
-                const campo = this.dataset.campo;
-                const valor = this.value;
-                const warningMsg = this.parentElement.querySelector('.warning-msg');
-
-                clearTimeout(checkTimeout);
-                if (valor.length < 3) {
-                    if (warningMsg) warningMsg.classList.add('d-none');
-                    return;
-                }
-
-                checkTimeout = setTimeout(() => {
-                    fetch(`/api/verificar-existente/?q=${encodeURIComponent(valor)}&campo=${campo}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.encontrado) {
-                                if (warningMsg) {
-                                    warningMsg.innerHTML = `<i class="bi bi-exclamation-triangle me-1"></i> Atenção: Já existe um registro semelhante (${data.nome})`;
-                                    warningMsg.classList.remove('d-none');
-                                }
-                            } else {
-                                if (warningMsg) warningMsg.classList.add('d-none');
-                            }
-                        })
-                        .catch(err => console.error('Erro na verificação:', err));
-                }, 500);
-            });
-        });
-
-const totalSteps = 4;
-
-// Navegação entre etapas
-document.getElementById('btn_next').addEventListener('click', () => {
-    if (validateStep(currentStep)) {
-        // Mensagens de sucesso para cada etapa
-        const mensagens = {
-            1: '✓ Identificação concluída!',
-            2: '✓ Responsáveis definidos!',
-            3: '✓ Contactos guardados!'
-        };
-        
-        if (mensagens[currentStep]) {
-            showToast('success', mensagens[currentStep]);
-        }
-        
-        if (currentStep < totalSteps) {
-            goToStep(currentStep + 1);
-        }
-    }
-});
-
-document.getElementById('btn_prev').addEventListener('click', () => {
-    if (currentStep > 1) {
-        goToStep(currentStep - 1);
-    }
-});
-
-function goToStep(step) {
-    // Remover active das etapas
-    document.querySelectorAll('.form-step').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('.wizard-step').forEach(el => {
-        el.classList.remove('active');
-        if (parseInt(el.dataset.step) < step) {
-            el.classList.add('completed');
-        } else {
-            el.classList.remove('completed');
-        }
-    });
-    
-    // Ativar nova etapa
-    document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
-    document.querySelector(`.wizard-step[data-step="${step}"]`).classList.add('active');
-    
-    currentStep = step;
-    
-    // Mostrar ícone de visto na última etapa
-    const checkIcon = document.getElementById('check_icon_final');
-    if (step === totalSteps && checkIcon) {
-        checkIcon.style.display = 'block';
-    } else if (checkIcon) {
-        checkIcon.style.display = 'none';
-    }
-    
-    // Controlar botões
-    document.getElementById('btn_prev').classList.toggle('d-none', step === 1);
-    document.getElementById('btn_next').classList.toggle('d-none', step === totalSteps);
-    document.getElementById('btn_submit').classList.toggle('d-none', step !== totalSteps);
-}
-
-function validateStep(step) {
-    const stepEl = document.querySelector(`.form-step[data-step="${step}"]`);
-    const requiredInputs = stepEl.querySelectorAll('[required]');
-    
-    for (let input of requiredInputs) {
-        if (!input.value.trim()) {
-            input.focus();
-            showToast('error', 'Por favor, preencha todos os campos obrigatórios (*)');
-            return false;
-        }
-    }
-    
-    // Validação especial do BI
-    if (step === 1) {
-        const biVencido = document.getElementById('data_validade_bi');
-        const hoje = new Date().toISOString().split('T')[0];
-        
-        if (biVencido.value < hoje) {
-            showToast('error', '⚠️ Seu BI está vencido! Por favor, renove o documento antes de prosseguir.');
-            biVencido.focus();
-            return false;
-        }
-        
-        // Validação do formato do BI
-        const biInput = document.getElementById('bilhete_identidade');
-        const bi = biInput.value;
-        
-        if (!validarFormatoBI(bi)) {
-            showToast('error', '⚠️ Formato do BI inválido! Use: 9 números + 2 letras + 3 números (ex: 123456789AB123)');
-            biInput.focus();
-            return false;
-        }
-    }
-    
-    return true;
-}
-
-// Cálculo automático de idade
-document.getElementById('data_nascimento').addEventListener('change', function() {
-    const dataNasc = new Date(this.value);
-    const hoje = new Date();
-    let idade = hoje.getFullYear() - dataNasc.getFullYear();
-    const m = hoje.getMonth() - dataNasc.getMonth();
-    
-    if (m < 0 || (m === 0 && hoje.getDate() < dataNasc.getDate())) {
-        idade--;
-    }
-    
-    // Calcular próximo aniversário
-    const proxAniv = new Date(hoje.getFullYear(), dataNasc.getMonth(), dataNasc.getDate());
-    if (proxAniv < hoje) {
-        proxAniv.setFullYear(proxAniv.getFullYear() + 1);
-    }
-    
-    const diasAniv = Math.ceil((proxAniv - hoje) / (1000 * 60 * 60 * 24));
-    
-    document.getElementById('idade_display').textContent = 
-        `Idade: ${idade} anos | Próximo aniversário: ${proxAniv.toLocaleDateString('pt-PT')} (${diasAniv} dias)`;
-});
-
-// Validação de BI vencido
-document.getElementById('data_validade_bi').addEventListener('change', function() {
-    const hoje = new Date().toISOString().split('T')[0];
-    const msg = document.getElementById('bi_vencido_msg');
-    
-    if (this.value < hoje) {
-        msg.classList.remove('d-none');
-        this.classList.add('is-invalid');
-    } else {
-        msg.classList.add('d-none');
-        this.classList.remove('is-invalid');
-    }
-});
-
-// Validação do formato do BI
-function validarFormatoBI(bi) {
-    // Formato: 9 números + 2 letras + 3 números (14 caracteres totais)
-    // Exemplo: 123456789AB123
-    
-    if (!bi || bi.length !== 14) {
-        return false;
-    }
-    
-    // Verificar primeiros 9 caracteres (devem ser números)
-    for (let i = 0; i < 9; i++) {
-        if (!/\d/.test(bi[i])) {
-            return false;
-        }
-    }
-    
-    // Verificar posições 10 e 11 (índices 9 e 10 - devem ser letras)
-    if (!/[A-Za-z]/.test(bi[9]) || !/[A-Za-z]/.test(bi[10])) {
-        return false;
-    }
-    
-    // Verificar últimos 3 caracteres (devem ser números)
-    for (let i = 11; i < 14; i++) {
-        if (!/\d/.test(bi[i])) {
-            return false;
-        }
-    }
-    
-    return true;
-}
-
-// Validação em tempo real do BI
-document.getElementById('bilhete_identidade').addEventListener('input', function() {
-    const bi = this.value.toUpperCase();
-    this.value = bi; // Converter para maiúsculas
-    
-    const msg = document.getElementById('bi_formato_msg');
-    
-    if (bi.length === 14) {
-        if (!validarFormatoBI(bi)) {
-            msg.classList.remove('d-none');
-            this.classList.add('is-invalid');
-        } else {
-            msg.classList.add('d-none');
-            this.classList.remove('is-invalid');
-        }
-    } else if (bi.length > 0) {
-        msg.classList.add('d-none');
-        this.classList.remove('is-invalid');
-    }
-});
-
-// Autocomplete de Escolas
-let escolaTimeout;
-document.getElementById('escola_search').addEventListener('input', function() {
-    clearTimeout(escolaTimeout);
-    const query = this.value.trim();
-    
-    if (query.length < 2) {
-        document.getElementById('escola_results').style.display = 'none';
-        return;
-    }
-    
-    escolaTimeout = setTimeout(() => {
-        fetch(`/api/escolas/autocomplete/?q=${encodeURIComponent(query)}`)
-            .then(res => res.json())
-            .then(data => {
-                const resultsDiv = document.getElementById('escola_results');
-                resultsDiv.innerHTML = '';
-                
-                if (data.escolas.length > 0) {
-                    data.escolas.forEach(escola => {
-                        const item = document.createElement('div');
-                        item.className = 'autocomplete-item';
-                        item.textContent = `${escola.nome}${escola.municipio ? ` - ${escola.municipio}` : ''}`;
-                        item.onclick = () => selectEscola(escola);
-                        resultsDiv.appendChild(item);
-                    });
-                    resultsDiv.style.display = 'block';
-                } else {
-                    resultsDiv.style.display = 'none';
-                }
-            });
-    }, 300);
-});
-
-function selectEscola(escola) {
-    document.getElementById('escola_search').value = escola.nome;
-    document.getElementById('escola_id').value = escola.id;
-    document.getElementById('escola_results').style.display = 'none';
-}
-
-// Modal Nova Escola
-document.getElementById('btn_nova_escola').addEventListener('click', () => {
-    new bootstrap.Modal(document.getElementById('modalNovaEscola')).show();
-});
-
-document.getElementById('btn_salvar_escola').addEventListener('click', () => {
-    const nome = document.getElementById('nova_escola_nome').value.trim();
-    const municipio = document.getElementById('nova_escola_municipio').value.trim();
-    const provincia = document.getElementById('nova_escola_provincia').value.trim();
-    const tipo = document.getElementById('nova_escola_tipo').value;
-    
-    if (!nome) {
-        showToast('error', 'Nome da escola é obrigatório!');
-        return;
-    }
-    
-    fetch('/api/escolas/create/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-        },
-        body: JSON.stringify({ nome, municipio, provincia, tipo })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            selectEscola(data.escola);
-            bootstrap.Modal.getInstance(document.getElementById('modalNovaEscola')).hide();
-            showToast('success', `Escola "${data.escola.nome}" cadastrada com sucesso!`);
-            
-            // Limpar formulário
-            document.getElementById('nova_escola_nome').value = '';
-            document.getElementById('nova_escola_municipio').value = '';
-            document.getElementById('nova_escola_provincia').value = '';
-        } else {
-            showToast('error', 'Erro ao cadastrar escola: ' + data.error);
-        }
-    });
-});
-
-// Fechar autocomplete ao clicar fora
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('#escola_search') && !e.target.closest('#escola_results')) {
-        document.getElementById('escola_results').style.display = 'none';
-    }
-});
-
-// Municípios por província em Angola
 const municipiosPorProvincia = {
-    'Luanda': ['Belas', 'Cacuaco', 'Cazenga', 'Icolo e Bengo', 'Luanda', 'Quiçama', 'Viana', 'Kilamba Kiaxi', 'Talatona'],
     'Bengo': ['Ambriz', 'Bula Atumba', 'Dande', 'Dembos', 'Nambuangongo', 'Pango Aluquém'],
-    'Benguela': ['Balombo', 'Baía Farta', 'Benguela', 'Bocoio', 'Caimbambo', 'Catumbela', 'Chongoroi', 'Cubal', 'Ganda', 'Lobito'],
+    'Benguela': ['Balombo', 'Baía Farta', 'Benguela', 'Bocoio', 'Caimbambo', 'Catumbela', 'Chongorói', 'Ganda', 'Lobito'],
     'Bié': ['Andulo', 'Camacupa', 'Catabola', 'Chinguar', 'Chitembo', 'Cuemba', 'Cunhinga', 'Cuíto', 'Nharea'],
     'Cabinda': ['Belize', 'Buco-Zau', 'Cabinda', 'Cacongo'],
-    'Cuando Cubango': ['Calai', 'Cuangar', 'Cuchi', 'Cuito Cuanavale', 'Dirico', 'Mavinga', 'Menongue', 'Nankova', 'Rivungo'],
-    'Cuanza Norte': ['Ambaca', 'Banga', 'Bolongongo', 'Cambambe', 'Cazengo', 'Golungo Alto', 'Gonguembo', 'Lucala', 'Quiculungo', 'Samba Cajú'],
-    'Cuanza Sul': ['Amboim', 'Cassongue', 'Cela', 'Conda', 'Ebo', 'Libolo', 'Mussende', 'Porto Amboim', 'Quibala', 'Quilenda', 'Seles', 'Sumbe', 'Waku Kungo'],
+    'Cuando Cubango': ['Calai', 'Cuangar', 'Cuchi', 'Cuito Cuanavale', 'Dirico', 'Mavinga', 'Menongue', 'Nancova', 'Rivungo'],
+    'Cuanza Norte': ['Ambaca', 'Banguela', 'Bolongongo', 'Cambambe', 'Cazengo', 'Golungo Alto', 'Gonguembo', 'Lucala', 'Quiculungo', 'Samba Caju'],
+    'Cuanza Sul': ['Amboim', 'Cassongue', 'Cela', 'Conda', 'Ebo', 'Libolo', 'Mussende', 'Porto Amboim', 'Quibala', 'Quilenda', 'Seles', 'Sumbe'],
     'Cunene': ['Cahama', 'Cuanhama', 'Curoca', 'Cuvelai', 'Namacunde', 'Ombadja'],
-    'Huambo': ['Bailundo', 'Caála', 'Cachiungo', 'Chinjenje', 'Chicomba', 'Ecunha', 'Huambo', 'Londuimbali', 'Longonjo', 'Mungo', 'Ucuma'],
+    'Huambo': ['Bailundo', 'Caála', 'Catchiungo', 'Chicala-Cholohanga', 'Chinjenje', 'Ecunha', 'Huambo', 'Londuimbali', 'Longonjo', 'Mungo', 'Ucuma'],
     'Huíla': ['Caconda', 'Cacula', 'Caluquembe', 'Chiange', 'Chibia', 'Chicomba', 'Chipindo', 'Cuvango', 'Humpata', 'Jamba', 'Lubango', 'Matala', 'Quilengues', 'Quipungo'],
-    'Lunda Norte': ['Cambulo', 'Capenda Camulemba', 'Caungula', 'Chitato', 'Cuango', 'Cuílo', 'Lubalo', 'Lucapa', 'Xá-Muteba'],
+    'Luanda': ['Belas', 'Cacuaco', 'Cazenga', 'Icolo e Bengo', 'Luanda', 'Quiçama', 'Kilamba Kiaxi', 'Talatona', 'Viana'],
+    'Lunda Norte': ['Cambulo', 'Capenda-Camulemba', 'Caungula', 'Chitato', 'Cuilo', 'Cuango', 'Lubalo', 'Lucapa', 'Xá-Muteba'],
     'Lunda Sul': ['Cacolo', 'Dala', 'Muconda', 'Saurimo'],
-    'Malanje': ['Cacuso', 'Calandula', 'Cambundi-Catembo', 'Cangandala', 'Caombo', 'Cuaba Nzogo', 'Cunda-Dia-Baze', 'Luquembo', 'Malanje', 'Marimba', 'Massango', 'Mucari', 'Quela', 'Quirima'],
-    'Moxico': ['Alto Zambeze', 'Bundas', 'Camanongue', 'Cameia', 'Léua', 'Luau', 'Luacano', 'Luchazes', 'Lumeje', 'Moxico'],
-    'Namibe': ['Bibala', 'Camucuio', 'Namibe', 'Tômbwa', 'Virei'],
+    'Malanje': ['Cacuso', 'Calandula', 'Cambundi-Catembo', 'Cangandala', 'Caombo', 'Cuaba Nzogo', 'Cunda-dia-Baze', 'Luquembo', 'Malanje', 'Marimba', 'Massango', 'Mucari', 'Quela', 'Quirima'],
+    'Moxico': ['Alto Zambeze', 'Bundas', 'Camanongue', 'Léua', 'Luau', 'Luacano', 'Luchazes', 'Cameia', 'Moxico'],
+    'Namibe': ['Bibala', 'Camucuio', 'Moçâmedes', 'Tômbua', 'Virei'],
     'Uíge': ['Alto Cauale', 'Ambuíla', 'Bembe', 'Buengas', 'Bungo', 'Damba', 'Milunga', 'Mucaba', 'Negage', 'Puri', 'Quimbele', 'Quitexe', 'Sanza Pombo', 'Songo', 'Uíge', 'Zombo'],
-    'Zaire': ['Cuimba', 'M\'banza Congo', 'Nóqui', 'N\'zeto', 'Soyo', 'Tomboco']
+    'Zaire': ['Cuimba', 'Mabanza Congo', 'Noqui', 'Nezeto', 'Soy', 'Tomboco']
 };
 
-// Selecionar província e mostrar municípios
-document.getElementById('provincia_nascimento').addEventListener('change', function() {
-    const provincia = this.value;
-    const municipioContainer = document.getElementById('municipio_container');
-    const municipioSelect = document.getElementById('municipio_nascimento');
-    
-    if (provincia && municipiosPorProvincia[provincia]) {
-        // Mostrar campo de município
-        municipioContainer.style.display = 'block';
-        
-        // Popular municípios
-        municipioSelect.innerHTML = '<option value="">Selecione o município...</option>';
-        municipiosPorProvincia[provincia].forEach(municipio => {
-            const option = document.createElement('option');
-            option.value = municipio + ', ' + provincia;
-            option.textContent = municipio;
-            municipioSelect.appendChild(option);
+function atualizarMunicipios() {
+    const provSelect = document.getElementById('provincia_nascimento_select');
+    const munSelect = document.getElementById('municipio_nascimento_select');
+    const prov = provSelect.value;
+    munSelect.innerHTML = '<option value="">Selecione o município...</option>';
+    if (prov && municipiosPorProvincia[prov]) {
+        municipiosPorProvincia[prov].forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m;
+            opt.text = m;
+            munSelect.appendChild(opt);
         });
-        
-        municipioSelect.required = true;
-    } else {
-        municipioContainer.style.display = 'none';
-        municipioSelect.required = false;
     }
-});
+    sincronizar();
+}
 
-// Iniciar na primeira etapa
-goToStep(1);
+function sincronizar() {
+    const nac = document.getElementById('id_nacionalidade').value;
+    const finalMun = document.getElementById('id_local_nascimento_final');
+    const finalProv = document.getElementById('id_provincia_nascimento_final');
+    if (nac === 'Angolana') {
+        finalMun.value = document.getElementById('municipio_nascimento_select').value;
+        finalProv.value = document.getElementById('provincia_nascimento_select').value;
+    } else {
+        finalMun.value = document.getElementById('municipio_nascimento_manual').value;
+        finalProv.value = document.getElementById('provincia_nascimento_manual').value;
+    }
+}
+
+function alternarNacionalidade() {
+    const nac = document.getElementById('id_nacionalidade').value;
+    const isAngola = nac === 'Angolana';
+    document.getElementById('div_provincia_select').classList.toggle('d-none', !isAngola);
+    document.getElementById('div_municipio_select').classList.toggle('d-none', !isAngola);
+    document.getElementById('div_provincia_manual').classList.toggle('d-none', isAngola);
+    document.getElementById('div_municipio_manual').classList.toggle('d-none', isAngola);
+    
+    // Atualizar requireds baseado na visibilidade
+    const pSel = document.getElementById('provincia_nascimento_select');
+    const mSel = document.getElementById('municipio_nascimento_select');
+    const pMan = document.getElementById('provincia_nascimento_manual');
+    const mMan = document.getElementById('municipio_nascimento_manual');
+    
+    if (isAngola) {
+        pSel.required = true;
+        mSel.required = true;
+        pMan.required = false;
+        mMan.required = false;
+    } else {
+        pSel.required = false;
+        mSel.required = false;
+        pMan.required = false; // Como pedido, não obrigatório para estrangeiros
+        mMan.required = false;
+    }
+    sincronizar();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const pSel = document.getElementById('provincia_nascimento_select');
+    const mSel = document.getElementById('municipio_nascimento_select');
+    const nSel = document.getElementById('id_nacionalidade');
+    const pMan = document.getElementById('provincia_nascimento_manual');
+    const mMan = document.getElementById('municipio_nascimento_manual');
+    
+    pSel.addEventListener('change', atualizarMunicipios);
+    mSel.addEventListener('change', sincronizar);
+    nSel.addEventListener('change', alternarNacionalidade);
+    pMan.addEventListener('input', sincronizar);
+    mMan.addEventListener('input', sincronizar);
+
+    // Lógica de Foto
+    const fotoInput = document.getElementById('id_foto');
+    const photoPreview = document.getElementById('photo_preview');
+    const placeholderIcon = document.getElementById('placeholder_icon');
+
+    fotoInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                photoPreview.style.backgroundImage = `url(${e.target.result})`;
+                photoPreview.style.backgroundSize = 'cover';
+                photoPreview.style.backgroundPosition = 'center';
+                placeholderIcon.style.display = 'none';
+                document.getElementById('id_foto_base64').value = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Webcam
+    const btnWebcam = document.getElementById('btn_webcam');
+    const btnCapture = document.getElementById('btn_capture');
+    const btnCancelWebcam = document.getElementById('btn_cancel_webcam');
+    const video = document.getElementById('webcam_video');
+    const canvas = document.getElementById('photo_canvas');
+    let stream = null;
+
+    btnWebcam.addEventListener('click', async () => {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            video.style.display = 'block';
+            placeholderIcon.style.display = 'none';
+            photoPreview.style.backgroundImage = 'none';
+            btnWebcam.classList.add('d-none');
+            btnCapture.classList.remove('d-none');
+            btnCancelWebcam.classList.remove('d-none');
+        } catch (err) { alert("Erro webcam: " + err); }
+    });
+
+    btnCapture.addEventListener('click', () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        const data = canvas.toDataURL('image/jpeg');
+        photoPreview.style.backgroundImage = `url(${data})`;
+        photoPreview.style.backgroundSize = 'cover';
+        document.getElementById('id_foto_base64').value = data;
+        pararWebcam();
+    });
+
+    btnCancelWebcam.addEventListener('click', pararWebcam);
+    function pararWebcam() {
+        if (stream) stream.getTracks().forEach(t => t.stop());
+        video.style.display = 'none';
+        if (!document.getElementById('id_foto_base64').value) placeholderIcon.style.display = 'block';
+        btnWebcam.classList.remove('d-none');
+        btnCapture.classList.add('d-none');
+        btnCancelWebcam.classList.add('d-none');
+    }
+
+    // Navegação
+    const btnNext = document.getElementById('btn_next');
+    const btnPrev = document.getElementById('btn_prev');
+    const btnSubmit = document.getElementById('btn_submit');
+    const form = document.getElementById('inscricaoForm');
+    let currentStep = 1;
+
+    function updateWizard() {
+        document.querySelectorAll('.form-step').forEach(s => s.classList.toggle('active', s.dataset.step == currentStep));
+        document.querySelectorAll('.wizard-step').forEach(s => {
+            s.classList.toggle('active', s.dataset.step == currentStep);
+            s.classList.toggle('completed', s.dataset.step < currentStep);
+        });
+
+        // Toggle required para campos apenas da etapa atual
+        document.querySelectorAll('.form-step').forEach(step => {
+            const inputs = step.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                if (step.dataset.step == currentStep) {
+                    if (input.dataset.requiredOriginal === 'true') input.required = true;
+                } else {
+                    if (input.required) input.dataset.requiredOriginal = 'true';
+                    input.required = false;
+                }
+            });
+        });
+
+        btnPrev.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+        btnNext.classList.toggle('d-none', currentStep === 4);
+        btnSubmit.classList.toggle('d-none', currentStep !== 4);
+    }
+
+    // Marcar campos originalmente requeridos
+    document.querySelectorAll('.form-step [required]').forEach(el => el.dataset.requiredOriginal = 'true');
+
+    btnNext.addEventListener('click', () => {
+        const stepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+        let valid = true;
+        let firstInvalid = null;
+        
+        stepEl.querySelectorAll('input, select, textarea').forEach(i => {
+            if (i.required && !i.value) {
+                i.classList.add('is-invalid');
+                valid = false;
+                if (!firstInvalid) firstInvalid = i;
+            } else {
+                i.classList.remove('is-invalid');
+            }
+        });
+
+        if (!valid) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Campos Obrigatórios',
+                text: 'Por favor, preencha todos os campos marcados com * antes de prosseguir.',
+                confirmButtonColor: '#1e3a8a'
+            });
+            if (firstInvalid) firstInvalid.focus();
+            return;
+        }
+
+        if (currentStep < 4) { currentStep++; updateWizard(); }
+    });
+
+    btnPrev.addEventListener('click', () => { if (currentStep > 1) { currentStep--; updateWizard(); } });
+
+    form.addEventListener('submit', (e) => {
+        let valid = true;
+        document.querySelectorAll('.form-step[data-step="4"] input, .form-step[data-step="4"] select, .form-step[data-step="4"] textarea').forEach(i => {
+            if (i.required && !i.value) {
+                i.classList.add('is-invalid');
+                valid = false;
+            }
+        });
+
+        if (!valid) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'error',
+                title: 'Campos Obrigatórios',
+                text: 'Por favor, preencha as configurações obrigatórias.',
+                confirmButtonColor: '#1e3a8a'
+            });
+            return;
+        }
+        
+        sincronizar();
+        console.log("Submetendo formulário...");
+    });
+
+    updateWizard();
+    alternarNacionalidade();
+    if (pSel.value) atualizarMunicipios();
+});
 </script>
 {% endblock %}

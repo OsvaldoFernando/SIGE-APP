@@ -98,13 +98,18 @@
                                 </div>
                             </div>
 
-                            <div class="mt-5 d-flex gap-2">
-                                <button class="btn btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#modalAlterarSenha">
+                            <div class="mt-5 d-flex flex-wrap gap-3">
+                                <button class="btn btn-action btn-alterar-senha rounded-pill" data-bs-toggle="modal" data-bs-target="#modalAlterarSenha">
                                     <i class="bi bi-key me-2"></i> Alterar Senha
                                 </button>
-                                <button class="btn btn-outline-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#modalEditarPerfil">
+                                <button class="btn btn-action btn-editar-perfil rounded-pill" data-bs-toggle="modal" data-bs-target="#modalEditarPerfil">
                                     <i class="bi bi-pencil me-2"></i> Editar Perfil
                                 </button>
+                                {% if user.perfil.nivel_acesso == 'super_admin' %}
+                                <button class="btn btn-action btn-logo-sistema rounded-pill" data-bs-toggle="modal" data-bs-target="#modalAlterarLogoSistema">
+                                    <i class="bi bi-image me-2"></i> Logo do Sistema
+                                </button>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -113,6 +118,38 @@
         </div>
     </div>
 </div>
+
+{% if user.perfil.nivel_acesso == 'super_admin' %}
+<!-- Modal Alterar Logo do Sistema -->
+<div class="modal fade" id="modalAlterarLogoSistema" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold">Alterar Logotipo do Sistema</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" enctype="multipart/form-data" action="{% url 'perfil_usuario' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3 text-center">
+                        <p class="text-muted small mb-4">O novo logotipo aparecerá no login e no topo do sistema.</p>
+                        {% if config.logo %}
+                            <div class="mb-3">
+                                <img src="{{ config.logo.url }}" alt="Logo Atual" style="max-height: 80px; object-fit: contain;">
+                            </div>
+                        {% endif %}
+                        <input type="file" class="form-control rounded-3" name="logo" accept="image/*" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" name="action" value="update_system_logo" class="btn btn-dark rounded-pill px-4">Salvar Logotipo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
 
 <!-- Modal Alterar Foto -->
 <div class="modal fade" id="modalAlterarFoto" tabindex="-1">
@@ -206,6 +243,53 @@
 </div>
 
 <style>
+    .btn-action {
+        padding: 12px 24px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 160px;
+        border: 2px solid transparent;
+        flex-direction: column;
+        line-height: 1.2;
+    }
+    
+    .btn-alterar-senha {
+        background-color: #0d6efd;
+        color: white;
+    }
+    .btn-alterar-senha:hover {
+        background-color: #0b5ed7;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+    
+    .btn-editar-perfil {
+        background-color: transparent;
+        color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    .btn-editar-perfil:hover {
+        background-color: #0d6efd;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+    }
+    
+    .btn-logo-sistema {
+        background-color: #212529;
+        color: white;
+    }
+    .btn-logo-sistema:hover {
+        background-color: #000;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
     .list-group-item { border-color: rgba(0,0,0,0.05); }
     .list-group-item.active { box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2); }
     .card-menu { transition: all 0.3s ease; }
