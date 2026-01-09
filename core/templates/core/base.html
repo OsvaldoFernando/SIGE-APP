@@ -182,8 +182,8 @@
                     </a>
                     {% endif %}
                     <div class="user-avatar" style="background: white; border: 1px solid rgba(0,0,0,0.1); width: 48px; height: 48px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        {% if user.perfil.foto %}
-                            <img src="{{ user.perfil.foto.url }}" alt="{{ user.username }}">
+                        {% if user_perfil.foto %}
+                            <img src="{{ user_perfil.foto.url }}" alt="{{ user.username }}">
                         {% else %}
                             <i class="bi bi-person-circle fs-2 text-primary"></i>
                         {% endif %}
@@ -192,7 +192,7 @@
                         <div class="user-greeting-text small opacity-75">Olá,</div>
                         <div class="user-greeting-name">
                             {{ user.get_full_name|default:user.username }}
-                            {% if user.perfil.nivel_acesso == 'super_admin' %}
+                            {% if user_perfil.nivel_acesso == 'super_admin' %}
                                 <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">Super Admin</span>
                             {% endif %}
                         </div>
@@ -220,6 +220,27 @@
         </div>
     </div>
     {% endif %}
+
+    <!-- Modal de Alerta de Inatividade -->
+    <div class="modal fade" id="idleTimeoutModal" tabindex="-1" aria-labelledby="idleTimeoutModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="idleTimeoutModalLabel">Aviso de Inatividade</h5>
+                </div>
+                <div class="modal-body py-4 text-center">
+                    <div class="bg-warning bg-opacity-10 p-3 rounded-circle text-warning d-inline-block mb-3">
+                        <i class="bi bi-clock-history fs-3"></i>
+                    </div>
+                    <p class="mb-0 fw-medium">Sua sessão está prestes a expirar por inatividade.</p>
+                    <p class="text-muted small">Você será desconectado em <span id="idleTimerSeconds" class="fw-bold text-danger">30</span> segundos.</p>
+                </div>
+                <div class="modal-footer border-0 pt-0 justify-content-center">
+                    <button type="button" class="btn btn-primary rounded-3 px-4" id="stayConnectedBtn">Continuar Conectado</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="toast-container" id="toast-container"></div>
 
@@ -342,6 +363,65 @@
             const logoutModal = new bootstrap.Modal(document.getElementById('logoutConfirmModal'));
             logoutModal.show();
         }
+
+        {% if user.is_authenticated %}
+        // Lógica de Auto-Logout por Inatividade
+        let idleTime = 0;
+        let countdownTime = 30;
+        let isCountdownActive = false;
+        let countdownInterval;
+        const idleModal = new bootstrap.Modal(document.getElementById('idleTimeoutModal'));
+
+        function resetTimer() {
+            if (!isCountdownActive) {
+                idleTime = 0;
+            }
+        }
+
+        // Eventos que resetam o timer
+        window.onload = resetTimer;
+        window.onmousemove = resetTimer;
+        window.onmousedown = resetTimer;
+        window.ontouchstart = resetTimer;
+        window.onclick = resetTimer;
+        window.onkeydown = resetTimer;
+
+        // Verifica inatividade a cada segundo
+        setInterval(function() {
+            if (!isCountdownActive) {
+                idleTime++;
+                if (idleTime >= 60) { // 1 minuto de inatividade
+                    startCountdown();
+                }
+            }
+        }, 1000);
+
+        function startCountdown() {
+            isCountdownActive = true;
+            countdownTime = 30;
+            document.getElementById('idleTimerSeconds').textContent = countdownTime;
+            idleModal.show();
+
+            countdownInterval = setInterval(function() {
+                countdownTime--;
+                document.getElementById('idleTimerSeconds').textContent = countdownTime;
+                
+                if (countdownTime <= 0) {
+                    clearInterval(countdownInterval);
+                    window.location.href = "{% url 'logout' %}";
+                }
+            }, 1000);
+        }
+
+        document.getElementById('stayConnectedBtn').addEventListener('click', function() {
+            clearInterval(countdownInterval);
+            isCountdownActive = false;
+            idleTime = 0;
+            idleModal.hide();
+            // Ping ao servidor para manter a sessão ativa no backend
+            fetch('/'); 
+        });
+        {% endif %}
     </script>
 </body>
 </html>
