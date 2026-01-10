@@ -4,28 +4,45 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
 class AnoAcademico(models.Model):
-    STATUS_CHOICES = [
-        ('ativo', 'Ativo'),
-        ('encerrado', 'Encerrado'),
+    ESTADO_CHOICES = [
+        ('PLANEADO', 'Planeado'),
+        ('ATIVO', 'Ativo'),
+        ('ENCERRADO', 'Encerrado'),
     ]
-    ano_inicio = models.IntegerField(verbose_name="Ano de Início")
-    ano_fim = models.IntegerField(verbose_name="Ano de Fim")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ativo', verbose_name="Status")
-    ativo = models.BooleanField(default=False, verbose_name="Ano Atual")
-    data_criacao = models.DateTimeField(auto_now_add=True)
+    codigo = models.CharField(max_length=20, unique=True, verbose_name="Código (ex: 2024/2025)", default="0000/0000")
+    descricao = models.CharField(max_length=255, verbose_name="Descrição", default="Ano Académico")
+    data_inicio = models.DateField(verbose_name="Data de Início", default=timezone.now)
+    data_fim = models.DateField(verbose_name="Data de Fim", default=timezone.now)
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='PLANEADO', verbose_name="Estado")
+    ano_atual = models.BooleanField(default=False, verbose_name="Ano Atual")
+    
+    criado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Criado por")
+    data_criacao = models.DateTimeField(auto_now_add=True, verbose_name="Data de Criação")
     
     class Meta:
         verbose_name = "Ano Académico"
         verbose_name_plural = "Anos Académicos"
-        ordering = ['-ano_inicio']
-        unique_together = ['ano_inicio', 'ano_fim']
+        ordering = ['-data_inicio']
     
     def __str__(self):
-        return f"{self.ano_inicio}/{self.ano_fim}"
+        return self.codigo
     
     def save(self, *args, **kwargs):
-        if self.ativo:
-            AnoAcademico.objects.exclude(pk=self.pk).update(ativo=False)
+        if self.pk:
+            old_obj = AnoAcademico.objects.get(pk=self.pk)
+            if old_obj.estado == 'ENCERRADO':
+                raise ValueError("Um ano académico ENCERRADO não pode ser alterado.")
+
+        if self.estado == 'ATIVO':
+            # Regra: Só pode existir 1 ano lectivo ATIVO
+            # Ao ativar um, os outros ativos passam a encerrados ou planeados? 
+            # Geralmente encerram-se os anteriores.
+            AnoAcademico.objects.exclude(pk=self.pk).filter(estado='ATIVO').update(estado='ENCERRADO', ano_atual=False)
+            self.ano_atual = True
+        
+        if self.ano_atual:
+            AnoAcademico.objects.exclude(pk=self.pk).update(ano_atual=False)
+            
         super().save(*args, **kwargs)
 
 class Semestre(models.Model):
@@ -297,9 +314,9 @@ class Inscricao(models.Model):
     responsavel_financeiro_relacao = models.CharField(max_length=100, verbose_name="Relação com o Estudante", blank=True)
     
     # 4. Responsáveis
-    responsavel_legal_nome = models.CharField(max_length=200, blank=True, verbose_name="Nome do Responsável Legal/Financeiro")
-    responsavel_legal_vinculo = models.CharField(max_length=100, blank=True, verbose_name="Grau/Vínculo Legal")
-    responsavel_legal_telefone = models.CharField(max_length=20, blank=True, verbose_name="Telefone Legal")
+    responsavel_legal_nome = models.CharField(max_length=200, blank=True, verbose_name="Nome do Contacto")
+    responsavel_legal_vinculo = models.CharField(max_length=100, blank=True, verbose_name="Grau/Vínculo")
+    responsavel_legal_telefone = models.CharField(max_length=20, blank=True, verbose_name="Telefone")
     
     responsavel_pedagogico_nome = models.CharField(max_length=200, blank=True, verbose_name="Nome do Responsável Pedagógico")
     responsavel_pedagogico_vinculo = models.CharField(max_length=100, blank=True, verbose_name="Grau/Vínculo Pedagógico")

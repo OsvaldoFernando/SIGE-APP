@@ -14,7 +14,7 @@ def global_academic_context(request):
     }
     
     if request.user.is_authenticated:
-        ano_atual = AnoAcademico.objects.filter(ativo=True).first()
+        ano_atual = AnoAcademico.objects.filter(ano_atual=True).first()
         semestre_atual = None
         if ano_atual:
             semestre_atual = ano_atual.semestres.filter(ativo=True).first()

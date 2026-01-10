@@ -1,31 +1,37 @@
 <form id="academicForm" method="post" action="{% if ano %}{% url 'ano_academico_edit' ano.pk %}{% else %}{% url 'ano_academico_create' %}{% endif %}">
     {% csrf_token %}
     <div class="row g-4">
-        <div class="col-md-6">
-            <label class="form-label">Ano de Início</label>
+        <div class="col-md-12">
+            <label class="form-label">Código do Ano</label>
             <div class="input-group">
-                <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar"></i></span>
-                <input type="number" name="ano_inicio" class="form-control border-start-0" value="{{ ano.ano_inicio }}" placeholder="Ex: 2025" required>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <label class="form-label">Ano de Fim</label>
-            <div class="input-group">
-                <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar-check"></i></span>
-                <input type="number" name="ano_fim" class="form-control border-start-0" value="{{ ano.ano_fim }}" placeholder="Ex: 2026" required>
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-hash"></i></span>
+                <input type="text" name="codigo" class="form-control border-start-0" value="{{ ano.codigo }}" placeholder="Ex: 2024/2025" required>
             </div>
         </div>
         <div class="col-12">
-            <label class="form-label">Status do Ciclo</label>
-            <select name="status" class="form-select">
-                <option value="ativo" {% if ano.status == 'ativo' %}selected{% endif %}>Ativo (Em curso)</option>
-                <option value="encerrado" {% if ano.status == 'encerrado' %}selected{% endif %}>Encerrado (Finalizado)</option>
+            <label class="form-label">Descrição</label>
+            <input type="text" name="descricao" class="form-control" value="{{ ano.descricao }}" placeholder="Ex: Ano Lectivo 2024–2025" required>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Data de Início</label>
+            <input type="date" name="data_inicio" class="form-control" value="{{ ano.data_inicio|date:'Y-m-d' }}" required>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Data de Fim</label>
+            <input type="date" name="data_fim" class="form-control" value="{{ ano.data_fim|date:'Y-m-d' }}" required>
+        </div>
+        <div class="col-12">
+            <label class="form-label">Estado</label>
+            <select name="estado" class="form-select">
+                <option value="PLANEADO" {% if ano.estado == 'PLANEADO' %}selected{% endif %}>Planeado</option>
+                <option value="ATIVO" {% if ano.estado == 'ATIVO' %}selected{% endif %}>Ativo</option>
+                <option value="ENCERRADO" {% if ano.estado == 'ENCERRADO' %}selected{% endif %}>Encerrado</option>
             </select>
         </div>
         <div class="col-12">
             <div class="p-3 bg-light rounded-3">
                 <div class="form-check form-switch mb-0">
-                    <input type="checkbox" name="ativo" class="form-check-input" id="ativoSwitch" style="width: 2.5em; height: 1.25em;" {% if ano.ativo %}checked{% endif %}>
+                    <input type="checkbox" name="ano_atual" class="form-check-input" id="ativoSwitch" style="width: 2.5em; height: 1.25em;" {% if ano.ano_atual %}checked{% endif %}>
                     <label class="form-check-label ms-2 fw-bold text-primary" for="ativoSwitch">Definir como Ano Atual do Sistema</label>
                 </div>
             </div>

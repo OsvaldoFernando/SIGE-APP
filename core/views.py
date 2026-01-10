@@ -45,7 +45,7 @@ def index_redirect(request):
 
 @login_required
 def index(request):
-    ano_atual = AnoAcademico.objects.filter(ativo=True).first()
+    ano_atual = AnoAcademico.objects.filter(ano_atual=True).first()
     semestre_atual = None
     if ano_atual:
         semestre_atual = ano_atual.semestres.filter(ativo=True).first()
@@ -70,6 +70,8 @@ def index(request):
 def inscricao_create(request, curso_id):
     """View para criar inscrição em um curso. Apenas cursos ativos aceitam inscrições."""
     curso = get_object_or_404(Curso, id=curso_id)
+    cursos = Curso.objects.filter(ativo=True)
+    anos_academicos = AnoAcademico.objects.filter(ano_atual=True)
     
     # Validar se o curso está ativo
     if not curso.ativo:
@@ -80,7 +82,11 @@ def inscricao_create(request, curso_id):
         )
         return redirect('index')
     
-    context = {'curso': curso}
+    context = {
+        'curso': curso,
+        'cursos': cursos,
+        'anos_academicos': anos_academicos
+    }
     if curso.requer_prerequisitos:
         context['prerequisitos'] = curso.prerequisitos.all()
     
@@ -552,40 +558,54 @@ def semestre_lista(request, ano_id):
     return render(request, 'core/semestre_lista.html', {'ano': ano, 'semestres': semestres})
 
 @login_required
-def ano_academico_edit(request, pk):
-    ano = get_object_or_404(AnoAcademico, pk=pk)
-    if request.method == 'POST':
-        ano.ano_inicio = request.POST.get('ano_inicio')
-        ano.ano_fim = request.POST.get('ano_fim')
-        ano.status = request.POST.get('status')
-        ano.ativo = 'ativo' in request.POST
-        ano.save()
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({'success': True, 'message': "Ano Académico atualizado com sucesso!"})
-        messages.success(request, "Ano Académico atualizado com sucesso!")
-        return redirect('ano_academico_lista')
-    
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return render(request, 'core/partials/ano_academico_form_inner.html', {'ano': ano})
-    return render(request, 'core/ano_academico_form.html', {'ano': ano})
-
-@login_required
 def ano_academico_create(request):
     if request.method == 'POST':
-        ano_inicio = request.POST.get('ano_inicio')
-        ano_fim = request.POST.get('ano_fim')
-        status = request.POST.get('status')
-        ativo = 'ativo' in request.POST
+        codigo = request.POST.get('codigo')
+        descricao = request.POST.get('descricao')
+        data_inicio = request.POST.get('data_inicio')
+        data_fim = request.POST.get('data_fim')
+        estado = request.POST.get('estado')
+        ano_atual = 'ano_atual' in request.POST
         
         AnoAcademico.objects.create(
-            ano_inicio=ano_inicio,
-            ano_fim=ano_fim,
-            status=status,
-            ativo=ativo
+            codigo=codigo,
+            descricao=descricao,
+            data_inicio=data_inicio,
+            data_fim=data_fim,
+            estado=estado,
+            ano_atual=ano_atual,
+            criado_por=request.user
         )
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': True, 'message': "Ano Académico criado com sucesso!"})
         messages.success(request, "Ano Académico criado com sucesso!")
+        return redirect('ano_academico_lista')
+    
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return render(request, 'core/partials/ano_academico_form_inner.html')
+    return render(request, 'core/ano_academico_form.html')
+
+@login_required
+def ano_academico_edit(request, pk):
+    ano = get_object_or_404(AnoAcademico, pk=pk)
+    
+    if ano.estado == 'ENCERRADO':
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'message': "Erro: Este ano está encerrado e não pode ser editado."})
+        messages.error(request, "Este ano está encerrado e não pode ser editado.")
+        return redirect('ano_academico_lista')
+
+    if request.method == 'POST':
+        ano.codigo = request.POST.get('codigo')
+        ano.descricao = request.POST.get('descricao')
+        ano.data_inicio = request.POST.get('data_inicio')
+        ano.data_fim = request.POST.get('data_fim')
+        ano.estado = request.POST.get('estado')
+        ano.ano_atual = 'ano_atual' in request.POST
+        ano.save()
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': True, 'message': "Ano Académico atualizado com sucesso!"})
+        messages.success(request, "Ano Académico atualizado com sucesso!")
         return redirect('ano_academico_lista')
     
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -1072,7 +1092,7 @@ def painel_principal(request):
     aguardando_nota = Inscricao.objects.filter(nota_teste__isnull=True).count()
     
     anos_academicos = AnoAcademico.objects.all()
-    ano_atual = AnoAcademico.objects.filter(ativo=True).first()
+    ano_atual = AnoAcademico.objects.filter(ano_atual=True).first()
     
     notificacoes_nao_lidas = Notificacao.objects.filter(
         Q(global_notificacao=True) | Q(destinatarios=request.user),
@@ -1103,8 +1123,8 @@ def painel_principal(request):
 @login_required
 def trocar_ano(request):
     """View para seleção de ano acadêmico"""
-    anos_academicos = AnoAcademico.objects.all().order_by('-ano_inicio')
-    ano_atual = AnoAcademico.objects.filter(ativo=True).first()
+    anos_academicos = AnoAcademico.objects.all().order_by('-data_inicio')
+    ano_atual = AnoAcademico.objects.filter(ano_atual=True).first()
     
     context = {
         'anos_academicos': anos_academicos,

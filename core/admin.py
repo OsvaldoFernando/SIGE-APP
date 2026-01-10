@@ -8,22 +8,25 @@ from .models import (
 
 @admin.register(AnoAcademico)
 class AnoAcademicoAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'ano_inicio', 'ano_fim', 'ativo', 'data_criacao']
-    list_filter = ['ativo', 'data_criacao']
-    ordering = ['-ano_inicio']
+    list_display = ['codigo', 'descricao', 'estado', 'ano_atual', 'data_criacao']
+    list_filter = ['estado', 'ano_atual', 'data_criacao']
+    ordering = ['-data_inicio']
     
     actions = ['marcar_como_ativo']
     
     def marcar_como_ativo(self, request, queryset):
-        # Desativar todos
-        AnoAcademico.objects.all().update(ativo=False)
-        # Ativar o primeiro selecionado
-        if queryset.exists():
-            ano = queryset.first()
-            ano.ativo = True
+        # Desativar todos os outros e ativar o selecionado
+        if queryset.count() > 1:
+            self.message_user(request, "Selecione apenas um ano para ativar.", level='error')
+            return
+            
+        ano = queryset.first()
+        try:
+            ano.estado = 'ATIVO'
             ano.save()
             self.message_user(request, f"Ano acadêmico {ano} marcado como ativo!")
-    marcar_como_ativo.short_description = "Marcar como ano ativo"
+        except ValueError as e:
+            self.message_user(request, str(e), level='error')
 
 @admin.register(ConfiguracaoEscola)
 class ConfiguracaoEscolaAdmin(admin.ModelAdmin):
