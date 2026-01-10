@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Confirmar Exclusão{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger shadow-lg">
+                <div class="card-header bg-danger text-white p-4">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <p class="lead mb-3">Tem certeza que deseja deletar o curso?</p>
+                    <div class="alert alert-warning">
+                        <strong>Curso:</strong> {{ curso.codigo }} - {{ curso.nome }}
+                    </div>
+                    <p class="text-muted">
+                        <i class="fas fa-info-circle"></i> 
+                        Esta ação não pode ser desfeita. Todas as inscrições associadas também serão removidas.
+                    </p>
+
+                    <form method="POST" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="fas fa-trash"></i> Deletar Curso
+                            </button>
+                            <a href="{% url 'listar_cursos' %}" class="btn btn-secondary btn-lg">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

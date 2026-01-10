@@ -1,0 +1,71 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Termo de Renovação - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <a href="{% url 'matricula' %}" style="text-decoration: none; color: #666; margin-bottom: 15px; display: inline-block;">← Voltar</a>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2>Termo de Renovação de Matrícula</h2>
+            <p class="text-muted">Processar termos de renovação de matrículas aprovadas</p>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Matrículas para Renovação</h5>
+        </div>
+        <div class="card-body">
+            {% if inscricoes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nº Inscrição</th>
+                                <th>Nome</th>
+                                <th>Curso</th>
+                                <th>Data de Inscrição</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inscricao in inscricoes %}
+                                <tr>
+                                    <td><strong>{{ inscricao.numero_inscricao }}</strong></td>
+                                    <td>{{ inscricao.nome_completo }}</td>
+                                    <td>{{ inscricao.curso.nome }}</td>
+                                    <td>{{ inscricao.data_inscricao|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <form method="POST" style="display: inline;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="inscricao_id" value="{{ inscricao.id }}">
+                                            <button type="submit" class="btn btn-sm btn-primary">
+                                                Processar Renovação
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <p class="mb-0">Nenhuma matrícula aprovada disponível para renovação.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

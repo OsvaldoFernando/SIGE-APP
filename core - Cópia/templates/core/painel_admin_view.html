@@ -1,0 +1,46 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Gestão de Documentos Académicos - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row g-4">
+        <!-- Main Content -->
+        <div class="col-md-12">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                    <h2 class="fw-bold mb-0 text-primary">Gestão de Documentos Académicos</h2>
+                    <p class="text-muted small">Gerencie os templates de documentos da instituição</p>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Cards de Configuração -->
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-4">
+                            <a href="{% url 'documento_criar' %}" class="text-decoration-none">
+                                <div class="card border-0 shadow-sm rounded-4 h-100 card-menu transition-hover bg-light">
+                                    <div class="card-body p-4 text-center">
+                                        <div class="bg-white rounded-4 p-3 d-inline-block mb-3 shadow-sm">
+                                            <i class="bi bi-file-earmark-plus text-primary" style="font-size: 2rem;"></i>
+                                        </div>
+                                        <h5 class="fw-bold text-dark mb-1">Novo Documento</h5>
+                                        <p class="text-muted small mb-0">Criar um novo template académico</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card-menu { transition: all 0.3s ease; border: 1px solid transparent !important; }
+    .card-menu:hover { 
+        transform: translateY(-5px); 
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+        border-color: rgba(30, 58, 138, 0.1) !important;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Gestão de Estudantes - SIGE{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div style="display: flex; min-height: 100vh; margin-top: 80px;">
+        <div style="width: 280px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 20px; position: fixed; left: 0; top: 80px; height: calc(100vh - 80px); overflow-y: auto;">
+            <h5 style="color: #fff; margin-bottom: 20px;">Gestão de Estudantes</h5>
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                <li><a href="/nova-matricula/" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📊 Nova Matrícula</a></li>
+                <li><a href="{% url 'matricula' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📝 Gestão de Matrícula</a></li>
+                <li><a href="{% url 'termo_renovacao' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">🔄 Termo de Renovação</a></li>
+                <li><a href="{% url 'receber_documento_matricula' %}" class="nav-link" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📄 Receber Documento</a></li>
+            </ul>
+        </div>
+
+        <div style="margin-left: 280px; flex: 1; padding: 30px;">
+            <a href="{% url 'painel_principal' %}" style="text-decoration: none; color: #666; font-size: 12px; margin-bottom: 15px; display: inline-block;">← Voltar ao Painel</a>
+            <h1 style="color: #1e3c72; margin-bottom: 30px;">Gestão de Estudantes</h1>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <a href="/nova-matricula/" style="text-decoration: none;">
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #1e3c72; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
+                        <h5 style="color: #1e3c72; margin-bottom: 10px;">📊 Nova Matrícula</h5>
+                        <p style="color: #666; margin: 0;">Selecionar tipo de matrícula e cadastrar alunos.</p>
+                    </div>
+                </a>
+
+                <a href="{% url 'matricula' %}" style="text-decoration: none;">
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #17a2b8; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
+                        <h5 style="color: #17a2b8; margin-bottom: 10px;">📝 Gestão de Matrícula</h5>
+                        <p style="color: #666; margin: 0;">Realizar e gerenciar matrículas de estudantes.</p>
+                    </div>
+                </a>
+
+                <a href="{% url 'termo_renovacao' %}" style="text-decoration: none;">
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #28a745; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
+                        <h5 style="color: #28a745; margin-bottom: 10px;">🔄 Termo de Renovação</h5>
+                        <p style="color: #666; margin: 0;">Processar termos de renovação de matrículas.</p>
+                    </div>
+                </a>
+
+                <a href="{% url 'receber_documento_matricula' %}" style="text-decoration: none;">
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #ffc107; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
+                        <h5 style="color: #ffc107; margin-bottom: 10px;">📄 Receber Documento</h5>
+                        <p style="color: #666; margin: 0;">Registrar recebimento de documentos de matrícula.</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,299 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Perfil do Usuário - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row g-4">
+        <!-- Sidebar Navigation -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'painel_principal' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
+                            <i class="bi bi-speedometer2 me-3 fs-5"></i> Painel Principal
+                        </a>
+                        <a href="{% url 'perfil_usuario' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center active bg-primary border-primary">
+                            <i class="bi bi-person me-3 fs-5"></i> Perfil do Usuário
+                        </a>
+                        <a href="{% url 'notificacoes' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
+                            <i class="bi bi-bell me-3 fs-5"></i> Notificações
+                        </a>
+                        <a href="{% url 'quadro_avisos' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
+                            <i class="bi bi-megaphone me-3 fs-5"></i> Quadro de Avisos
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                    <h2 class="fw-bold mb-0 text-primary">Perfil do Usuário</h2>
+                    <p class="text-muted small">Gerencie suas informações pessoais e de acesso</p>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row">
+                        <!-- Perfil Section Left -->
+                        <div class="col-md-4 text-center border-end">
+                            <div class="position-relative d-inline-block mb-3">
+                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center overflow-hidden border border-4 border-white shadow-sm" style="width: 150px; height: 150px;">
+                                    {% if user.perfil.foto %}
+                                        <img src="{{ user.perfil.foto.url }}" alt="{{ user.username }}" class="img-fluid w-100 h-100 object-fit-cover">
+                                    {% else %}
+                                        <i class="bi bi-person-circle text-muted" style="font-size: 80px;"></i>
+                                    {% endif %}
+                                </div>
+                                <button class="btn btn-primary btn-sm rounded-circle position-absolute bottom-0 end-0 shadow" title="Alterar Foto" data-bs-toggle="modal" data-bs-target="#modalAlterarFoto">
+                                    <i class="bi bi-camera"></i>
+                                </button>
+                            </div>
+                            <h4 class="fw-bold mb-1">{{ user.get_full_name|default:user.username }}</h4>
+                            <p class="badge bg-primary-subtle text-primary rounded-pill px-3">{{ user.perfil.get_nivel_acesso_display }}</p>
+                            
+                            <div class="mt-4 text-start">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-envelope text-primary me-2"></i>
+                                    <span class="text-muted small">{{ user.email }}</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-telephone text-primary me-2"></i>
+                                    <span class="text-muted small">{{ user.perfil.telefone|default:"Não informado" }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Perfil Section Right -->
+                        <div class="col-md-8 ps-md-4">
+                            <h5 class="fw-bold mb-4">Informações Detalhadas</h5>
+                            <div class="row g-4">
+                                <div class="col-sm-6">
+                                    <label class="text-muted small text-uppercase fw-bold mb-1">Utilizador</label>
+                                    <div class="p-2 bg-light rounded-3">{{ user.username }}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="text-muted small text-uppercase fw-bold mb-1">Membro desde</label>
+                                    <div class="p-2 bg-light rounded-3">{{ user.date_joined|date:"d M Y" }}</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="text-muted small text-uppercase fw-bold mb-1">Status da Conta</label>
+                                    <div>
+                                        {% if user.perfil.ativo %}
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill px-3 py-2">
+                                                <i class="bi bi-check-circle-fill me-1"></i> Ativa
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 rounded-pill px-3 py-2">
+                                                <i class="bi bi-x-circle-fill me-1"></i> Inativa
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="text-muted small text-uppercase fw-bold mb-1">Último Acesso</label>
+                                    <div class="p-2 bg-light rounded-3 text-muted">{{ user.last_login|date:"d/m/Y H:i"|default:"Primeiro acesso" }}</div>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 d-flex flex-wrap gap-3">
+                                <button class="btn btn-action btn-alterar-senha rounded-pill" data-bs-toggle="modal" data-bs-target="#modalAlterarSenha">
+                                    <i class="bi bi-key me-2"></i> Alterar Senha
+                                </button>
+                                <button class="btn btn-action btn-editar-perfil rounded-pill" data-bs-toggle="modal" data-bs-target="#modalEditarPerfil">
+                                    <i class="bi bi-pencil me-2"></i> Editar Perfil
+                                </button>
+                                {% if user.perfil.nivel_acesso == 'super_admin' %}
+                                <button class="btn btn-action btn-logo-sistema rounded-pill" data-bs-toggle="modal" data-bs-target="#modalAlterarLogoSistema">
+                                    <i class="bi bi-image me-2"></i> Logo do Sistema
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if user.perfil.nivel_acesso == 'super_admin' %}
+<!-- Modal Alterar Logo do Sistema -->
+<div class="modal fade" id="modalAlterarLogoSistema" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold">Alterar Logotipo do Sistema</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" enctype="multipart/form-data" action="{% url 'perfil_usuario' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3 text-center">
+                        <p class="text-muted small mb-4">O novo logotipo aparecerá no login e no topo do sistema.</p>
+                        {% if config.logo %}
+                            <div class="mb-3">
+                                <img src="{{ config.logo.url }}" alt="Logo Atual" style="max-height: 80px; object-fit: contain;">
+                            </div>
+                        {% endif %}
+                        <input type="file" class="form-control rounded-3" name="logo" accept="image/*" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" name="action" value="update_system_logo" class="btn btn-dark rounded-pill px-4">Salvar Logotipo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Modal Alterar Foto -->
+<div class="modal fade" id="modalAlterarFoto" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold">Alterar Foto de Perfil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" enctype="multipart/form-data" action="{% url 'perfil_usuario' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3 text-center">
+                        <p class="text-muted small mb-4">Selecione uma imagem quadrada para melhor visualização</p>
+                        <input type="file" class="form-control rounded-3" name="foto" accept="image/*" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" name="action" value="update_photo" class="btn btn-primary rounded-pill px-4">Salvar Foto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Alterar Senha -->
+<div class="modal fade" id="modalAlterarSenha" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold">Alterar Senha</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'perfil_usuario' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Senha Atual</label>
+                        <input type="password" class="form-control rounded-3" name="senha_atual" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Nova Senha</label>
+                        <input type="password" class="form-control rounded-3" name="nova_senha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Confirmar Nova Senha</label>
+                        <input type="password" class="form-control rounded-3" name="confirmar_senha" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" name="action" value="change_password" class="btn btn-primary rounded-pill px-4">Atualizar Senha</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Perfil -->
+<div class="modal fade" id="modalEditarPerfil" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold">Editar Perfil</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{% url 'perfil_usuario' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Nome Completo</label>
+                        <input type="text" class="form-control rounded-3" name="nome" value="{{ user.get_full_name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Email</label>
+                        <input type="email" class="form-control rounded-3" name="email" value="{{ user.email }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Telefone</label>
+                        <input type="text" class="form-control rounded-3" name="telefone" value="{{ user.perfil.telefone }}">
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" name="action" value="update_profile" class="btn btn-primary rounded-pill px-4">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-action {
+        padding: 12px 24px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 160px;
+        border: 2px solid transparent;
+        flex-direction: column;
+        line-height: 1.2;
+    }
+    
+    .btn-alterar-senha {
+        background-color: #0d6efd;
+        color: white;
+    }
+    .btn-alterar-senha:hover {
+        background-color: #0b5ed7;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+    }
+    
+    .btn-editar-perfil {
+        background-color: transparent;
+        color: #0d6efd;
+        border-color: #0d6efd;
+    }
+    .btn-editar-perfil:hover {
+        background-color: #0d6efd;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+    }
+    
+    .btn-logo-sistema {
+        background-color: #212529;
+        color: white;
+    }
+    .btn-logo-sistema:hover {
+        background-color: #000;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .list-group-item { border-color: rgba(0,0,0,0.05); }
+    .list-group-item.active { box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2); }
+    .card-menu { transition: all 0.3s ease; }
+    .object-fit-cover { object-fit: cover; }
+    .bg-primary-subtle { background-color: #e7f1ff; }
+</style>
+{% endblock %}

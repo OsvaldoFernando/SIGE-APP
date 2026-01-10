@@ -1,0 +1,549 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<style>
+    .academic-card { border: none; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: transform 0.3s ease; }
+    .academic-card:hover { transform: translateY(-5px); }
+    .table-modern thead th { background-color: #f8f9fa; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; color: #6c757d; border-bottom: 2px solid #dee2e6; padding: 15px; }
+    .table-modern tbody td { padding: 15px; vertical-align: middle; }
+    .status-badge { padding: 6px 12px; border-radius: 20px; font-weight: 500; font-size: 0.85rem; }
+    .btn-action { width: 35px; height: 35px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; margin: 0 2px; transition: all 0.2s; }
+    .page-header { background: white; padding: 2rem 0; margin-bottom: 2rem; border-bottom: 1px solid #edf2f7; }
+    .nav-tabs-modern { 
+        border: none; 
+        background: #f1f5f9; 
+        padding: 5px; 
+        border-radius: 12px;
+        display: inline-flex;
+    }
+    .nav-tabs-modern .nav-item {
+        margin-right: 5px;
+    }
+    .nav-tabs-modern .nav-item:last-child {
+        margin-right: 0;
+    }
+    .nav-tabs-modern .nav-link { 
+        border: none; 
+        color: #64748b; 
+        font-weight: 600; 
+        padding: 0.6rem 1.5rem; 
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .nav-tabs-modern .nav-link:hover { 
+        color: #1e3a8a; 
+        background: rgba(255, 255, 255, 0.5); 
+    }
+    .nav-tabs-modern .nav-link.active { 
+        color: #1e3a8a; 
+        background: white; 
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .btn-header {
+        border: none;
+        border-radius: 12px;
+        padding: 0.6rem 1.4rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 0.95rem;
+    }
+    .btn-header-light {
+        background: #f1f5f9;
+        color: #475569;
+    }
+    .btn-header-light:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+        transform: translateY(-1px);
+    }
+    .btn-header-primary {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+    .btn-header-primary:hover {
+        background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
+    }
+    .btn-header-primary:active {
+        transform: translateY(0);
+    }
+</style>
+
+<div class="page-header">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h2 class="fw-bold mb-1" style="color: #1e3a8a;">Gestão de Cursos e Disciplinas</h2>
+                <p class="text-muted mb-0">Organize e gerencie a estrutura curricular da instituição</p>
+            </div>
+            <div class="d-flex gap-3">
+                <a href="{% url 'painel_principal' %}" class="btn-header btn-header-light text-decoration-none">
+                    <i class="bi bi-grid-1x2"></i> Painel
+                </a>
+                <button type="button" id="btnNovoHeader" class="btn-header btn-header-primary" data-bs-toggle="modal" data-bs-target="#modalNovoCurso">
+                    <i class="bi bi-plus-lg"></i> Novo Curso
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="d-flex justify-content-start mb-4">
+        <ul class="nav nav-tabs nav-tabs-modern" id="managementTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="cursos-tab" data-bs-toggle="tab" data-bs-target="#cursos-pane" type="button" role="tab">
+                    <i class="bi bi-mortarboard-fill"></i> Cursos
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="disciplinas-tab" data-bs-toggle="tab" data-bs-target="#disciplinas-pane" type="button" role="tab">
+                    <i class="bi bi-book-half"></i> Disciplinas
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="plano-tab" data-bs-toggle="tab" data-bs-target="#plano-pane" type="button" role="tab">
+                    <i class="bi bi-card-checklist"></i> Plano Curricular
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <div class="tab-content" id="managementTabsContent">
+        <!-- CURSOS TAB -->
+        <div class="tab-pane fade show active" id="cursos-pane" role="tabpanel">
+            <div class="card academic-card">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-modern mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Curso</th>
+                                    <th>Grau</th>
+                                    <th>Vagas</th>
+                                    <th>Duração</th>
+                                    <th>Regime</th>
+                                    <th>Modalidade</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-end pe-4">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for curso in cursos %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
+                                                <i class="bi bi-graduation-cap text-primary"></i>
+                                            </div>
+                                            <div>
+                                                <span class="fw-bold text-dark d-block">{{ curso.nome }}</span>
+                                                <small class="text-muted">{{ curso.codigo }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ curso.get_grau_display|default:'' }}</td>
+                                    <td>{{ curso.vagas }}</td>
+                                    <td>{{ curso.get_duracao_meses_display }}</td>
+                                    <td>{{ curso.get_regime_display|default:'' }}</td>
+                                    <td>{{ curso.get_modalidade_display|default:'' }}</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-link p-0 text-decoration-none btn-toggle-curso" data-curso-id="{{ curso.id }}">
+                                            {% if curso.ativo %}
+                                            <span class="status-badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                                                <i class="bi bi-check-circle me-1"></i>Ativo
+                                            </span>
+                                            {% else %}
+                                            <span class="status-badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25">
+                                                <i class="bi bi-circle me-1"></i>Inativo
+                                            </span>
+                                            {% endif %}
+                                        </button>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a href="{% url 'grelha_curricular' %}" class="btn-action btn btn-outline-primary" title="Ver Plano Curricular">
+                                            <i class="bi bi-card-checklist"></i>
+                                        </a>
+                                        <button class="btn-action btn btn-outline-info btn-editar-curso" 
+                                                data-curso-id="{{ curso.id }}" 
+                                                data-curso-codigo="{{ curso.codigo }}"
+                                                data-curso-nome="{{ curso.nome }}"
+                                                data-curso-vagas="{{ curso.vagas }}"
+                                                data-curso-duracao="{{ curso.duracao_meses }}"
+                                                data-curso-nota="{{ curso.nota_minima }}"
+                                                data-curso-grau="{{ curso.grau }}"
+                                                data-curso-regime="{{ curso.regime }}"
+                                                data-curso-modalidade="{{ curso.modalidade }}"
+                                                data-curso-requer="{{ curso.requer_prerequisitos|yesno:'True,False' }}"
+                                                data-bs-toggle="modal" data-bs-target="#modalEditarCurso">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </button>
+                                        <button class="btn-action btn btn-outline-danger btn-deletar-curso" 
+                                                data-curso-id="{{ curso.id }}" data-curso-nome="{{ curso.nome }}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DISCIPLINAS TAB -->
+        <div class="tab-pane fade" id="disciplinas-pane" role="tabpanel">
+            <div class="card academic-card">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-modern mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Disciplina</th>
+                                    <th>Curso</th>
+                                    <th>Carga Horária</th>
+                                    <th class="text-end pe-4">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for disciplina in disciplinas %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
+                                                <i class="bi bi-book text-primary"></i>
+                                            </div>
+                                            <span class="fw-bold text-dark">{{ disciplina.nome }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-light text-dark border">{{ disciplina.curso.codigo }}</span>
+                                        <small class="ms-1">{{ disciplina.curso.nome }}</small>
+                                    </td>
+                                    <td>{{ disciplina.carga_horaria }}h</td>
+                                    <td class="text-end pe-4">
+                                        <button class="btn-action btn btn-outline-info"><i class="bi bi-pencil-square"></i></button>
+                                        <button class="btn-action btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PLANO CURRICULAR TAB -->
+        <div class="tab-pane fade" id="plano-pane" role="tabpanel">
+            <div class="card academic-card overflow-hidden">
+                <div class="card-body p-5 text-center">
+                    <div class="mb-4">
+                        <i class="bi bi-card-checklist text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4 class="fw-bold" style="color: #1e3a8a;">Plano Curricular Estruturado</h4>
+                    <p class="text-muted mx-auto mb-4" style="max-width: 500px;">
+                        Visualize e gerencie a grelha curricular completa de todos os cursos. 
+                        Defina a ordem das disciplinas por semestres e anos académicos.
+                    </p>
+                    <a href="{% url 'grelha_curricular' %}" class="btn-header btn-header-primary text-decoration-none">
+                        <i class="bi bi-eye"></i> Aceder à Grelha Curricular
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Novo Curso -->
+<div class="modal fade" id="modalNovoCurso" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+            <div class="modal-header border-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold" style="color: #1e3a8a;">Novo Curso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formNovoCurso">
+                {% csrf_token %}
+                <div class="modal-body px-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Código</label>
+                        <input type="text" class="form-control" name="codigo" required style="border-radius: 10px;">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Nome do Curso</label>
+                            <input type="text" class="form-control" name="nome" required style="border-radius: 10px;">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Grau Académico</label>
+                            <select name="grau" class="form-select" required style="border-radius: 10px;">
+                                <option value="licenciatura">Licenciatura</option>
+                                <option value="mestrado">Mestrado</option>
+                                <option value="doutoramento">Doutoramento</option>
+                                <option value="especialidade">Especialidade</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Vagas</label>
+                            <input type="number" class="form-control" name="vagas" value="30" style="border-radius: 10px;">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Duração</label>
+                            <select class="form-select" name="duracao_meses" required style="border-radius: 10px;">
+                                {% for val, label in duracao_choices %}
+                                <option value="{{ val }}" {% if val == 12 %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Regime</label>
+                            <select name="regime" class="form-select" required style="border-radius: 10px;">
+                                <option value="diurno">Diurno</option>
+                                <option value="pos-laboral">Pós-Laboral</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Modalidade</label>
+                            <select name="modalidade" class="form-select" required style="border-radius: 10px;">
+                                <option value="presencial">Presencial</option>
+                                <option value="semipresencial">Semipresencial</option>
+                                <option value="ead">EAD</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Nota Mínima</label>
+                            <input type="number" step="0.01" class="form-control" name="nota_minima" value="10" style="border-radius: 10px;">
+                        </div>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="requer_prerequisitos" id="novoRequer">
+                        <label class="form-check-label" for="novoRequer">Requer Pré-requisitos</label>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pb-4 px-4">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal" style="border-radius: 10px;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary px-4" style="border-radius: 10px;">Criar Curso</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Curso -->
+<div class="modal fade" id="modalEditarCurso" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+            <div class="modal-header border-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold" style="color: #1e3a8a;">Editar Curso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formEditarCurso">
+                {% csrf_token %}
+                <input type="hidden" id="editarCurso_id" name="curso_id">
+                <div class="modal-body px-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Código</label>
+                        <input type="text" class="form-control" id="editarCurso_codigo" name="codigo" required style="border-radius: 10px;">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Nome do Curso</label>
+                            <input type="text" class="form-control" id="editarCurso_nome" name="nome" required style="border-radius: 10px;">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Grau Académico</label>
+                            <select id="editarCurso_grau" name="grau" class="form-select" required style="border-radius: 10px;">
+                                <option value="licenciatura">Licenciatura</option>
+                                <option value="mestrado">Mestrado</option>
+                                <option value="doutoramento">Doutoramento</option>
+                                <option value="especialidade">Especialidade</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Vagas</label>
+                            <input type="number" class="form-control" id="editarCurso_vagas" name="vagas" style="border-radius: 10px;">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Duração</label>
+                            <select class="form-select" id="editarCurso_duracao" name="duracao_meses" style="border-radius: 10px;">
+                                {% for val, label in duracao_choices %}
+                                <option value="{{ val }}">{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-semibold">Regime</label>
+                            <select id="editarCurso_regime" name="regime" class="form-select" required style="border-radius: 10px;">
+                                <option value="diurno">Diurno</option>
+                                <option value="pos-laboral">Pós-Laboral</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Modalidade</label>
+                            <select id="editarCurso_modalidade" name="modalidade" class="form-select" required style="border-radius: 10px;">
+                                <option value="presencial">Presencial</option>
+                                <option value="semipresencial">Semipresencial</option>
+                                <option value="ead">EAD</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Nota Mínima</label>
+                            <input type="number" step="0.01" class="form-control" id="editarCurso_nota" name="nota_minima" style="border-radius: 10px;">
+                        </div>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="requer_prerequisitos" id="editarCurso_prerequisitos">
+                        <label class="form-check-label" for="editarCurso_prerequisitos">Requer Pré-requisitos</label>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pb-4 px-4">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal" style="border-radius: 10px;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary px-4" style="border-radius: 10px;">Atualizar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Nova Disciplina -->
+<div class="modal fade" id="modalNovaDisciplina" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 15px;">
+            <div class="modal-header border-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold" style="color: #1e3a8a;">Nova Disciplina</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formNovaDisciplina">
+                {% csrf_token %}
+                <div class="modal-body px-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nome da Disciplina</label>
+                        <input type="text" class="form-control" name="nome" required style="border-radius: 10px;">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Curso</label>
+                        <select class="form-select" name="curso_id" required style="border-radius: 10px;">
+                            <option value="">Selecionar Curso...</option>
+                            {% for c in cursos %}
+                            <option value="{{ c.id }}">{{ c.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Carga Horária (h)</label>
+                        <input type="number" class="form-control" name="carga_horaria" required style="border-radius: 10px;">
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pb-4 px-4">
+                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal" style="border-radius: 10px;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary px-4" style="border-radius: 10px;">Criar Disciplina</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnNovoHeader = document.getElementById('btnNovoHeader');
+        
+        // Tab switch handling for the header button
+        document.getElementById('managementTabs').addEventListener('shown.bs.tab', function (e) {
+            if (e.target.id === 'disciplinas-tab') {
+                btnNovoHeader.innerHTML = '<i class="bi bi-plus-lg me-2"></i>Nova Disciplina';
+                btnNovoHeader.setAttribute('data-bs-target', '#modalNovaDisciplina');
+            } else {
+                btnNovoHeader.innerHTML = '<i class="bi bi-plus-lg me-2"></i>Novo Curso';
+                btnNovoHeader.setAttribute('data-bs-target', '#modalNovoCurso');
+            }
+        });
+
+        // Toggle Curso Status
+        document.querySelectorAll('.btn-toggle-curso').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const cursoId = this.dataset.cursoId;
+                fetch(`/cursos/${cursoId}/toggle/`, {
+                    method: 'POST',
+                    headers: { 'X-CSRFToken': '{{ csrf_token }}', 'X-Requested-With': 'XMLHttpRequest' }
+                }).then(r => r.json()).then(data => { if(data.success) location.reload(); });
+            });
+        });
+
+        // Handle Edit Modal populate
+        document.querySelectorAll('.btn-editar-curso').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.getElementById('editarCurso_id').value = this.dataset.cursoId;
+                document.getElementById('editarCurso_codigo').value = this.dataset.cursoCodigo;
+                document.getElementById('editarCurso_nome').value = this.dataset.cursoNome;
+                document.getElementById('editarCurso_vagas').value = this.dataset.cursoVagas;
+                document.getElementById('editarCurso_duracao').value = this.dataset.cursoDuracao;
+                document.getElementById('editarCurso_nota').value = this.dataset.cursoNota;
+                document.getElementById('editarCurso_grau').value = this.dataset.cursoGrau;
+                document.getElementById('editarCurso_regime').value = this.dataset.cursoRegime;
+                document.getElementById('editarCurso_modalidade').value = this.dataset.cursoModalidade;
+                document.getElementById('editarCurso_prerequisitos').checked = this.dataset.cursoRequer === 'True';
+            });
+        });
+
+        // Form Submissions
+        function handleForm(id, url) {
+            document.getElementById(id).addEventListener('submit', function(e) {
+                e.preventDefault();
+                fetch(url, {
+                    method: 'POST',
+                    body: new FormData(this),
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                }).then(r => r.json()).then(data => { if(data.success) location.reload(); });
+            });
+        }
+
+        handleForm('formNovoCurso', '/cursos/novo/');
+        handleForm('formEditarCurso', '/cursos/' + (document.getElementById('editarCurso_id').value || '0') + '/editar/');
+        
+        // Fixed edit form URL handling
+        document.getElementById('formEditarCurso').onsubmit = function(e) {
+            e.preventDefault();
+            const id = document.getElementById('editarCurso_id').value;
+            fetch(`/cursos/${id}/editar/`, {
+                method: 'POST',
+                body: new FormData(this),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            }).then(r => r.json()).then(data => { if(data.success) location.reload(); });
+        };
+
+        handleForm('formNovaDisciplina', '/disciplinas/nova/');
+
+        // Delete Course
+        document.querySelectorAll('.btn-deletar-curso').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.cursoId;
+                const nome = this.dataset.cursoNome;
+                if (confirm(`ATENÇÃO: Você está prestes a eliminar o curso "${nome}".\n\nEsta ação é irreversível.\n\nDeseja continuar?`)) {
+                    fetch(`/cursos/${id}/deletar/`, {
+                        method: 'POST',
+                        headers: { 'X-CSRFToken': '{{ csrf_token }}', 'X-Requested-With': 'XMLHttpRequest' }
+                    }).then(r => r.json()).then(data => { if(data.success) location.reload(); });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

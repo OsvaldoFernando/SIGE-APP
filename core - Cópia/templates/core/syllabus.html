@@ -1,0 +1,18 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Syllabus Acadêmico - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <a href="{% url 'painel_principal' %}" style="text-decoration: none; color: #666; margin-bottom: 15px; display: inline-block;">← Voltar</a>
+    <h2>Syllabus Acadêmico</h2>
+    <hr>
+
+    <div class="card">
+        <div class="card-body">
+            <p class="text-muted">Gerenciar programa de disciplinas e conteúdos acadêmicos.</p>
+            <p class="text-muted">Configure: Ementa, objetivos, referências, metodologia de cada disciplina.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

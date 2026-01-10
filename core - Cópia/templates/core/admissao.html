@@ -1,0 +1,118 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Admissão de Estudantes - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center mb-4">Admissão de Estudantes</h2>
+    <p class="text-center text-muted mb-5">Sistema de Inscrição e Consulta de Resultados</p>
+
+    <div class="row g-4">
+        <!-- Nova Inscrição -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="#1e40af" class="bi bi-person-plus-fill" viewBox="0 0 16 16">
+                            <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                            <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5"/>
+                        </svg>
+                    </div>
+                    <h4 class="card-title mb-3">Nova Inscrição</h4>
+                    <p class="card-text mb-4">Faça sua inscrição para os cursos disponíveis</p>
+                    
+                    <form method="get" action="{% url 'admissao_inscricao' %}">
+                        <button type="submit" class="btn btn-custom btn-lg w-100">
+                            <i class="bi bi-pencil-square me-2"></i>
+                            Fazer Inscrição
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'nova_matricula' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>
+                Voltar
+            </a>
+        </div>
+
+        <!-- Consultar Resultado -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="#059669" class="bi bi-search" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                        </svg>
+                    </div>
+                    <h4 class="card-title text-center mb-3">Consultar Resultado</h4>
+                    <p class="card-text text-center mb-4">Consulte sua inscrição e nota de aprovação</p>
+                    
+                    <form method="post" action="{% url 'inscricao_buscar' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="numero_inscricao" class="form-label">Número de Inscrição</label>
+                            <input type="text" class="form-control form-control-lg" id="numero_inscricao" name="numero_inscricao" placeholder="INS-XXXXXX" required>
+                            <div class="form-text">Digite o número de inscrição recebido após o cadastro</div>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-lg w-100">
+                            <i class="bi bi-search me-2"></i>
+                            Consultar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cursos Disponíveis -->
+    <div class="mt-5">
+        <h3 class="mb-4">Cursos Disponíveis para Inscrição</h3>
+        
+        {% if cursos %}
+            <div class="row">
+                {% for curso in cursos %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card curso-card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary">{{ curso.nome }}</h5>
+                            <p class="card-text text-muted">{{ curso.descricao|truncatewords:15 }}</p>
+                            <hr>
+                            <ul class="list-unstyled">
+                                <li><strong>Vagas Totais:</strong> {{ curso.vagas }}</li>
+                                <li><strong>Vagas Disponíveis:</strong> 
+                                    <span class="badge bg-success">{{ curso.vagas_disponiveis }}</span>
+                                </li>
+                                <li><strong>Nota Mínima:</strong> {{ curso.nota_minima }} valores</li>
+                                <li><strong>Inscrições:</strong> {{ curso.total_inscricoes }}</li>
+                            </ul>
+                            <a href="{% url 'inscricao_create' curso.id %}" class="btn btn-outline-primary w-100 mt-2">
+                                Inscrever-se neste curso
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                Não há cursos disponíveis no momento. Por favor, volte mais tarde.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .curso-card {
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s ease;
+    }
+    .curso-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        border-color: #1e40af;
+    }
+</style>
+{% endblock %}

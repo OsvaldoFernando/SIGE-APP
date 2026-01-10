@@ -1,0 +1,86 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Dashboard - Sistema Escolar{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="mb-4">Dashboard do Sistema</h2>
+    
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Total de Inscrições</h5>
+                    <h2 class="display-4">{{ total_inscricoes }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Aprovados</h5>
+                    <h2 class="display-4">{{ total_aprovados }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">Não Aprovados</h5>
+                    <h2 class="display-4">{{ total_reprovados }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Aguardando Nota</h5>
+                    <h2 class="display-4">{{ aguardando_nota }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <h3 class="mb-3">Cursos e Estatísticas</h3>
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Curso</th>
+                    <th>Vagas Totais</th>
+                    <th>Vagas Disponíveis</th>
+                    <th>Total Inscrições</th>
+                    <th>Aprovados</th>
+                    <th>Nota Mínima</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for curso in cursos %}
+                <tr>
+                    <td><strong>{{ curso.nome }}</strong></td>
+                    <td>{{ curso.vagas }}</td>
+                    <td>
+                        <span class="badge {% if curso.vagas_disponiveis > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                            {{ curso.vagas_disponiveis }}
+                        </span>
+                    </td>
+                    <td>{{ curso.total_inscricoes }}</td>
+                    <td>{{ curso.inscricoes.filter.aprovado__True.count }}</td>
+                    <td>{{ curso.nota_minima }}</td>
+                    <td>
+                        <span class="badge {% if curso.ativo %}bg-success{% else %}bg-secondary{% endif %}">
+                            {% if curso.ativo %}Ativo{% else %}Inativo{% endif %}
+                        </span>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center">Nenhum curso cadastrado</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

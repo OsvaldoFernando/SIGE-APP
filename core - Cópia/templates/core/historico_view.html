@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Histórico Escolar - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <a href="{% url 'matricula' %}" style="text-decoration: none; color: #666; margin-bottom: 15px; display: inline-block;">← Voltar</a>
+    <h2>Histórico Escolar</h2>
+    <hr>
+
+    <div class="card">
+        <div class="card-body">
+            <p class="text-muted">Consultar e gerenciar histórico acadêmico dos estudantes.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

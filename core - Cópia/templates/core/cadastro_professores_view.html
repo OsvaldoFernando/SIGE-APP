@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Cadastro e Gestão de Professores - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <a href="{% url 'gestao_docentes' %}" style="text-decoration: none; color: #666; margin-bottom: 15px; display: inline-block;">← Voltar</a>
+    <h2>Cadastro e Gestão de Professores</h2>
+    <hr>
+
+    <div class="card">
+        <div class="card-body">
+            <p class="text-muted">Gerenciar cadastro e informações dos docentes.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

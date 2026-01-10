@@ -1,0 +1,371 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Gestão de Utilizadores - SIGE{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 style="color: #1e3a8a;">👥 Gestão de Utilizadores</h2>
+            <p class="text-muted">Gerencie todos os utilizadores do sistema</p>
+        </div>
+        <button type="button" class="btn btn-primary" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); border: none;" onclick="abrirModalCriacao()">
+            <i class="bi bi-plus-circle me-2"></i>Novo Utilizador
+        </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <h6 class="card-title mb-3">Filtros</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <form method="get" class="d-flex gap-2">
+                        <select name="nivel" class="form-select form-select-sm">
+                            <option value="">Todos os níveis</option>
+                            {% for value, label in niveis_acesso %}
+                                <option value="{{ value }}" {% if nivel_filtro == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <select name="ativo" class="form-select form-select-sm">
+                            <option value="">Todos os status</option>
+                            <option value="sim" {% if ativo_filtro == 'sim' %}selected{% endif %}>Ativos</option>
+                            <option value="nao" {% if ativo_filtro == 'nao' %}selected{% endif %}>Inativos</option>
+                            <option value="pendente" {% if ativo_filtro == 'pendente' %}selected{% endif %}>Pendentes</option>
+                        </select>
+                        <button type="submit" class="btn btn-outline-primary btn-sm">Filtrar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabela de Utilizadores -->
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead style="background: #f8f9fa;">
+                    <tr>
+                        <th style="color: #1e3a8a;">👤 Utilizador</th>
+                        <th style="color: #1e3a8a;">📧 Email</th>
+                        <th style="color: #1e3a8a;">🔐 Nível de Acesso</th>
+                        <th style="color: #1e3a8a;">📞 Telefone</th>
+                        <th style="color: #1e3a8a;">Status</th>
+                        <th style="color: #1e3a8a;">📅 Data Cadastro</th>
+                        <th style="color: #1e3a8a;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user_item in utilizadores %}
+                    <tr id="user-row-{{ user_item.id }}">
+                        <td>
+                            <strong>{{ user_item.get_full_name|default:user_item.username }}</strong>
+                            <br><small class="text-muted">@{{ user_item.username }}</small>
+                        </td>
+                        <td>{{ user_item.email }}</td>
+                        <td>
+                            <span class="badge" id="badge-nivel-{{ user_item.id }}" style="background: {% if user_item.perfil.nivel_acesso == 'admin' or user_item.perfil.nivel_acesso == 'super_admin' %}#dc2626{% elif user_item.perfil.nivel_acesso == 'secretaria' or user_item.perfil.nivel_acesso == 'secretario_academico' %}#2563eb{% elif user_item.perfil.nivel_acesso == 'professor' %}#059669{% else %}#6b7280{% endif %};">
+                                {{ user_item.perfil.get_nivel_acesso_display }}
+                            </span>
+                        </td>
+                        <td>{{ user_item.perfil.telefone|default:"-" }}</td>
+                        <td>
+                            <span class="badge {% if user_item.is_active %}bg-success{% else %}bg-secondary{% endif %}" id="badge-status-{{ user_item.id }}">
+                                {% if user_item.is_active %}Ativo{% else %}Inativo{% endif %}
+                            </span>
+                        </td>
+                        <td><small>{{ user_item.date_joined|date:"d/m/Y" }}</small></td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-outline-primary" onclick="abrirModalEdicao({{ user_item.id }})" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                {% if user_item.id != request.user.id %}
+                                <a href="{% url 'ativar_utilizador' user_item.id %}" class="btn btn-outline-warning" title="{% if user_item.is_active %}Desativar{% else %}Ativar{% endif %}">
+                                    <i class="bi bi-toggle{% if user_item.is_active %}2-on{% else %}2-off{% endif %}"></i>
+                                </a>
+                                <a href="{% url 'deletar_utilizador' user_item.id %}" class="btn btn-outline-danger" title="Deletar">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="bi bi-inbox" style="font-size: 2rem;"></i><br>
+                            Nenhum utilizador encontrado
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalCriacao" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header text-white" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);">
+                    <h5 class="modal-title"><i class="bi bi-person-plus-fill me-2"></i>Novo Utilizador</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formCriacao" class="needs-validation">
+                        {% csrf_token %}
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Nome de Utilizador</label>
+                                <input type="text" class="form-control" name="username" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Email</label>
+                                <input type="email" class="form-control" name="email" required>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Primeiro Nome</label>
+                                <input type="text" class="form-control" name="first_name">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Último Nome</label>
+                                <input type="text" class="form-control" name="last_name">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Senha</label>
+                                <input type="password" class="form-control" name="password" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Telefone</label>
+                                <input type="tel" class="form-control" name="telefone">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Nível de Acesso</label>
+                                <select class="form-select" name="nivel_acesso" required>
+                                    {% for value, label in niveis_acesso %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary px-4" id="btnSalvarCriacao" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); border: none;">
+                        Criar Utilizador
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Edição -->
+    <div class="modal fade" id="modalEdicao" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header text-white" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%);">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Editar Utilizador</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="formEdicao" class="needs-validation">
+                        {% csrf_token %}
+                        <input type="hidden" id="edit_user_id" name="user_id">
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Nome de Utilizador</label>
+                                <input type="text" class="form-control" id="edit_username" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Email</label>
+                                <input type="email" class="form-control" id="edit_email" name="email" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Primeiro Nome</label>
+                                <input type="text" class="form-control" id="edit_first_name" name="first_name">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Último Nome</label>
+                                <input type="text" class="form-control" id="edit_last_name" name="last_name">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Nova Senha <small class="text-muted">(opcional)</small></label>
+                                <input type="password" class="form-control" id="edit_password" name="password" placeholder="Deixe em branco para manter">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Telefone</label>
+                                <input type="tel" class="form-control" id="edit_telefone" name="telefone">
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Nível de Acesso</label>
+                                <select class="form-select" id="edit_nivel_acesso" name="nivel_acesso" required>
+                                    {% for value, label in niveis_acesso %}
+                                    <option value="{{ value }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Status</label>
+                                <div class="form-check form-switch mt-2">
+                                    <input class="form-check-input" type="checkbox" id="edit_is_active" name="is_active">
+                                    <label class="form-check-label" for="edit_is_active">Utilizador Ativo</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary px-4" id="btnSalvarEdicao" style="background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); border: none;">
+                        Salvar Alterações
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modais initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            const modalEdicaoEl = document.getElementById('modalEdicao');
+            if (modalEdicaoEl) {
+                window.modalEdicaoObj = new bootstrap.Modal(modalEdicaoEl);
+            }
+            
+            const modalCriacaoEl = document.getElementById('modalCriacao');
+            if (modalCriacaoEl) {
+                window.modalCriacaoObj = new bootstrap.Modal(modalCriacaoEl);
+            }
+        });
+
+        function abrirModalCriacao() {
+            document.getElementById('formCriacao').reset();
+            if (window.modalCriacaoObj) {
+                window.modalCriacaoObj.show();
+            }
+        }
+
+        document.getElementById('btnSalvarCriacao').addEventListener('click', async () => {
+            const form = document.getElementById('formCriacao');
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch('{% url "criar_utilizador" %}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (window.modalCriacaoObj) {
+                        window.modalCriacaoObj.hide();
+                    }
+                    location.reload();
+                } else {
+                    alert('Erro ao criar: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao processar requisição.');
+            }
+        });
+        
+        async function abrirModalEdicao(userId) {
+            try {
+                const response = await fetch(`/utilizadores/${userId}/editar/`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const u = data.user;
+                    document.getElementById('edit_user_id').value = u.id;
+                    document.getElementById('edit_username').value = u.username;
+                    document.getElementById('edit_email').value = u.email;
+                    document.getElementById('edit_first_name').value = u.first_name || '';
+                    document.getElementById('edit_last_name').value = u.last_name || '';
+                    document.getElementById('edit_telefone').value = u.telefone || '';
+                    document.getElementById('edit_nivel_acesso').value = u.nivel_acesso;
+                    document.getElementById('edit_is_active').checked = u.is_active;
+                    document.getElementById('edit_password').value = '';
+                    
+                    if (window.modalEdicaoObj) {
+                        window.modalEdicaoObj.show();
+                    }
+                } else {
+                    alert('Erro ao carregar dados: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro na comunicação com o servidor.');
+            }
+        }
+
+        document.getElementById('btnSalvarEdicao').addEventListener('click', async () => {
+            const form = document.getElementById('formEdicao');
+            const formData = new FormData(form);
+            const userId = document.getElementById('edit_user_id').value;
+            
+            try {
+                const response = await fetch(`/utilizadores/${userId}/editar/`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    if (window.modalEdicaoObj) {
+                        window.modalEdicaoObj.hide();
+                    }
+                    location.reload(); 
+                } else {
+                    alert('Erro ao salvar: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao processar requisição.');
+            }
+        });
+    </script>
+
+    <div class="mt-4 text-muted">
+        <small>Total: <strong>{{ utilizadores|length }}</strong> utilizador(es)</small>
+    </div>
+</div>
+
+<style>
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}

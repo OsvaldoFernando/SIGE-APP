@@ -1,0 +1,83 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Quadro de Avisos - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row g-4">
+        <!-- Sidebar Navigation -->
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'painel_principal' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
+                            <i class="bi bi-speedometer2 me-3 fs-5"></i> Painel Principal
+                        </a>
+                        <a href="{% url 'perfil_usuario' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
+                            <i class="bi bi-person me-3 fs-5"></i> Perfil do Usuário
+                        </a>
+                        <a href="{% url 'notificacoes' %}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center">
+                            <i class="bi bi-bell me-3 fs-5"></i> Notificações
+                        </a>
+                        <a href="{% url 'quadro_avisos' %}" class="list-group-item list-group-item-action active d-flex align-items-center">
+                            <i class="bi bi-megaphone me-3 fs-5"></i> Quadro de Avisos
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white border-bottom-0 pt-4 px-4">
+                    <h2 class="fw-bold mb-0 text-primary">Quadro de Avisos</h2>
+                    <p class="text-muted small">Comunicados importantes da instituição</p>
+                </div>
+                <div class="card-body p-4">
+                    {% if avisos %}
+                        <div class="row g-4">
+                            {% for aviso in avisos %}
+                                <div class="col-md-6">
+                                    <div class="card h-100 border shadow-sm rounded-4 hover-lift">
+                                        <div class="card-body p-4">
+                                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                                {% if aviso.tipo == 'urgente' %}
+                                                    <span class="badge bg-danger rounded-pill px-3">Urgente</span>
+                                                {% elif aviso.tipo == 'aviso' %}
+                                                    <span class="badge bg-warning text-dark rounded-pill px-3">Aviso</span>
+                                                {% elif aviso.tipo == 'sucesso' %}
+                                                    <span class="badge bg-success rounded-pill px-3">Sucesso</span>
+                                                {% else %}
+                                                    <span class="badge bg-info rounded-pill px-3">Informação</span>
+                                                {% endif %}
+                                                <small class="text-muted">{{ aviso.data_criacao|date:"d/m/Y" }}</small>
+                                            </div>
+                                            <h5 class="fw-bold mb-2">{{ aviso.titulo }}</h5>
+                                            <p class="text-secondary small mb-0">{{ aviso.mensagem }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 100px; height: 100px;">
+                                <i class="bi bi-megaphone-slash text-muted" style="font-size: 3rem;"></i>
+                            </div>
+                            <h4 class="fw-bold text-muted">Nenhum aviso</h4>
+                            <p class="text-muted small">Aqui aparecerão os comunicados importantes.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.hover-lift:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; }
+</style>
+{% endblock %}

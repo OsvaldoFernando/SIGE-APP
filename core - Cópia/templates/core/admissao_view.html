@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Admissão - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <a href="{% url 'matricula' %}" style="text-decoration: none; color: #666; margin-bottom: 15px; display: inline-block;">← Voltar</a>
+    <h2>Admissão</h2>
+    <hr>
+
+    <div class="card">
+        <div class="card-body">
+            <p class="text-muted">Gerenciar admissões, inscrições e candidaturas de novos estudantes.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

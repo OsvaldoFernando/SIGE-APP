@@ -1,0 +1,91 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Consulta - {{ inscricao.numero_inscricao }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">Detalhes da Inscrição</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p><strong>Número de Inscrição:</strong><br>{{ inscricao.numero_inscricao }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Data de Inscrição:</strong><br>{{ inscricao.data_inscricao|date:"d/m/Y H:i" }}</p>
+                        </div>
+                    </div>
+                    
+                    <h5 class="border-bottom pb-2 mb-3">Dados Pessoais</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <p><strong>Nome Completo:</strong><br>{{ inscricao.nome_completo }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Data de Nascimento:</strong><br>{{ inscricao.data_nascimento|date:"d/m/Y" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Sexo:</strong><br>{{ inscricao.get_sexo_display }}</p>
+                        </div>
+                        <div class="col-md-12">
+                            <p><strong>Bilhete de Identidade:</strong><br>{{ inscricao.bilhete_identidade }}</p>
+                        </div>
+                    </div>
+                    
+                    <h5 class="border-bottom pb-2 mb-3">Informações de Contato</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Telefone:</strong><br>{{ inscricao.telefone }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Email:</strong><br>{{ inscricao.email }}</p>
+                        </div>
+                        <div class="col-md-12">
+                            <p><strong>Endereço:</strong><br>{{ inscricao.endereco }}</p>
+                        </div>
+                    </div>
+                    
+                    <h5 class="border-bottom pb-2 mb-3">Informações do Curso</h5>
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <p><strong>Curso:</strong><br>{{ inscricao.curso.nome }}</p>
+                        </div>
+                    </div>
+                    
+                    <h5 class="border-bottom pb-2 mb-3">Resultado</h5>
+                    {% if inscricao.nota_teste is not None %}
+                        <div class="alert {% if inscricao.aprovado %}alert-success{% else %}alert-danger{% endif %}">
+                            <h5 class="alert-heading">
+                                {% if inscricao.aprovado %}
+                                    ✓ APROVADO
+                                {% else %}
+                                    ✗ NÃO APROVADO
+                                {% endif %}
+                            </h5>
+                            <p class="mb-0"><strong>Nota do Teste:</strong> {{ inscricao.nota_teste }} valores</p>
+                            {% if inscricao.data_resultado %}
+                                <p class="mb-0"><strong>Data do Resultado:</strong> {{ inscricao.data_resultado|date:"d/m/Y H:i" }}</p>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <p class="mb-0">Aguardando nota do teste de inscrição.</p>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <a href="{% url 'gerar_pdf' inscricao.numero_inscricao %}" class="btn btn-primary btn-lg">
+                            📄 Baixar Comprovante em PDF
+                        </a>
+                        <a href="{% url 'index' %}" class="btn btn-secondary">Voltar ao Início</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

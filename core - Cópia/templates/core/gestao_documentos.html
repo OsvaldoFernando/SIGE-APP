@@ -1,0 +1,130 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Gestão de Documentos Académicos - SIGE{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" style="background-color: #f8f9fa; min-height: 100vh;">
+    <div class="container">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold text-primary mb-0">📄 Gestão de Documentos Académicos</h2>
+                <p class="text-muted mb-0">Repositório de modelos e templates oficiais</p>
+            </div>
+            <a href="{% url 'documento_criar' %}" class="btn btn-primary rounded-pill px-4">
+                <i class="bi bi-plus-lg me-2"></i> Novo Documento
+            </a>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 shadow-sm" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- "Word" Style Layout -->
+        <div class="row g-4">
+            <!-- Sidebar / Folders -->
+            <div class="col-lg-3">
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-body p-3">
+                        <h6 class="fw-bold text-uppercase small text-muted mb-3 px-2">Categorias</h6>
+                        <div class="list-group list-group-flush rounded-3 overflow-hidden">
+                            <a href="#" class="list-group-item list-group-item-action border-0 py-2 px-3 active rounded-3 mb-1">
+                                <i class="bi bi-files me-2"></i> Todos os Documentos
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action border-0 py-2 px-3 rounded-3 mb-1">
+                                <i class="bi bi-folder me-2"></i> Matrículas
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action border-0 py-2 px-3 rounded-3 mb-1">
+                                <i class="bi bi-folder me-2"></i> Certificados
+                            </a>
+                            <a href="#" class="list-group-item list-group-item-action border-0 py-2 px-3 rounded-3 mb-1">
+                                <i class="bi bi-folder me-2"></i> Administrativos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Document Grid -->
+            <div class="col-lg-9">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-header bg-white border-bottom-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0">Documentos Recentes</h5>
+                        <div class="input-group input-group-sm w-auto">
+                            <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control bg-light border-0" placeholder="Pesquisar...">
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        {% if documentos %}
+                            <div class="row g-4">
+                                {% for documento in documentos %}
+                                    <div class="col-md-4 col-sm-6">
+                                        <div class="card h-100 border-0 shadow-sm rounded-4 doc-card text-center p-3 transition-hover">
+                                            <div class="doc-icon mb-3 mx-auto d-flex align-items-center justify-content-center" 
+                                                 style="width: 80px; height: 110px; background-color: #fff; border: 1px solid #e0e0e0; box-shadow: 0 4px 8px rgba(0,0,0,0.05); position: relative;">
+                                                <i class="bi bi-file-earmark-text text-primary" style="font-size: 2.5rem;"></i>
+                                                <div class="doc-fold"></div>
+                                            </div>
+                                            <h6 class="fw-bold mb-1 text-truncate" title="{{ documento.titulo }}">{{ documento.titulo }}</h6>
+                                            <p class="text-muted x-small mb-3">{{ documento.data_criacao|date:"d M Y" }}</p>
+                                            
+                                            <div class="d-flex justify-content-center gap-2">
+                                                <a href="{% url 'documento_visualizar' documento.id %}" class="btn btn-light btn-sm rounded-circle" title="Visualizar">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a href="{% url 'documento_editar' documento.id %}" class="btn btn-light btn-sm rounded-circle" title="Editar">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a href="{% url 'gerar_pdf_documento' documento.id %}" class="btn btn-light btn-sm rounded-circle text-danger" title="PDF">
+                                                    <i class="bi bi-file-pdf"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 100px; height: 100px;">
+                                    <i class="bi bi-file-earmark-plus text-muted" style="font-size: 3rem;"></i>
+                                </div>
+                                <h4 class="fw-bold text-muted">Nenhum documento</h4>
+                                <p class="text-muted small">Comece criando modelos de documentos para a instituição.</p>
+                                <a href="{% url 'documento_criar' %}" class="btn btn-primary rounded-pill px-4">Criar Primeiro Template</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition-hover { transition: all 0.3s ease; }
+    .transition-hover:hover { 
+        transform: translateY(-5px); 
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    .doc-card { cursor: pointer; border: 1px solid transparent !important; }
+    .doc-card:hover { border-color: #1e3a8a33 !important; }
+    .doc-icon { border-radius: 4px; border-top-right-radius: 20px !important; }
+    .doc-fold {
+        position: absolute;
+        top: -1px;
+        right: -1px;
+        width: 20px;
+        height: 20px;
+        background: linear-gradient(225deg, #f8f9fa 45%, #e0e0e0 50%, #fff 56%);
+        border-bottom-left-radius: 4px;
+        border: 1px solid #e0e0e0;
+    }
+    .x-small { font-size: 0.75rem; }
+</style>
+{% endblock %}

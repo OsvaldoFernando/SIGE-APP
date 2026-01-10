@@ -1,0 +1,38 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Deletar Utilizador - SIGE{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-lg border-danger">
+                <div class="card-header text-white text-center py-4" style="background: #dc2626;">
+                    <h4 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Confirmar Deleção</h4>
+                </div>
+
+                <div class="card-body p-4">
+                    <p class="mb-3">Tem certeza que deseja deletar o utilizador?</p>
+                    <div class="alert alert-warning" style="background: #fef3c7; border-color: #fcd34d; color: #92400e;">
+                        <strong>{{ user.get_full_name|default:user.username }}</strong> (@{{ user.username }})<br>
+                        <small>Email: {{ user.email }}</small>
+                    </div>
+                    <p class="text-danger fw-bold mb-4">
+                        <i class="bi bi-exclamation-circle"></i> Esta ação é irreversível!
+                    </p>
+
+                    <form method="post" class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        {% csrf_token %}
+                        <a href="{% url 'listar_utilizadores' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash me-2"></i>Deletar Utilizador
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
