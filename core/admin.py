@@ -3,8 +3,15 @@ from .models import (
     ConfiguracaoEscola, Curso, Disciplina, Escola, Inscricao, Professor, 
     Turma, Aluno, Pai, AnoAcademico, PerfilUsuario, Notificacao, Subscricao, 
     PagamentoSubscricao, RecuperacaoSenha, Documento, PrerequisitoDisciplina,
-    HistoricoAcademico, NotaDisciplina
+    HistoricoAcademico, NotaDisciplina, PeriodoLectivo
 )
+
+@admin.register(PeriodoLectivo)
+class PeriodoLectivoAdmin(admin.ModelAdmin):
+    list_display = ['nome', 'ano_lectivo', 'data_inicio', 'data_fim', 'estado']
+    list_filter = ['estado', 'ano_lectivo']
+    search_fields = ['nome']
+    ordering = ['ano_lectivo', 'data_inicio']
 
 @admin.register(AnoAcademico)
 class AnoAcademicoAdmin(admin.ModelAdmin):
@@ -15,7 +22,6 @@ class AnoAcademicoAdmin(admin.ModelAdmin):
     actions = ['marcar_como_ativo']
     
     def marcar_como_ativo(self, request, queryset):
-        # Desativar todos os outros e ativar o selecionado
         if queryset.count() > 1:
             self.message_user(request, "Selecione apenas um ano para ativar.", level='error')
             return
@@ -70,7 +76,6 @@ class CursoAdmin(admin.ModelAdmin):
         }),
         ('Pré-requisitos', {
             'fields': ('requer_prerequisitos',),
-            'description': 'Marque se este curso exige disciplinas/notas anteriores'
         }),
         ('Status', {
             'fields': ('ativo',)
@@ -145,7 +150,7 @@ class InscricaoAdmin(admin.ModelAdmin):
     def get_nome_completo(self, obj):
         return obj.nome_completo
     get_nome_completo.short_description = 'Nome Completo'
-    get_nome_completo.admin_order_field = 'primeiro_nome'
+    
     list_filter = ['curso', 'aprovado', 'data_inscricao']
     search_fields = ['numero_inscricao', 'primeiro_nome', 'apelido', 'bilhete_identidade', 'email']
     readonly_fields = ['numero_inscricao', 'data_inscricao', 'data_resultado']
@@ -163,16 +168,6 @@ class InscricaoAdmin(admin.ModelAdmin):
             'fields': ('nota_teste', 'aprovado', 'data_resultado')
         }),
     )
-    
-    actions = ['processar_aprovacao']
-    
-    def processar_aprovacao(self, request, queryset):
-        from .views import processar_aprovacoes_curso
-        cursos = queryset.values_list('curso', flat=True).distinct()
-        for curso_id in cursos:
-            processar_aprovacoes_curso(curso_id)
-        self.message_user(request, "Aprovações processadas com sucesso!")
-    processar_aprovacao.short_description = "Processar aprovação automática"
 
 @admin.register(Professor)
 class ProfessorAdmin(admin.ModelAdmin):
@@ -195,23 +190,15 @@ class AlunoAdmin(admin.ModelAdmin):
 
 @admin.register(Pai)
 class PaiAdmin(admin.ModelAdmin):
-    list_display = ['nome_completo', 'parentesco', 'telefone', 'email']
+    list_display = ['nome_completo', 'telefone', 'email']
     search_fields = ['nome_completo', 'bilhete_identidade']
-    filter_horizontal = ['alunos']
 
 @admin.register(PerfilUsuario)
 class PerfilUsuarioAdmin(admin.ModelAdmin):
-    list_display = ['user', 'nivel_acesso', 'telefone', 'ativo', 'data_cadastro', 'status_badge']
+    list_display = ['user', 'nivel_acesso', 'telefone', 'ativo', 'data_cadastro']
     list_filter = ['nivel_acesso', 'ativo', 'data_cadastro']
-    search_fields = ['user__username', 'user__first_name', 'user__last_name', 'telefone']
+    search_fields = ['user__username', 'telefone']
     readonly_fields = ['data_cadastro']
-    list_editable = ['nivel_acesso']
-    
-    def status_badge(self, obj):
-        if obj.nivel_acesso == 'pendente':
-            return '⏳ Aguardando Atribuição'
-        return '✅ Atribuído'
-    status_badge.short_description = 'Status'
 
 @admin.register(Notificacao)
 class NotificacaoAdmin(admin.ModelAdmin):
@@ -220,142 +207,29 @@ class NotificacaoAdmin(admin.ModelAdmin):
     search_fields = ['titulo', 'mensagem']
     filter_horizontal = ['destinatarios', 'lida_por']
     readonly_fields = ['data_criacao']
-    fieldsets = (
-        ('Informações da Notificação', {
-            'fields': ('titulo', 'mensagem', 'tipo', 'ativa')
-        }),
-        ('Destinatários', {
-            'fields': ('global_notificacao', 'destinatarios', 'lida_por')
-        }),
-        ('Metadata', {
-            'fields': ('data_criacao',)
-        }),
-    )
 
 @admin.register(Subscricao)
 class SubscricaoAdmin(admin.ModelAdmin):
-    list_display = ['nome_escola', 'plano', 'estado', 'data_inicio', 'data_expiracao', 'dias_restantes', 'esta_ativo']
+    list_display = ['nome_escola', 'plano', 'estado', 'data_inicio', 'data_expiracao', 'esta_ativo']
     list_filter = ['plano', 'estado', 'data_inicio', 'data_expiracao']
-    search_fields = ['nome_escola', 'observacoes']
-    readonly_fields = ['data_criacao', 'dias_restantes', 'percentual_usado', 'esta_ativo']
-    fieldsets = (
-        ('Informações da Escola', {
-            'fields': ('nome_escola',)
-        }),
-        ('Dados da Subscrição', {
-            'fields': ('plano', 'estado', 'data_inicio', 'data_expiracao', 'valor_pago')
-        }),
-        ('Status', {
-            'fields': ('dias_restantes', 'percentual_usado', 'esta_ativo')
-        }),
-        ('Observações', {
-            'fields': ('observacoes', 'data_criacao')
-        }),
-    )
+    search_fields = ['nome_escola']
+    readonly_fields = ['data_criacao', 'esta_ativo']
 
 @admin.register(PagamentoSubscricao)
 class PagamentoSubscricaoAdmin(admin.ModelAdmin):
-    list_display = ['id', 'subscricao', 'plano_escolhido', 'valor', 'data_pagamento', 'status', 'data_submissao']
-    list_filter = ['status', 'plano_escolhido', 'data_pagamento', 'data_submissao']
-    search_fields = ['subscricao__nome_escola', 'numero_referencia', 'observacoes']
-    readonly_fields = ['data_submissao', 'aprovado_por', 'data_aprovacao', 'recibo_pdf']
-    
-    fieldsets = (
-        ('Informações do Pagamento', {
-            'fields': ('subscricao', 'plano_escolhido', 'valor', 'data_pagamento', 'numero_referencia')
-        }),
-        ('Comprovante', {
-            'fields': ('comprovante',)
-        }),
-        ('Status', {
-            'fields': ('status', 'observacoes')
-        }),
-        ('Aprovação', {
-            'fields': ('aprovado_por', 'data_aprovacao', 'recibo_pdf', 'data_submissao')
-        }),
-    )
-    
-    actions = ['aprovar_pagamentos', 'rejeitar_pagamentos']
-    
-    def aprovar_pagamentos(self, request, queryset):
-        from datetime import datetime, timedelta
-        from django.utils import timezone
-        from .utils import gerar_recibo_pagamento
-        
-        count = 0
-        for pagamento in queryset.filter(status='pendente'):
-            pagamento.status = 'aprovado'
-            pagamento.aprovado_por = request.user
-            pagamento.data_aprovacao = timezone.now()
-            
-            subscricao = pagamento.subscricao
-            if pagamento.plano_escolhido == 'mensal':
-                dias = 30
-            elif pagamento.plano_escolhido == 'anual':
-                dias = 365
-            else:
-                dias = 30
-            
-            if subscricao.esta_ativo():
-                subscricao.data_expiracao = subscricao.data_expiracao + timedelta(days=dias)
-            else:
-                subscricao.data_inicio = datetime.now().date()
-                subscricao.data_expiracao = datetime.now().date() + timedelta(days=dias)
-            
-            subscricao.plano = pagamento.plano_escolhido
-            subscricao.estado = 'ativo'
-            subscricao.valor_pago = pagamento.valor
-            subscricao.save()
-            
-            recibo_path = gerar_recibo_pagamento(pagamento)
-            if recibo_path:
-                pagamento.recibo_pdf = recibo_path
-            
-            pagamento.save()
-            count += 1
-        
-        self.message_user(request, f'{count} pagamento(s) aprovado(s) com sucesso!')
-    aprovar_pagamentos.short_description = "Aprovar pagamentos selecionados"
-    
-    def rejeitar_pagamentos(self, request, queryset):
-        from django.utils import timezone
-        
-        count = queryset.filter(status='pendente').update(
-            status='rejeitado',
-            aprovado_por=request.user,
-            data_aprovacao=timezone.now()
-        )
-        self.message_user(request, f'{count} pagamento(s) rejeitado(s)!')
-    rejeitar_pagamentos.short_description = "Rejeitar pagamentos selecionados"
+    list_display = ['id', 'subscricao', 'plano_escolhido', 'valor', 'data_pagamento', 'status']
+    list_filter = ['status', 'plano_escolhido']
+    search_fields = ['subscricao__nome_escola']
+    readonly_fields = ['data_submissao']
 
 @admin.register(RecuperacaoSenha)
 class RecuperacaoSenhaAdmin(admin.ModelAdmin):
-    list_display = ['user', 'tipo', 'usado', 'esta_expirado', 'data_criacao', 'data_expiracao']
-    list_filter = ['tipo', 'usado', 'data_criacao']
-    search_fields = ['user__username', 'email_enviado', 'telefone_enviado']
+    list_display = ['user', 'tipo', 'usado', 'esta_expirado', 'data_criacao']
+    list_filter = ['tipo', 'usado']
     readonly_fields = ['data_criacao']
 
 @admin.register(Documento)
 class DocumentoAdmin(admin.ModelAdmin):
-    list_display = ['titulo', 'secao', 'ativo', 'criado_por', 'data_criacao']
-    list_filter = ['secao', 'ativo', 'data_criacao']
-    search_fields = ['titulo', 'descricao', 'conteudo']
+    list_display = ['titulo', 'secao', 'ativo', 'data_criacao']
+    list_filter = ['secao', 'ativo']
     readonly_fields = ['data_criacao', 'data_atualizacao']
-    fieldsets = (
-        ('Informações Básicas', {
-            'fields': ('titulo', 'secao', 'descricao', 'ativo')
-        }),
-        ('Conteúdo do Documento', {
-            'fields': ('conteudo',),
-            'description': 'Use variáveis como {nome}, {bilhete_identidade}, {email}, {telefone}, {data_nascimento}, {curso}, {numero_inscricao}, {data_inscricao}, {data_hoje}, {nome_escola}, {endereco}, {sexo}, {estado_civil}, {nacionalidade}, {local_nascimento}'
-        }),
-        ('Metadados', {
-            'fields': ('criado_por', 'data_criacao', 'data_atualizacao'),
-            'classes': ('collapse',)
-        }),
-    )
-    
-    def save_model(self, request, obj, form, change):
-        if not change:
-            obj.criado_por = request.user
-        super().save_model(request, obj, form, change)

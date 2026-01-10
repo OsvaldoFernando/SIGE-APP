@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
-from .models import Curso, Inscricao, ConfiguracaoEscola, Escola, AnoAcademico, Notificacao, PerfilUsuario, Subscricao, PagamentoSubscricao, RecuperacaoSenha, Documento, Semestre
+from .models import Curso, Inscricao, ConfiguracaoEscola, Escola, AnoAcademico, Notificacao, PerfilUsuario, Subscricao, PagamentoSubscricao, RecuperacaoSenha, Documento, Semestre, PeriodoLectivo
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
@@ -71,7 +71,8 @@ def inscricao_create(request, curso_id):
     """View para criar inscrição em um curso. Apenas cursos ativos aceitam inscrições."""
     curso = get_object_or_404(Curso, id=curso_id)
     cursos = Curso.objects.filter(ativo=True)
-    anos_academicos = AnoAcademico.objects.filter(ano_atual=True)
+    anos_academicos = AnoAcademico.objects.all()
+    periodos_lectivos = PeriodoLectivo.objects.all()
     
     # Validar se o curso está ativo
     if not curso.ativo:
@@ -85,80 +86,99 @@ def inscricao_create(request, curso_id):
     context = {
         'curso': curso,
         'cursos': cursos,
-        'anos_academicos': anos_academicos
+        'anos_academicos': anos_academicos,
+        'periodos_lectivos': periodos_lectivos
     }
     if curso.requer_prerequisitos:
         context['prerequisitos'] = curso.prerequisitos.all()
     
     if request.method == 'POST':
-        # Validar BI único
+        # ... (validações BI, email, telefone permanecem iguais)
         bilhete_identidade = request.POST.get('bilhete_identidade')
         if bilhete_identidade and Inscricao.objects.filter(bilhete_identidade=bilhete_identidade).exists():
             messages.error(request, 'Este Bilhete de Identidade já está registrado no sistema!')
-            return render(request, 'core/inscricao_form.html', {'curso': curso})
+            return render(request, 'core/inscricao_form.html', context)
         
-        # Validar email único em inscrições
-        email = request.POST.get('email')
-        if email and Inscricao.objects.filter(email=email).exists():
+        email_check = request.POST.get('email_recuperacao') or request.POST.get('email')
+        if email_check and Inscricao.objects.filter(email=email_check).exists():
             messages.error(request, 'Este email já está sendo usado em outra inscrição!')
-            return render(request, 'core/inscricao_form.html', {'curso': curso})
+            return render(request, 'core/inscricao_form.html', context)
         
-        # Validar telefone único em inscrições
         telefone = request.POST.get('telefone')
         if telefone and Inscricao.objects.filter(telefone=telefone).exists():
             messages.error(request, 'Este telefone já está sendo usado em outra inscrição!')
-            return render(request, 'core/inscricao_form.html', {'curso': curso})
-        
-        # Obter escola
-        escola_id = request.POST.get('escola_id')
-        escola = None
-        if escola_id:
-            try:
-                escola = Escola.objects.get(id=escola_id)
-            except Escola.DoesNotExist:
-                pass
-        
+            return render(request, 'core/inscricao_form.html', context)
+
         # 1. Informações Pessoais
-        inscricao = Inscricao(
-            curso=curso,
-            primeiro_nome=request.POST['primeiro_nome'],
-            nomes_meio=request.POST.get('nomes_meio', ''),
-            apelido=request.POST['apelido'],
-            data_nascimento=request.POST['data_nascimento'],
-            local_nascimento=request.POST['local_nascimento'],
-            nacionalidade=request.POST['nacionalidade'],
-            bilhete_identidade=request.POST['bilhete_identidade'],
-            data_validade_bi=request.POST.get('data_validade_bi') or None,
-            sexo=request.POST['sexo'],
-            estado_civil=request.POST.get('estado_civil', 'S'),
-            endereco=request.POST['endereco'],
-            telefone=request.POST['telefone'],
-            email=request.POST.get('email'),
-            # Documentos
-            arquivo_bi=request.FILES.get('arquivo_bi'),
-            arquivo_certificado=request.FILES.get('arquivo_certificado'),
-            status_inscricao='submetida',
-            # 2. Informações Académicas
-            escola=escola,
-            ano_conclusao=request.POST['ano_conclusao'],
-            certificados_obtidos=request.POST.get('certificados_obtidos', ''),
-            historico_escolar=request.POST.get('historico_escolar', ''),
-            turno_preferencial=request.POST.get('turno_preferencial', 'M'),
-            # 3. Informações Financeiras
-            numero_comprovante=request.POST.get('numero_comprovante', ''),
-            responsavel_financeiro_nome=request.POST.get('responsavel_financeiro_nome', ''),
-            responsavel_financeiro_telefone=request.POST.get('responsavel_financeiro_telefone', ''),
-            responsavel_financeiro_relacao=request.POST.get('responsavel_financeiro_relacao', ''),
-            # 4. Responsáveis
-            responsavel_legal_nome=request.POST.get('responsavel_legal_nome', ''),
-            responsavel_legal_vinculo=request.POST.get('responsavel_legal_vinculo', ''),
-            responsavel_legal_telefone=request.POST.get('responsavel_legal_telefone', ''),
-            responsavel_pedagogico_nome=request.POST.get('responsavel_pedagogico_nome', ''),
-            responsavel_pedagogico_vinculo=request.POST.get('responsavel_pedagogico_vinculo', ''),
-            responsavel_pedagogico_telefone=request.POST.get('responsavel_pedagogico_telefone', ''),
-        )
-        
-        inscricao.save()
+        try:
+            # Criar usuário para o candidato
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            email = request.POST.get('email_recuperacao')
+            
+            if User.objects.filter(username=username).exists():
+                messages.error(request, 'Este e-mail já possui uma conta no sistema!')
+                return render(request, 'core/inscricao_form.html', context)
+            
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                first_name=request.POST['primeiro_nome'],
+                last_name=request.POST['apelido']
+            )
+            
+            # Criar perfil para o usuário
+            perfil, created = PerfilUsuario.objects.get_or_create(user=user)
+            perfil.nivel_acesso = 'estudante'
+            perfil.telefone = request.POST['telefone']
+            perfil.save()
+
+            inscricao = Inscricao(
+                user=user,  # Associar a inscrição ao usuário criado
+                curso=curso,
+                ano_academico_id=request.POST.get('ano_academico'),
+                primeiro_nome=request.POST.get('primeiro_nome'),
+                nomes_meio=request.POST.get('nomes_meio', ''),
+                apelido=request.POST.get('apelido'),
+                data_nascimento=request.POST.get('data_nascimento'),
+                local_nascimento=request.POST.get('local_nascimento'),
+                nacionalidade=request.POST.get('nacionalidade'),
+                bilhete_identidade=request.POST.get('bilhete_identidade'),
+                data_validade_bi=request.POST.get('data_validade_bi') or None,
+                sexo=request.POST.get('sexo'),
+                estado_civil=request.POST.get('estado_civil', 'S'),
+                endereco=request.POST.get('endereco', 'N/A'),
+                telefone=request.POST.get('telefone'),
+                email=request.POST.get('email_recuperacao') or request.POST.get('email'),
+                # Documentos
+                arquivo_bi=request.FILES.get('arquivo_bi'),
+                arquivo_certificado=request.FILES.get('arquivo_certificado'),
+                status_inscricao='submetida',
+                # 2. Informações Académicas
+                escola=escola,
+                ano_conclusao=request.POST.get('ano_conclusao', 2024),
+                certificados_obtidos=request.POST.get('certificados_obtidos', ''),
+                historico_escolar=request.POST.get('historico_escolar', ''),
+                turno_preferencial=request.POST.get('turno', 'Manhã'),
+                # 3. Informações Financeiras
+                numero_comprovante=request.POST.get('numero_comprovante', ''),
+                responsavel_financeiro_nome=request.POST.get('responsavel_financeiro_nome', ''),
+                responsavel_financeiro_telefone=request.POST.get('responsavel_financeiro_telefone', ''),
+                responsavel_financeiro_relacao=request.POST.get('responsavel_financeiro_relacao', ''),
+                # 4. Responsáveis
+                responsavel_legal_nome=request.POST.get('responsavel_legal_nome', ''),
+                responsavel_legal_vinculo=request.POST.get('responsavel_legal_vinculo', ''),
+                responsavel_legal_telefone=request.POST.get('responsavel_legal_telefone', ''),
+                responsavel_pedagogico_nome=request.POST.get('responsavel_pedagogico_nome', ''),
+                responsavel_pedagogico_vinculo=request.POST.get('responsavel_pedagogico_vinculo', ''),
+                responsavel_pedagogico_telefone=request.POST.get('responsavel_pedagogico_telefone', ''),
+            )
+            
+            inscricao.save()
+        except Exception as e:
+            messages.error(request, f'Erro ao processar inscrição: {str(e)}')
+            return render(request, 'core/inscricao_form.html', context)
         
         # Criar histórico académico e salvar notas se curso requer pré-requisitos
         if curso.requer_prerequisitos:
@@ -186,7 +206,7 @@ def inscricao_create(request, curso_id):
 
 def inscricao_consulta(request, numero):
     inscricao = get_object_or_404(Inscricao, numero_inscricao=numero)
-    return render(request, 'core/inscricao_consulta.html', {'inscricao': inscricao})
+    return render(request, 'core/inscricao_espelho.html', {'inscricao': inscricao})
 
 def inscricao_buscar(request):
     if request.method == 'POST':
@@ -548,6 +568,57 @@ def trocar_ano_academico(request):
 def ano_academico_lista(request):
     anos = AnoAcademico.objects.all()
     return render(request, 'core/ano_academico_lista.html', {'anos': anos})
+
+@login_required
+def periodo_lectivo_lista(request, ano_id):
+    ano = get_object_or_404(AnoAcademico, id=ano_id)
+    periodos = ano.periodos_lectivos.all()
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return render(request, 'core/partials/periodo_lectivo_lista_inner.html', {'ano': ano, 'periodos': periodos})
+    return render(request, 'core/periodo_letivo.html', {'ano': ano, 'periodos': periodos})
+
+@login_required
+def periodo_lectivo_create(request, ano_id):
+    ano = get_object_or_404(AnoAcademico, id=ano_id)
+    if request.method == 'POST':
+        nome = request.POST.get('nome')
+        data_inicio = request.POST.get('data_inicio')
+        data_fim = request.POST.get('data_fim')
+        estado = request.POST.get('estado', 'ATIVO')
+        
+        PeriodoLectivo.objects.create(
+            ano_lectivo=ano,
+            nome=nome,
+            data_inicio=data_inicio,
+            data_fim=data_fim,
+            estado=estado
+        )
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': True, 'message': "Período Lectivo criado com sucesso!"})
+        messages.success(request, "Período Lectivo criado com sucesso!")
+        return redirect('periodo_lectivo_lista', ano_id=ano.id)
+    
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return render(request, 'core/partials/periodo_lectivo_form_inner.html', {'ano': ano})
+    return render(request, 'core/periodo_letivo_form.html', {'ano': ano})
+
+@login_required
+def periodo_lectivo_edit(request, pk):
+    periodo = get_object_or_404(PeriodoLectivo, pk=pk)
+    if request.method == 'POST':
+        periodo.nome = request.POST.get('nome')
+        periodo.data_inicio = request.POST.get('data_inicio')
+        periodo.data_fim = request.POST.get('data_fim')
+        periodo.estado = request.POST.get('estado')
+        periodo.save()
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': True, 'message': "Período Lectivo atualizado com sucesso!"})
+        messages.success(request, "Período Lectivo atualizado com sucesso!")
+        return redirect('periodo_lectivo_lista', ano_id=periodo.ano_lectivo.id)
+    
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return render(request, 'core/partials/periodo_lectivo_form_inner.html', {'periodo': periodo, 'ano': periodo.ano_lectivo})
+    return render(request, 'core/periodo_letivo_form.html', {'periodo': periodo, 'ano': periodo.ano_lectivo})
 
 @login_required
 def semestre_lista(request, ano_id):

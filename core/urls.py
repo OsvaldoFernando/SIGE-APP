@@ -7,9 +7,9 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('inscricao/<int:curso_id>/', views.inscricao_create, name='inscricao_create'),
-    path('inscricao/<int:inscricao_id>/pdf/', views.gerar_pdf_inscricao, name='gerar_pdf_inscricao'),
+    path('inscricao/<int:numero>/pdf/', views.gerar_pdf_confirmacao, name='gerar_pdf_confirmacao'),
     path('minha-conta/', views.perfil_usuario, name='perfil_usuario'),
-    path('pagamento/', views.pagamento_subscription, name='pagamento_subscription'),
+    path('pagamento/', views.pagamento_subscricao_view, name='pagamento_subscription'),
     path('documentos/', views.gestao_documentos, name='gestao_documentos'),
     path('documentos/novo/', views.documento_criar, name='documento_criar'),
     path('documentos/<int:doc_id>/editar/', views.documento_editar, name='documento_editar'),
@@ -33,6 +33,9 @@ urlpatterns = [
     path('anos-academicos/', views.ano_academico_lista, name='ano_academico_lista'),
     path('anos-academicos/novo/', views.ano_academico_create, name='ano_academico_create'),
     path('anos-academicos/<int:pk>/editar/', views.ano_academico_edit, name='ano_academico_edit'),
+    path('anos-academicos/<int:ano_id>/periodos/', views.periodo_lectivo_lista, name='periodo_lectivo_lista'),
+    path('anos-academicos/<int:ano_id>/periodos/novo/', views.periodo_lectivo_create, name='periodo_lectivo_create'),
+    path('periodos/<int:pk>/editar/', views.periodo_lectivo_edit, name='periodo_lectivo_edit'),
     
     # URLs para Menus do Painel Principal
     path('nova-matricula/', views.selecionar_tipo_matricula, name='nova_matricula'),

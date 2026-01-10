@@ -1,0 +1,24 @@
+<form id="periodoForm" action="{% if periodo %}{% url 'periodo_lectivo_edit' periodo.pk %}{% else %}{% url 'periodo_lectivo_create' ano.id %}{% endif %}" method="post">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label class="form-label">Nome do Período</label>
+        <input type="text" name="nome" class="form-control" value="{{ periodo.nome|default:'' }}" placeholder="Ex: 1º Semestre" required>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Data de Início</label>
+            <input type="date" name="data_inicio" class="form-control" value="{{ periodo.data_inicio|date:'Y-m-d' }}" required>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">Data de Fim</label>
+            <input type="date" name="data_fim" class="form-control" value="{{ periodo.data_fim|date:'Y-m-d' }}" required>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Estado</label>
+        <select name="estado" class="form-select">
+            <option value="ATIVO" {% if periodo.estado == 'ATIVO' %}selected{% endif %}>Ativo</option>
+            <option value="ENCERRADO" {% if periodo.estado == 'ENCERRADO' %}selected{% endif %}>Encerrado</option>
+        </select>
+    </div>
+</form>

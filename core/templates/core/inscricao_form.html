@@ -28,6 +28,10 @@
                             <div class="wizard-label">Académicos</div>
                         </div>
                         <div class="wizard-step" data-step="4">
+                            <div class="wizard-icon"><i class="bi bi-shield-lock"></i></div>
+                            <div class="wizard-label">Conta</div>
+                        </div>
+                        <div class="wizard-step" data-step="5">
                             <div class="wizard-icon"><i class="bi bi-gear"></i></div>
                             <div class="wizard-label">Configurações</div>
                         </div>
@@ -208,10 +212,10 @@
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Ano Lectivo *</label>
-                                    <select name="ano_academico" class="form-select" required>
+                                    <select name="ano_academico" id="id_ano_academico" class="form-select" required>
                                         <option value="">Selecione o ano...</option>
                                         {% for ano in anos_academicos %}
-                                            <option value="{{ ano.id }}">{{ ano.ano }}</option>
+                                            <option value="{{ ano.id }}">{{ ano.codigo }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -226,8 +230,38 @@
                             </div>
                         </div>
 
-                        <!-- Etapa 4: Configurações -->
+                        <!-- Etapa 4: Dados da Conta -->
                         <div class="form-step" data-step="4">
+                            <h5 class="mb-3"><i class="bi bi-shield-lock me-2"></i>Dados da Conta de Acesso</h5>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Nome de Usuário (Username) *</label>
+                                    <input type="text" name="username" id="id_username" class="form-control" required readonly placeholder="Será preenchido automaticamente com seu e-mail">
+                                    <small class="text-muted">Seu e-mail de contacto será usado como nome de usuário.</small>
+                                </div>
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label">Senha de Acesso</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="bi bi-key"></i></span>
+                                        <input type="text" name="password_display" id="id_password_display" class="form-control" readonly style="background-color: #f8f9fa; font-family: monospace; font-weight: bold; color: #1e3a8a;">
+                                        <input type="hidden" name="password" id="id_password">
+                                    </div>
+                                    <div class="form-text mt-2">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        Esta senha foi gerada automaticamente para si. <strong>Guarde-a com cuidado!</strong>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="alert alert-info border-0 bg-info bg-opacity-10 text-dark small">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        Utilize esta conta para consultar o estado da sua inscrição e realizar matrículas futuramente.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Etapa 5: Configurações -->
+                        <div class="form-step" data-step="5">
                             <h5 class="mb-3"><i class="bi bi-gear me-2"></i>Configurações</h5>
                             <div class="row">
                                 <div class="col-md-12 mb-3">
@@ -458,8 +492,8 @@ document.addEventListener('DOMContentLoaded', () => {
             s.classList.toggle('completed', s.dataset.step < currentStep);
         });
         btnPrev.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
-        btnNext.classList.toggle('d-none', currentStep === 4);
-        btnSubmit.classList.toggle('d-none', currentStep !== 4);
+        btnNext.classList.toggle('d-none', currentStep === 5);
+        btnSubmit.classList.toggle('d-none', currentStep !== 5);
     }
 
     btnNext.addEventListener('click', () => {
@@ -469,6 +503,26 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!i.value) { i.classList.add('is-invalid'); valid = false; }
             else i.classList.remove('is-invalid');
         });
+
+        if (currentStep === 2 && valid) {
+            // Sincronizar e-mail com username
+            const email = document.getElementsByName('email_recuperacao')[0].value;
+            document.getElementById('id_username').value = email;
+        }
+
+        if (currentStep === 3 && valid) {
+            // Gerar senha automática: Apelido + Ano de Nascimento
+            const apelido = document.getElementById('id_apelido').value || 'estudante';
+            const dataNascimento = document.getElementById('data_nascimento').value;
+            let anoInvertido = '0000';
+            if (dataNascimento) {
+                const ano = dataNascimento.split('-')[0];
+                anoInvertido = ano.split('').reverse().join('');
+            }
+            const autoPass = apelido.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '') + anoInvertido;
+            document.getElementById('id_password_display').value = autoPass;
+            document.getElementById('id_password').value = autoPass;
+        }
 
         if (currentStep === 1 && valid) {
             const dataValidade = document.getElementById('id_data_validade_bi').value;
@@ -513,7 +567,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        if (valid && currentStep < 4) { currentStep++; updateWizard(); }
+        if (valid && currentStep < 5) { currentStep++; updateWizard(); }
     });
 
     btnPrev.addEventListener('click', () => { if (currentStep > 1) { currentStep--; updateWizard(); } });

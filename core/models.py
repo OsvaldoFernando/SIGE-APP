@@ -29,14 +29,14 @@ class AnoAcademico(models.Model):
     
     def save(self, *args, **kwargs):
         if self.pk:
-            old_obj = AnoAcademico.objects.get(pk=self.pk)
-            if old_obj.estado == 'ENCERRADO':
-                raise ValueError("Um ano académico ENCERRADO não pode ser alterado.")
+            try:
+                old_obj = AnoAcademico.objects.get(pk=self.pk)
+                if old_obj.estado == 'ENCERRADO':
+                    raise ValueError("Um ano académico ENCERRADO não pode ser alterado.")
+            except AnoAcademico.DoesNotExist:
+                pass
 
         if self.estado == 'ATIVO':
-            # Regra: Só pode existir 1 ano lectivo ATIVO
-            # Ao ativar um, os outros ativos passam a encerrados ou planeados? 
-            # Geralmente encerram-se os anteriores.
             AnoAcademico.objects.exclude(pk=self.pk).filter(estado='ATIVO').update(estado='ENCERRADO', ano_atual=False)
             self.ano_atual = True
         
@@ -44,6 +44,183 @@ class AnoAcademico(models.Model):
             AnoAcademico.objects.exclude(pk=self.pk).update(ano_atual=False)
             
         super().save(*args, **kwargs)
+
+class PeriodoLectivo(models.Model):
+    ESTADO_CHOICES = [
+        ('ATIVO', 'Ativo'),
+        ('ENCERRADO', 'Encerrado'),
+    ]
+    ano_lectivo = models.ForeignKey(AnoAcademico, on_delete=models.CASCADE, related_name='periodos_lectivos', verbose_name="Ano Lectivo")
+    nome = models.CharField(max_length=100, verbose_name="Nome (ex: 1º Semestre / 2º Semestre)")
+    data_inicio = models.DateField(verbose_name="Data de Início")
+    data_fim = models.DateField(verbose_name="Data de Fim")
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='ATIVO', verbose_name="Estado")
+
+    class Meta:
+        verbose_name = "Período Lectivo"
+        verbose_name_plural = "Períodos Lectivos"
+        ordering = ['ano_lectivo', 'data_inicio']
+
+    def __str__(self):
+        return f"{self.nome} - {self.ano_lectivo}"
+
+class PerfilUsuario(models.Model):
+    NIVEL_ACESSO_CHOICES = [
+        ('admin', 'Administrador'),
+        ('pedagogico', 'Pedagógico'),
+        ('financeiro', 'Financeiro'),
+        ('secretaria', 'Secretaria'),
+        ('professor', 'Professor'),
+        ('estudante', 'Estudante'),
+        ('pendente', 'Pendente'),
+    ]
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
+    nivel_acesso = models.CharField(max_length=20, choices=NIVEL_ACESSO_CHOICES, default='pendente')
+    telefone = models.CharField(max_length=20, blank=True)
+    foto = models.ImageField(upload_to='perfis/', blank=True, null=True)
+    ativo = models.BooleanField(default=True)
+    data_cadastro = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Perfil de Usuário"
+        verbose_name_plural = "Perfis de Usuários"
+        
+    def __str__(self):
+        return f"{self.user.username} - {self.get_nivel_acesso_display()}"
+
+class Notificacao(models.Model):
+    TIPO_CHOICES = [
+        ('INFO', 'Informação'),
+        ('AVISO', 'Aviso'),
+        ('URGENTE', 'Urgente'),
+        ('SISTEMA', 'Sistema'),
+    ]
+    
+    titulo = models.CharField(max_length=200)
+    mensagem = models.TextField()
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='INFO')
+    destinatarios = models.ManyToManyField(User, related_name='notificacoes_recebidas', blank=True)
+    global_notificacao = models.BooleanField(default=False, help_text="Se marcado, todos os usuários verão esta notificação")
+    lida_por = models.ManyToManyField(User, related_name='notificacoes_lidas', blank=True)
+    ativa = models.BooleanField(default=True)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Notificação"
+        verbose_name_plural = "Notificações"
+        ordering = ['-data_criacao']
+        
+    def __str__(self):
+        return self.titulo
+
+class Subscricao(models.Model):
+    ESTADO_CHOICES = [
+        ('ativo', 'Ativo'),
+        ('expirado', 'Expirado'),
+        ('pendente', 'Pendente'),
+        ('cancelado', 'Cancelado'),
+    ]
+    
+    PLANO_CHOICES = [
+        ('trial', 'Trial (15 dias)'),
+        ('mensal', 'Mensal'),
+        ('anual', 'Anual'),
+    ]
+    
+    nome_escola = models.CharField(max_length=200)
+    plano = models.CharField(max_length=20, choices=PLANO_CHOICES, default='trial')
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendente')
+    data_inicio = models.DateField(default=timezone.now)
+    data_expiracao = models.DateField()
+    valor_pago = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    observacoes = models.TextField(blank=True)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Subscrição"
+        verbose_name_plural = "Subscrições"
+        
+    def __str__(self):
+        return f"{self.nome_escola} - {self.plano}"
+    
+    def esta_ativo(self):
+        return self.estado == 'ativo' and self.data_expiracao >= timezone.now().date()
+    
+    @property
+    def dias_restantes(self):
+        delta = self.data_expiracao - timezone.now().date()
+        return max(0, delta.days)
+
+class PagamentoSubscricao(models.Model):
+    STATUS_CHOICES = [
+        ('pendente', 'Pendente'),
+        ('aprovado', 'Aprovado'),
+        ('rejeitado', 'Rejeitado'),
+    ]
+    
+    subscricao = models.ForeignKey(Subscricao, on_delete=models.CASCADE, related_name='pagamentos')
+    plano_escolhido = models.CharField(max_length=20)
+    valor = models.DecimalField(max_digits=10, decimal_places=2)
+    data_pagamento = models.DateField()
+    numero_referencia = models.CharField(max_length=100, blank=True)
+    comprovante = models.FileField(upload_to='pagamentos/comprovantes/')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pendente')
+    observacoes = models.TextField(blank=True)
+    aprovado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    data_aprovacao = models.DateTimeField(null=True, blank=True)
+    recibo_pdf = models.FileField(upload_to='pagamentos/recibos/', blank=True, null=True)
+    data_submissao = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Pagamento de Subscrição"
+        verbose_name_plural = "Pagamentos de Subscrição"
+
+class RecuperacaoSenha(models.Model):
+    TIPO_CHOICES = [
+        ('email', 'E-mail'),
+        ('sms', 'SMS'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    codigo = models.CharField(max_length=10, default='000000')
+    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
+    usado = models.BooleanField(default=False)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    data_expiracao = models.DateTimeField()
+    email_enviado = models.EmailField(blank=True, null=True)
+    telefone_enviado = models.CharField(max_length=20, blank=True, null=True)
+    
+    class Meta:
+        verbose_name = "Recuperação de Senha"
+        verbose_name_plural = "Recuperações de Senha"
+        
+    def esta_expirado(self):
+        return timezone.now() > self.data_expiracao
+
+class Documento(models.Model):
+    SECAO_CHOICES = [
+        ('geral', 'Geral'),
+        ('inscricao', 'Inscrição'),
+        ('financeiro', 'Financeiro'),
+        ('academico', 'Académico'),
+    ]
+    
+    titulo = models.CharField(max_length=200)
+    descricao = models.TextField(blank=True)
+    conteudo = models.TextField(help_text="Template do documento (HTML/Text)")
+    secao = models.CharField(max_length=20, choices=SECAO_CHOICES, default='geral')
+    ativo = models.BooleanField(default=True)
+    criado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    data_atualizacao = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Documento"
+        verbose_name_plural = "Documentos"
+        
+    def __str__(self):
+        return self.titulo
 
 class Semestre(models.Model):
     SEMESTRE_CHOICES = [
@@ -279,6 +456,9 @@ class Inscricao(models.Model):
         default='submetida', 
         verbose_name="Estado da Inscrição"
     )
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Usuário de Acesso")
+    ano_academico = models.ForeignKey(AnoAcademico, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Ano Académico")
+    periodo_lectivo = models.ForeignKey(PeriodoLectivo, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Período Lectivo")
     
     # Documentos
     arquivo_bi = models.FileField(
@@ -357,7 +537,10 @@ class Inscricao(models.Model):
         if not self.numero_inscricao:
             ultimo = Inscricao.objects.order_by('-id').first()
             if ultimo:
-                numero = int(ultimo.numero_inscricao.split('-')[1]) + 1
+                try:
+                    numero = int(ultimo.numero_inscricao.split('-')[1]) + 1
+                except:
+                    numero = 1
             else:
                 numero = 1
             self.numero_inscricao = f"INS-{numero:06d}"
@@ -496,7 +679,10 @@ class Aluno(models.Model):
         if not self.numero_estudante:
             ultimo = Aluno.objects.order_by('-id').first()
             if ultimo and ultimo.numero_estudante:
-                numero = int(ultimo.numero_estudante.split('-')[1]) + 1
+                try:
+                    numero = int(ultimo.numero_estudante.split('-')[1]) + 1
+                except:
+                    numero = 1
             else:
                 numero = 1
             self.numero_estudante = f"ALU-{numero:06d}"
@@ -508,355 +694,11 @@ class Pai(models.Model):
     telefone = models.CharField(max_length=20, verbose_name="Telefone")
     email = models.EmailField(blank=True, verbose_name="Email")
     endereco = models.TextField(verbose_name="Endereço")
-    parentesco = models.CharField(max_length=50, verbose_name="Parentesco (Pai, Mãe, Tutor, etc.)")
-    alunos = models.ManyToManyField(Aluno, related_name='pais', verbose_name="Alunos")
+    aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name='pais', verbose_name="Aluno", null=True, blank=True)
     
     class Meta:
-        verbose_name = "Pai/Responsável"
-        verbose_name_plural = "Pais/Responsáveis"
-        ordering = ['nome_completo']
+        verbose_name = "Pai/Encarregado"
+        verbose_name_plural = "Pais/Encarregados"
     
     def __str__(self):
-        return f"{self.nome_completo} ({self.parentesco})"
-
-class PerfilUsuario(models.Model):
-    NIVEL_ACESSO_CHOICES = [
-        ('pendente', 'Pendente de Aprovação'),
-        ('super_admin', 'Super Administrador (TI)'),
-        ('admin', 'Administrador'),
-        ('secretaria', 'Secretaria'),
-        ('secretario_academico', 'Secretário Académico'),
-        ('daac', 'Chefe de Departamento para Assuntos Académico (DAAC)'),
-        ('financeiro', 'Responsável Financeiro'),
-        ('bibliotecario', 'Bibliotecário'),
-        ('rh', 'Gestor de Recursos Humanos'),
-        ('professor', 'Docente (Professor)'),
-        ('coordenador', 'Coordenador'),
-        ('aluno', 'Aluno'),
-    ]
-    
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil', verbose_name="Usuário")
-    nivel_acesso = models.CharField(
-        max_length=20,
-        choices=NIVEL_ACESSO_CHOICES,
-        default='pendente',
-        verbose_name="Nível de Acesso"
-    )
-    telefone = models.CharField(max_length=20, blank=True, verbose_name="Telefone")
-    foto = models.ImageField(upload_to='usuarios/', blank=True, null=True, verbose_name="Foto")
-    data_cadastro = models.DateTimeField(default=timezone.now, verbose_name="Data de Cadastro")
-    ativo = models.BooleanField(default=True, verbose_name="Ativo")
-    
-    class Meta:
-        verbose_name = "Perfil de Usuário"
-        verbose_name_plural = "Perfis de Usuários"
-        ordering = ['user__username']
-    
-    def __str__(self):
-        return f"{self.user.get_full_name() or self.user.username} - {self.get_nivel_acesso_display()}"
-
-class Notificacao(models.Model):
-    TIPO_CHOICES = [
-        ('info', 'Informação'),
-        ('aviso', 'Aviso'),
-        ('urgente', 'Urgente'),
-        ('sucesso', 'Sucesso'),
-    ]
-    
-    titulo = models.CharField(max_length=200, verbose_name="Título")
-    mensagem = models.TextField(verbose_name="Mensagem")
-    tipo = models.CharField(
-        max_length=20,
-        choices=TIPO_CHOICES,
-        default='info',
-        verbose_name="Tipo"
-    )
-    data_criacao = models.DateTimeField(auto_now_add=True, verbose_name="Data de Criação")
-    destinatarios = models.ManyToManyField(
-        User,
-        related_name='notificacoes',
-        verbose_name="Destinatários",
-        blank=True
-    )
-    lida_por = models.ManyToManyField(
-        User,
-        related_name='notificacoes_lidas',
-        verbose_name="Lida por",
-        blank=True
-    )
-    global_notificacao = models.BooleanField(
-        default=False,
-        verbose_name="Notificação Global",
-        help_text="Se marcado, todos os usuários verão esta notificação"
-    )
-    ativa = models.BooleanField(default=True, verbose_name="Ativa")
-    
-    class Meta:
-        verbose_name = "Notificação"
-        verbose_name_plural = "Notificações"
-        ordering = ['-data_criacao']
-    
-    def __str__(self):
-        return f"{self.titulo} - {self.get_tipo_display()}"
-    
-    def marcar_como_lida(self, usuario):
-        self.lida_por.add(usuario)
-    
-    def esta_lida(self, usuario):
-        return self.lida_por.filter(id=usuario.id).exists()
-
-class Subscricao(models.Model):
-    PLANO_CHOICES = [
-        ('mensal', 'Mensal'),
-        ('trimestral', 'Trimestral'),
-        ('semestral', 'Semestral'),
-        ('anual', 'Anual'),
-    ]
-    
-    ESTADO_CHOICES = [
-        ('ativo', 'Ativo'),
-        ('expirado', 'Expirado'),
-        ('cancelado', 'Cancelado'),
-        ('teste', 'Período de Teste'),
-    ]
-    
-    nome_escola = models.CharField(max_length=200, verbose_name="Nome da Escola", unique=True)
-    plano = models.CharField(
-        max_length=20,
-        choices=PLANO_CHOICES,
-        default='mensal',
-        verbose_name="Plano"
-    )
-    data_inicio = models.DateField(verbose_name="Data de Início")
-    data_expiracao = models.DateField(verbose_name="Data de Expiração")
-    estado = models.CharField(
-        max_length=20,
-        choices=ESTADO_CHOICES,
-        default='teste',
-        verbose_name="Estado"
-    )
-    valor_pago = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        default=0.00,
-        verbose_name="Valor Pago"
-    )
-    observacoes = models.TextField(blank=True, verbose_name="Observações")
-    data_criacao = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        verbose_name = "Subscrição"
-        verbose_name_plural = "Subscrições"
-        ordering = ['-data_inicio']
-    
-    def __str__(self):
-        return f"{self.nome_escola} - {self.get_plano_display()}"
-    
-    def dias_restantes(self):
-        """Calcula quantos dias faltam para expirar"""
-        from datetime import date
-        if self.data_expiracao:
-            delta = self.data_expiracao - date.today()
-            return max(0, delta.days)
-        return 0
-    
-    def esta_ativo(self):
-        """Verifica se a subscrição está ativa"""
-        from datetime import date
-        return self.estado in ['ativo', 'teste'] and self.data_expiracao >= date.today()
-    
-    def percentual_usado(self):
-        """Retorna o percentual de tempo usado da subscrição"""
-        from datetime import date
-        if self.data_inicio and self.data_expiracao:
-            total_dias = (self.data_expiracao - self.data_inicio).days
-            dias_passados = (date.today() - self.data_inicio).days
-            if total_dias > 0:
-                return min(100, int((dias_passados / total_dias) * 100))
-        return 0
-
-class PagamentoSubscricao(models.Model):
-    """Modelo para registrar pagamentos de renovação de subscrição"""
-    STATUS_CHOICES = [
-        ('pendente', 'Pendente'),
-        ('aprovado', 'Aprovado'),
-        ('rejeitado', 'Rejeitado'),
-    ]
-    
-    subscricao = models.ForeignKey(
-        Subscricao,
-        on_delete=models.CASCADE,
-        related_name='pagamentos',
-        verbose_name="Subscrição"
-    )
-    plano_escolhido = models.CharField(
-        max_length=20,
-        choices=Subscricao.PLANO_CHOICES,
-        default='mensal',
-        verbose_name="Plano Escolhido"
-    )
-    valor = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        verbose_name="Valor Pago"
-    )
-    comprovante = models.FileField(
-        upload_to='comprovantes/',
-        verbose_name="Comprovante de Pagamento"
-    )
-    numero_referencia = models.CharField(
-        max_length=100,
-        blank=True,
-        verbose_name="Número de Referência"
-    )
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='pendente',
-        verbose_name="Status"
-    )
-    data_pagamento = models.DateField(verbose_name="Data do Pagamento")
-    data_submissao = models.DateTimeField(auto_now_add=True, verbose_name="Data de Submissão")
-    observacoes = models.TextField(blank=True, verbose_name="Observações")
-    
-    aprovado_por = models.ForeignKey(
-        'auth.User',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='pagamentos_aprovados',
-        verbose_name="Aprovado Por"
-    )
-    data_aprovacao = models.DateTimeField(null=True, blank=True, verbose_name="Data de Aprovação")
-    recibo_pdf = models.FileField(
-        upload_to='recibos/',
-        null=True,
-        blank=True,
-        verbose_name="Recibo PDF"
-    )
-    
-    class Meta:
-        verbose_name = "Pagamento de Subscrição"
-        verbose_name_plural = "Pagamentos de Subscrição"
-        ordering = ['-data_submissao']
-    
-    def __str__(self):
-        return f"Pagamento {self.id} - {self.subscricao.nome_escola} - {self.get_status_display()}"
-
-class RecuperacaoSenha(models.Model):
-    """Modelo para gerenciar recuperação de senha via email ou telefone"""
-    TIPO_CHOICES = [
-        ('email', 'Email'),
-        ('telefone', 'Telefone'),
-    ]
-    
-    user = models.ForeignKey(
-        'auth.User',
-        on_delete=models.CASCADE,
-        related_name='recuperacoes_senha',
-        verbose_name="Usuário"
-    )
-    tipo = models.CharField(
-        max_length=20,
-        choices=TIPO_CHOICES,
-        verbose_name="Tipo de Recuperação"
-    )
-    codigo_otp = models.CharField(
-        max_length=6,
-        blank=True,
-        verbose_name="Código OTP"
-    )
-    token = models.CharField(
-        max_length=100,
-        blank=True,
-        verbose_name="Token de Recuperação"
-    )
-    email_enviado = models.EmailField(blank=True, verbose_name="Email Enviado Para")
-    telefone_enviado = models.CharField(max_length=20, blank=True, verbose_name="Telefone Enviado Para")
-    usado = models.BooleanField(default=False, verbose_name="Usado")
-    data_criacao = models.DateTimeField(auto_now_add=True, verbose_name="Data de Criação")
-    data_expiracao = models.DateTimeField(verbose_name="Data de Expiração")
-    
-    class Meta:
-        verbose_name = "Recuperação de Senha"
-        verbose_name_plural = "Recuperações de Senha"
-        ordering = ['-data_criacao']
-    
-    def __str__(self):
-        return f"{self.user.username} - {self.get_tipo_display()} - {'Usado' if self.usado else 'Pendente'}"
-    
-    def esta_expirado(self):
-        from django.utils import timezone
-        return timezone.now() > self.data_expiracao
-    
-    def marcar_como_usado(self):
-        self.usado = True
-        self.save()
-
-class Documento(models.Model):
-    """Modelo para gerenciar templates de documentos com variáveis dinâmicas"""
-    SECAO_CHOICES = [
-        ('inscricao', 'Inscrição'),
-        ('certificado', 'Certificado'),
-        ('declaracao', 'Declaração'),
-        ('atestado', 'Atestado'),
-        ('diploma', 'Diploma'),
-        ('historico', 'Histórico Escolar'),
-        ('recibo', 'Recibo'),
-        ('convite', 'Convite'),
-        ('outra', 'Outra'),
-    ]
-    
-    titulo = models.CharField(max_length=200, verbose_name="Título do Documento")
-    secao = models.CharField(
-        max_length=50,
-        choices=SECAO_CHOICES,
-        default='outra',
-        verbose_name="Seção/Módulo"
-    )
-    conteudo = models.TextField(
-        verbose_name="Conteúdo do Documento",
-        help_text="Use variáveis como {nome}, {bilhete_identidade}, {email}, {telefone}, {data_nascimento}, {curso}, {numero_inscricao}, {data_inscricao}, {data_hoje}, {nome_escola}, etc."
-    )
-    descricao = models.TextField(blank=True, verbose_name="Descrição")
-    ativo = models.BooleanField(default=True, verbose_name="Ativo")
-    criado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Criado por")
-    data_criacao = models.DateTimeField(auto_now_add=True, verbose_name="Data de Criação")
-    data_atualizacao = models.DateTimeField(auto_now=True, verbose_name="Última Atualização")
-    
-    class Meta:
-        verbose_name = "Documento"
-        verbose_name_plural = "Documentos"
-        ordering = ['-data_criacao']
-    
-    def __str__(self):
-        return f"{self.titulo} ({self.get_secao_display()})"
-    
-    def obter_variaveis_disponiveis(self):
-        """Retorna lista de variáveis disponíveis para este documento"""
-        return {
-            'nome': 'Nome completo',
-            'bilhete_identidade': 'Número do Bilhete de Identidade',
-            'email': 'Email',
-            'telefone': 'Telefone',
-            'data_nascimento': 'Data de Nascimento',
-            'curso': 'Nome do Curso',
-            'numero_inscricao': 'Número de Inscrição',
-            'data_inscricao': 'Data de Inscrição',
-            'data_hoje': 'Data Atual',
-            'nome_escola': 'Nome da Escola',
-            'endereco': 'Endereço',
-            'sexo': 'Sexo',
-            'estado_civil': 'Estado Civil',
-            'nacionalidade': 'Nacionalidade',
-            'local_nascimento': 'Local de Nascimento',
-        }
-    
-    def renderizar(self, dados):
-        """Renderiza o documento com os dados fornecidos"""
-        conteudo = self.conteudo
-        try:
-            conteudo = conteudo.format(**dados)
-        except KeyError as e:
-            conteudo = f"Erro: Variável {e} não encontrada nos dados fornecidos."
-        return conteudo
+        return self.nome_completo

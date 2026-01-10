@@ -1,0 +1,121 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Espelho de Inscrição - {{ inscricao.nome_completo }}{% endblock %}
+
+{% block content %}
+<div class="container my-5 pb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <div class="card shadow-lg border-0 print-content">
+                <div class="card-header bg-custom text-white py-4 text-center">
+                    <h2 class="mb-1">Comprovativo de Inscrição</h2>
+                    <p class="mb-0 opacity-75">Sistema Integrado de Gestão Académica (SIGA)</p>
+                </div>
+                
+                <div class="card-body p-5">
+                    <!-- Cabeçalho de Status -->
+                    <div class="d-flex justify-content-between align-items-center mb-5 pb-4 border-bottom">
+                        <div>
+                            <h4 class="text-primary mb-1">Nº {{ inscricao.numero_inscricao }}</h4>
+                            <p class="text-muted mb-0">Submetida em: {{ inscricao.data_inscricao|date:"d/m/Y H:i" }}</p>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge rounded-pill bg-success px-4 py-2 fs-6">
+                                {{ inscricao.get_status_inscricao_display|upper }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row g-5">
+                        <!-- Coluna da Foto e Identificação Principal -->
+                        <div class="col-md-3 text-center border-end">
+                            <div class="mb-4">
+                                {% if inscricao.foto %}
+                                    <img src="{{ inscricao.foto.url }}" class="img-thumbnail shadow-sm mb-3" style="width: 150px; height: 180px; object-fit: cover;">
+                                {% else %}
+                                    <div class="bg-light d-flex align-items-center justify-content-center mx-auto mb-3 rounded shadow-sm" style="width: 150px; height: 180px; border: 2px dashed #dee2e6;">
+                                        <i class="bi bi-person text-muted" style="font-size: 4rem;"></i>
+                                    </div>
+                                {% endif %}
+                                <h5 class="fw-bold mb-0 text-uppercase">{{ inscricao.apelido }}</h5>
+                                <p class="text-muted small">{{ inscricao.primeiro_nome }} {{ inscricao.nomes_meio }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Detalhes do Candidato -->
+                        <div class="col-md-9">
+                            <div class="mb-5">
+                                <h5 class="section-title"><i class="bi bi-person-lines-fill me-2"></i>Dados Pessoais</h5>
+                                <div class="row row-cols-2 g-3">
+                                    <div><label class="text-muted small d-block">Sexo</label><strong>{{ inscricao.get_sexo_display }}</strong></div>
+                                    <div><label class="text-muted small d-block">Data de Nascimento</label><strong>{{ inscricao.data_nascimento|date:"d/m/Y" }}</strong></div>
+                                    <div><label class="text-muted small d-block">Documento</label><strong>{{ inscricao.bilhete_identidade }}</strong></div>
+                                    <div><label class="text-muted small d-block">Nacionalidade</label><strong>{{ inscricao.nacionalidade }}</strong></div>
+                                    <div class="col-12"><label class="text-muted small d-block">Naturalidade</label><strong>{{ inscricao.local_nascimento }} ({{ inscricao.provincia_nascimento }})</strong></div>
+                                </div>
+                            </div>
+
+                            <div class="mb-5">
+                                <h5 class="section-title"><i class="bi bi-envelope-at me-2"></i>Contactos e Acesso</h5>
+                                <div class="row row-cols-2 g-3">
+                                    <div><label class="text-muted small d-block">E-mail</label><strong>{{ inscricao.email_recuperacao|default:inscricao.email }}</strong></div>
+                                    <div><label class="text-muted small d-block">Telefone</label><strong>{{ inscricao.telefone }}</strong></div>
+                                    <div class="col-12 bg-light p-3 rounded">
+                                        <label class="text-primary small d-block fw-bold"><i class="bi bi-shield-lock me-1"></i>Credenciais de Acesso</label>
+                                        <div class="d-flex justify-content-between mt-1">
+                                            <span>Usuário: <strong>{{ inscricao.user.username }}</strong></span>
+                                            <span class="text-danger small">Senha: <em>(Definida na inscrição)</em></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-0">
+                                <h5 class="section-title"><i class="bi bi-mortarboard me-2"></i>Opção Académica</h5>
+                                <div class="p-3 border rounded border-primary bg-primary bg-opacity-10">
+                                    <div class="row row-cols-2 g-3">
+                                        <div><label class="text-primary small d-block">Curso</label><strong class="fs-5">{{ inscricao.curso.nome }}</strong></div>
+                                        <div><label class="text-primary small d-block">Nível</label><strong>{{ inscricao.nivel_academico }}</strong></div>
+                                        <div><label class="text-primary small d-block">Ano Lectivo</label><strong>{{ inscricao.ano_academico.codigo }}</strong></div>
+                                        <div><label class="text-primary small d-block">Turno</label><strong>{{ inscricao.turno_preferencial }}</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white p-4 border-0 text-center">
+                    <button onclick="window.print()" class="btn btn-outline-primary px-4 me-2">
+                        <i class="bi bi-printer me-2"></i>Imprimir Espelho
+                    </button>
+                    <a href="{% url 'gerar_pdf_confirmacao' inscricao.numero_inscricao %}" class="btn btn-primary px-4">
+                        <i class="bi bi-file-earmark-pdf me-2"></i>Baixar PDF Oficial
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .bg-custom { background: linear-gradient(135deg, #1e3a8a 0%, #059669 100%); }
+    .section-title { 
+        font-size: 1rem; 
+        color: #1e3a8a; 
+        text-transform: uppercase; 
+        letter-spacing: 1px; 
+        border-bottom: 2px solid #e9ecef; 
+        padding-bottom: 8px; 
+        margin-bottom: 15px;
+        font-weight: 700;
+    }
+    @media print {
+        .btn, nav, footer { display: none !important; }
+        .card { border: none !important; box-shadow: none !important; }
+        .print-content { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+        .bg-custom { background: #1e3a8a !important; color: white !important; -webkit-print-color-adjust: exact; }
+    }
+</style>
+{% endblock %}
