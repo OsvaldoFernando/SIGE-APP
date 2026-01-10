@@ -143,9 +143,137 @@
             align-items: center;
             gap: 8px;
         }
-        .user-greeting-name {
-            font-weight: bold;
-            font-size: 1rem;
+        .user-dropdown-menu {
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-radius: 12px;
+            padding: 0.5rem;
+            min-width: 220px;
+            margin-top: 8px !important;
+        }
+        .user-dropdown-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.5rem 0.75rem 0.75rem;
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .user-dropdown-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .user-dropdown-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .user-dropdown-info {
+            flex: 1;
+            overflow: hidden;
+        }
+        .user-dropdown-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #1e293b;
+            margin-bottom: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .user-dropdown-role {
+            font-size: 0.75rem;
+            color: #f59e0b;
+            font-weight: 600;
+        }
+        .user-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            color: #475569;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        .user-dropdown-item:hover {
+            background-color: #f1f5f9;
+            color: var(--primary-color);
+        }
+        .user-dropdown-item i {
+            font-size: 1.1rem;
+            color: #94a3b8;
+        }
+        .user-dropdown-divider {
+            height: 1px;
+            background-color: #f1f5f9;
+            margin: 0.4rem 0.5rem;
+        }
+        .user-dropdown-logout {
+            color: #ef4444 !important;
+        }
+        .user-dropdown-logout i {
+            color: #ef4444 !important;
+        }
+        .user-dropdown-logout:hover {
+            background-color: #fef2f2 !important;
+        }
+        .nav-icon-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .nav-icon-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .nav-icon-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 10px;
+            height: 10px;
+            background: #ef4444;
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: pulse-red 2s infinite;
+        }
+        .online-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: #10b981;
+            border: 2px solid white;
+            border-radius: 50%;
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-red {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); opacity: 0.7; }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); opacity: 1; }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); opacity: 0.7; }
+        }
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); opacity: 0.7; }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); opacity: 1; }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); opacity: 0.7; }
         }
         main {
             flex: 1;
@@ -181,22 +309,6 @@
                         <img src="{{ config.logo.url }}" alt="Logo" style="height: 100%; max-width: 150px; object-fit: contain;">
                     </a>
                     {% endif %}
-                    <div class="user-avatar" style="background: white; border: 1px solid rgba(0,0,0,0.1); width: 48px; height: 48px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        {% if user_perfil.foto %}
-                            <img src="{{ user_perfil.foto.url }}" alt="{{ user.username }}">
-                        {% else %}
-                            <i class="bi bi-person-circle fs-2 text-primary"></i>
-                        {% endif %}
-                    </div>
-                    <div class="user-greeting d-none d-md-block">
-                        <div class="user-greeting-text small opacity-75">Olá,</div>
-                        <div class="user-greeting-name">
-                            {{ user.get_full_name|default:user.username }}
-                            {% if user_perfil.nivel_acesso == 'super_admin' %}
-                                <span class="badge bg-danger ms-1" style="font-size: 0.6rem;">Super Admin</span>
-                            {% endif %}
-                        </div>
-                    </div>
                 </div>
                 {% if ano_atual %}
                 <div class="academic-badge d-none d-lg-flex">
@@ -206,16 +318,59 @@
                 {% endif %}
             </div>
 
-            <div class="d-flex align-items-center gap-2">
-                <a href="{% url 'painel_principal' %}" title="Início" class="btn btn-link text-white p-2">
-                    <i class="bi bi-house-door fs-4"></i>
-                </a>
-                <a href="{% url 'perfil_usuario' %}" title="Meu Perfil" class="btn btn-link text-white p-2">
-                    <i class="bi bi-person-gear fs-4"></i>
-                </a>
-                <a href="#" onclick="confirmLogout(event)" title="Sair" class="btn btn-link text-white p-2">
-                    <i class="bi bi-box-arrow-right fs-4"></i>
-                </a>
+            <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{% url 'painel_principal' %}" class="nav-icon-btn" title="Início">
+                        <i class="bi bi-house-door fs-5"></i>
+                    </a>
+                    <div class="nav-icon-btn" title="Notificações">
+                        <i class="bi bi-bell fs-5"></i>
+                        <span class="nav-icon-badge"></span>
+                    </div>
+                </div>
+
+                <div class="dropdown">
+                    <div class="user-avatar" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer; background: white; border: 2px solid rgba(255,255,255,0.5); width: 48px; height: 48px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative;">
+                        {% if user_perfil.foto %}
+                            <img src="{{ user_perfil.foto.url }}" alt="{{ user.username }}">
+                        {% else %}
+                            <i class="bi bi-person-fill fs-2 text-primary"></i>
+                        {% endif %}
+                        <div class="online-indicator"></div>
+                    </div>
+                    
+                    <div class="dropdown-menu dropdown-menu-end user-dropdown-menu" aria-labelledby="userDropdown">
+                        <div class="user-dropdown-header">
+                            <div class="user-dropdown-avatar">
+                                {% if user_perfil.foto %}
+                                    <img src="{{ user_perfil.foto.url }}" alt="{{ user.username }}">
+                                {% else %}
+                                    <i class="bi bi-person-fill fs-2 text-primary"></i>
+                                {% endif %}
+                            </div>
+                            <div class="user-dropdown-info">
+                                <div class="user-dropdown-name">{{ user.get_full_name|default:user.username }}</div>
+                                <div class="user-dropdown-role">
+                                    {% if user_perfil.nivel_acesso == 'super_admin' %}
+                                        Super Admin <i class="bi bi-gem"></i>
+                                    {% else %}
+                                        Membro
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="{% url 'perfil_usuario' %}" class="user-dropdown-item">
+                            <i class="bi bi-person"></i> Perfil
+                        </a>
+                        
+                        <div class="user-dropdown-divider"></div>
+                        
+                        <a href="#" onclick="confirmLogout(event)" class="user-dropdown-item user-dropdown-logout">
+                            <i class="bi bi-box-arrow-right"></i> Sair do Sistema
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -235,7 +390,7 @@
                     <p class="mb-0 fw-medium">Sua sessão está prestes a expirar por inatividade.</p>
                     <p class="text-muted small">Você será desconectado em <span id="idleTimerSeconds" class="fw-bold text-danger">30</span> segundos.</p>
                 </div>
-                <div class="modal-footer border-0 pt-0 justify-content-center">
+                <div class="modal-footer border-0 pt-0 justify-content-center d-none">
                     <button type="button" class="btn btn-primary rounded-3 px-4" id="stayConnectedBtn">Continuar Conectado</button>
                 </div>
             </div>
@@ -365,32 +520,42 @@
         }
 
         {% if user.is_authenticated %}
-        // Lógica de Auto-Logout por Inatividade
+        // Lógica de Auto-Logout por Inatividade (Melhorada)
         let idleTime = 0;
         let countdownTime = 30;
         let isCountdownActive = false;
         let countdownInterval;
-        const idleModal = new bootstrap.Modal(document.getElementById('idleTimeoutModal'));
+        const idleModalElement = document.getElementById('idleTimeoutModal');
+        const idleModal = new bootstrap.Modal(idleModalElement);
 
         function resetTimer() {
             if (!isCountdownActive) {
                 idleTime = 0;
+            } else {
+                // Se o modal estiver aberto, fechar e resetar ao tocar em qualquer parte do sistema
+                isCountdownActive = false;
+                idleTime = 0;
+                clearInterval(countdownInterval);
+                idleModal.hide();
+                // Ping ao servidor para manter a sessão ativa no backend
+                fetch('/');
             }
         }
 
-        // Eventos que resetam o timer
-        window.onload = resetTimer;
-        window.onmousemove = resetTimer;
-        window.onmousedown = resetTimer;
-        window.ontouchstart = resetTimer;
-        window.onclick = resetTimer;
-        window.onkeydown = resetTimer;
+        // Eventos que resetam o timer (Qualquer toque no sistema)
+        window.addEventListener('load', resetTimer);
+        window.addEventListener('mousemove', resetTimer);
+        window.addEventListener('mousedown', resetTimer);
+        window.addEventListener('touchstart', resetTimer);
+        window.addEventListener('click', resetTimer);
+        window.addEventListener('keydown', resetTimer);
+        window.addEventListener('scroll', resetTimer);
 
         // Verifica inatividade a cada segundo
         setInterval(function() {
             if (!isCountdownActive) {
                 idleTime++;
-                if (idleTime >= 60) { // 1 minuto de inatividade
+                if (idleTime >= 60) { // 1 minuto (60 segundos) para teste
                     startCountdown();
                 }
             }
@@ -398,9 +563,16 @@
 
         function startCountdown() {
             isCountdownActive = true;
-            countdownTime = 30;
+            countdownTime = 60; // 60 segundos de aviso para dar mais tempo
             document.getElementById('idleTimerSeconds').textContent = countdownTime;
             idleModal.show();
+
+            // Adiciona evento para fechar ao clicar no fundo do modal (backdrop)
+            idleModalElement.addEventListener('click', function(e) {
+                if (e.target === idleModalElement) {
+                    resetTimer();
+                }
+            });
 
             countdownInterval = setInterval(function() {
                 countdownTime--;
@@ -412,15 +584,6 @@
                 }
             }, 1000);
         }
-
-        document.getElementById('stayConnectedBtn').addEventListener('click', function() {
-            clearInterval(countdownInterval);
-            isCountdownActive = false;
-            idleTime = 0;
-            idleModal.hide();
-            // Ping ao servidor para manter a sessão ativa no backend
-            fetch('/'); 
-        });
         {% endif %}
     </script>
 </body>

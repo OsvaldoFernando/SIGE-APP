@@ -257,13 +257,16 @@
                             </div>
                             
                             <!-- Seção de Pagamento de Subscrição -->
-                            <hr class="my-4">
-                            <div class="alert alert-info mb-0">
-                                <h6 class="mb-2"><i class="bi bi-credit-card"></i> Pagamento de Subscrição</h6>
-                                <p class="small mb-3">Precisa renovar ou efetuar um pagamento de subscrição? Clique no botão abaixo.</p>
-                                <a href="{% url 'pagamento_subscricao' %}" class="btn btn-info w-100">
-                                    <i class="bi bi-credit-card-fill me-2"></i>Efetuar Pagamento
-                                </a>
+                            <div class="mt-4">
+                                <div class="alert alert-info border-0 shadow-sm mb-0 p-3" style="background-color: #e0f2fe; border-radius: 12px;">
+                                    <h6 class="mb-2 d-flex align-items-center" style="color: #0369a1;">
+                                        <i class="bi bi-credit-card me-2"></i> Pagamento de Subscrição
+                                    </h6>
+                                    <p class="small mb-3" style="color: #0c4a6e;">Precisa renovar ou efetuar um pagamento de subscrição? Clique no botão abaixo.</p>
+                                    <a href="{% url 'pagamento_subscricao' %}" class="btn btn-info w-100 py-2 shadow-sm" style="background-color: #0ea5e9; border: none; border-radius: 8px; font-weight: 500;">
+                                        <i class="bi bi-credit-card-fill me-2"></i>Efetuar Pagamento
+                                    </a>
+                                </div>
                             </div>
                             
                             {% if subscricao %}

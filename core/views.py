@@ -143,13 +143,13 @@ def inscricao_create(request, curso_id):
             responsavel_financeiro_nome=request.POST.get('responsavel_financeiro_nome', ''),
             responsavel_financeiro_telefone=request.POST.get('responsavel_financeiro_telefone', ''),
             responsavel_financeiro_relacao=request.POST.get('responsavel_financeiro_relacao', ''),
-            # 4. Encarregado de Educação
-            encarregado_nome=request.POST.get('encarregado_nome', ''),
-            encarregado_parentesco=request.POST.get('encarregado_parentesco', ''),
-            encarregado_telefone=request.POST.get('encarregado_telefone', ''),
-            encarregado_email=request.POST.get('encarregado_email', ''),
-            encarregado_profissao=request.POST.get('encarregado_profissao', ''),
-            encarregado_local_trabalho=request.POST.get('encarregado_local_trabalho', ''),
+            # 4. Responsáveis
+            responsavel_legal_nome=request.POST.get('responsavel_legal_nome', ''),
+            responsavel_legal_vinculo=request.POST.get('responsavel_legal_vinculo', ''),
+            responsavel_legal_telefone=request.POST.get('responsavel_legal_telefone', ''),
+            responsavel_pedagogico_nome=request.POST.get('responsavel_pedagogico_nome', ''),
+            responsavel_pedagogico_vinculo=request.POST.get('responsavel_pedagogico_vinculo', ''),
+            responsavel_pedagogico_telefone=request.POST.get('responsavel_pedagogico_telefone', ''),
         )
         
         inscricao.save()
