@@ -7,6 +7,15 @@
     <div class="row g-4">
         <!-- Sidebar Navigation -->
         <div class="col-md-3">
+            <!-- Back Button -->
+            <div class="mb-4">
+                <a href="{% url 'painel_principal' %}" class="d-inline-flex align-items-center text-decoration-none text-muted fw-medium transition-all hover-translate">
+                    <div class="bg-dark shadow-sm rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                        <i class="bi bi-arrow-left text-white"></i>
+                    </div>
+                    <span>Painel Principal</span>
+                </a>
+            </div>
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush">
@@ -135,7 +144,11 @@
                         <p class="text-muted small mb-4">O novo logotipo aparecerá no login e no topo do sistema.</p>
                         {% if config.logo %}
                             <div class="mb-3">
-                                <img src="{{ config.logo.url }}" alt="Logo Atual" style="max-height: 80px; object-fit: contain;">
+                                <img src="{{ config.logo.url }}" alt="Logo Atual" style="max-height: 80px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                <div class="p-3 bg-light rounded text-muted small" style="display: none;">
+                                    <i class="bi bi-image-fill fs-2 d-block mb-1"></i>
+                                    Logo não encontrada
+                                </div>
                             </div>
                         {% endif %}
                         <input type="file" class="form-control rounded-3" name="logo" accept="image/*" required>

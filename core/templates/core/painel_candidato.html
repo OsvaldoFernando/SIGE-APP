@@ -23,8 +23,12 @@
             <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px;">
                 <div class="card-body p-4 text-center">
                     <div class="mb-4 position-relative d-inline-block">
-                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center border shadow-sm" style="width: 100px; height: 100px; margin: 0 auto;">
-                            <i class="bi bi-person-circle text-secondary" style="font-size: 3.5rem;"></i>
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center border shadow-sm" style="width: 100px; height: 100px; margin: 0 auto; overflow: hidden;">
+                            {% if inscricao.foto %}
+                                <img src="{{ inscricao.foto.url }}" alt="{{ inscricao.nome_completo }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            {% else %}
+                                <i class="bi bi-person-circle text-secondary" style="font-size: 3.5rem;"></i>
+                            {% endif %}
                         </div>
                         <span class="position-absolute bottom-0 end-0 bg-success border border-white border-2 rounded-circle p-2" title="Candidatura Ativa"></span>
                     </div>
@@ -32,18 +36,27 @@
                     <h4 class="fw-bold text-dark mb-1">{{ inscricao.nome_completo }}</h4>
                     <p class="text-primary fw-medium small mb-4">{{ inscricao.curso.nome }}</p>
                     
-                    <div class="bg-light rounded-4 p-3 text-start mb-0">
-                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom border-white">
-                            <span class="text-muted small fw-bold">PROCESSO</span>
-                            <span class="fw-bold text-dark small">{{ inscricao.numero_inscricao }}</span>
+                    <div class="bg-white border rounded-4 p-3 text-start mb-0 shadow-sm">
+                        <div class="mb-3 pb-2 border-bottom border-light">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <i class="bi bi-hash text-muted"></i>
+                                <span class="text-muted small fw-bold">PROCESSO</span>
+                            </div>
+                            <div class="fw-bold text-dark ps-4">{{ inscricao.numero_inscricao }}</div>
                         </div>
-                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom border-white">
-                            <span class="text-muted small fw-bold">DOCUMENTO</span>
-                            <span class="fw-bold text-dark small">{{ inscricao.bilhete_identidade }}</span>
+                        <div class="mb-3 pb-2 border-bottom border-light">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <i class="bi bi-card-text text-muted"></i>
+                                <span class="text-muted small fw-bold">DOCUMENTO</span>
+                            </div>
+                            <div class="fw-bold text-dark ps-4" style="word-break: break-all;">{{ inscricao.bilhete_identidade }}</div>
                         </div>
-                        <div class="d-flex justify-content-between">
-                            <span class="text-muted small fw-bold">DATA</span>
-                            <span class="fw-bold text-dark small">{{ inscricao.data_cadastro|date:"d/m/Y" }}</span>
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <i class="bi bi-calendar-event text-muted"></i>
+                                <span class="text-muted small fw-bold">DATA</span>
+                            </div>
+                            <div class="fw-bold text-dark ps-4">{{ inscricao.data_cadastro|date:"d/m/Y" }}</div>
                         </div>
                     </div>
                 </div>
@@ -52,50 +65,45 @@
 
         <!-- Status & Timeline -->
         <div class="col-lg-8">
-            <!-- Main Status Card -->
-            <div class="card border-0 shadow-sm mb-4 overflow-hidden" style="border-radius: 20px;">
-                <div class="card-header bg-white border-0 p-4 pb-0">
-                    <h5 class="fw-bold mb-0 text-dark">Estado da Candidatura</h5>
-                </div>
-                <div class="card-body p-4">
-                    {% if inscricao.aprovado %}
-                        <div class="alert alert-success border-0 p-4 d-flex align-items-center gap-4 mb-0" style="border-radius: 16px; background-color: #ecfdf5;">
-                            <div class="bg-success rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 60px; height: 60px;">
-                                <i class="bi bi-patch-check-fill text-white fs-2"></i>
-                            </div>
-                            <div>
-                                <h4 class="alert-heading fw-bold text-success mb-1">Parabéns! Você foi Selecionado(a).</h4>
-                                <p class="mb-0 text-success-emphasis opacity-75">Sua candidatura foi aprovada com a nota <strong>{{ inscricao.nota_teste }}</strong>. Dirija-se à secretaria para realizar sua matrícula definitiva.</p>
-                            </div>
-                        </div>
-                    {% elif inscricao.nota_teste is not None %}
-                        <div class="alert alert-danger border-0 p-4 d-flex align-items-center gap-4 mb-0" style="border-radius: 16px; background-color: #fef2f2;">
-                            <div class="bg-danger rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 60px; height: 60px;">
-                                <i class="bi bi-x-circle-fill text-white fs-2"></i>
-                            </div>
-                            <div>
-                                <h4 class="alert-heading fw-bold text-danger mb-1">Não Selecionado(a)</h4>
-                                <p class="mb-0 text-danger-emphasis opacity-75">Infelizmente sua nota ({{ inscricao.nota_teste }}) não foi suficiente para as vagas disponíveis no momento.</p>
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="alert alert-info border-0 p-4 d-flex align-items-center gap-4 mb-0" style="border-radius: 16px; background-color: #eff6ff;">
-                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 60px; height: 60px;">
-                                <i class="bi bi-hourglass-split text-white fs-2"></i>
-                            </div>
-                            <div>
-                                <h4 class="alert-heading fw-bold text-primary mb-1">Em Processamento...</h4>
-                                <p class="mb-0 text-primary-emphasis opacity-75">Sua inscrição foi recebida com sucesso. Aguarde o lançamento das notas dos testes de admissão.</p>
-                            </div>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-
             <!-- Timeline/Next Steps -->
-            <div class="card border-0 shadow-sm" style="border-radius: 20px;">
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 20px;">
                 <div class="card-body p-4">
-                    <h5 class="fw-bold mb-4 text-dark">Fluxo do Processo</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="fw-bold mb-0 text-dark">Fluxo do Processo</h5>
+                        <span class="badge rounded-pill {% if inscricao.aprovado %}bg-success{% elif inscricao.nota_teste is not None %}bg-danger{% else %}bg-primary{% endif %} px-3 py-2">
+                            {% if inscricao.aprovado %}Selecionado(a){% elif inscricao.nota_teste is not None %}Não Selecionado(a){% else %}Em Processamento{% endif %}
+                        </span>
+                    </div>
+
+                    <!-- Mensagem de Estado Integrada -->
+                    <div class="mb-4">
+                        {% if inscricao.aprovado %}
+                            <div class="alert alert-success border-0 p-3 d-flex align-items-center gap-3 mb-0" style="border-radius: 12px; background-color: #ecfdf5;">
+                                <i class="bi bi-patch-check-fill text-success fs-4"></i>
+                                <div class="small">
+                                    <span class="fw-bold d-block text-success">Candidatura Aprovada!</span>
+                                    <span class="text-success-emphasis opacity-75">Parabéns pela nota {{ inscricao.nota_teste }}. Dirija-se à secretaria.</span>
+                                </div>
+                            </div>
+                        {% elif inscricao.nota_teste is not None %}
+                            <div class="alert alert-danger border-0 p-3 d-flex align-items-center gap-3 mb-0" style="border-radius: 12px; background-color: #fef2f2;">
+                                <i class="bi bi-x-circle-fill text-danger fs-4"></i>
+                                <div class="small">
+                                    <span class="fw-bold d-block text-danger">Não Selecionado(a)</span>
+                                    <span class="text-danger-emphasis opacity-75">Nota ({{ inscricao.nota_teste }}) insuficiente para as vagas atuais.</span>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info border-0 p-3 d-flex align-items-center gap-3 mb-0" style="border-radius: 12px; background-color: #eff6ff;">
+                                <i class="bi bi-hourglass-split text-primary fs-4"></i>
+                                <div class="small">
+                                    <span class="fw-bold d-block text-primary">Inscrição em Análise</span>
+                                    <span class="text-primary-emphasis opacity-75">Aguarde o lançamento das notas dos testes de admissão.</span>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
                     <div class="timeline-modern">
                         <div class="timeline-item active">
                             <div class="timeline-icon bg-success text-white"><i class="bi bi-check-lg"></i></div>
@@ -145,7 +153,7 @@
     .transition-all { transition: all 0.3s ease; }
     .hover-translate:hover { transform: translateX(-5px); color: #000 !important; }
     
-    .timeline-modern { position: relative; padding-left: 1.5rem; }
+    .timeline-modern { position: relative; padding-left: 1.5rem; margin-top: 20px; }
     .timeline-modern::before {
         content: '';
         position: absolute;
@@ -158,33 +166,51 @@
     
     .timeline-item {
         position: relative;
-        padding-bottom: 2rem;
+        padding-bottom: 2.5rem;
         display: flex;
         align-items: flex-start;
-        gap: 1rem;
+        gap: 1.5rem;
     }
     
     .timeline-icon {
-        width: 24px;
-        height: 24px;
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 0.75rem;
+        font-size: 0.85rem;
         z-index: 1;
         flex-shrink: 0;
-        border: 2px solid white;
+        border: 4px solid white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
     
     .timeline-content {
         flex: 1;
+        padding-top: 4px;
         padding-bottom: 1rem;
         border-bottom: 1px solid #f1f5f9;
     }
     
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+    
+    .timeline-item:last-child .timeline-content {
+        border-bottom: none;
+    }
+    
     .timeline-item.active .timeline-icon {
-        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+    }
+    
+    footer {
+        display: none;
+    }
+    
+    main {
+        padding-bottom: 100px;
     }
 </style>
 {% endblock %}

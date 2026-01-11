@@ -149,6 +149,36 @@
                                                 <option value="Outra" {% if form_data.nacionalidade == 'Outra' %}selected{% endif %}>Outra</option>
                                             </select>
                                         </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold text-muted">PROVÍNCIA *</label>
+                                            <select name="provincia" id="id_provincia" class="form-select bg-light border-0 py-2 shadow-none rounded-3" required>
+                                                <option value="">Selecione a província...</option>
+                                                <option value="Bengo">Bengo</option>
+                                                <option value="Benguela">Benguela</option>
+                                                <option value="Bié">Bié</option>
+                                                <option value="Cabinda">Cabinda</option>
+                                                <option value="Cuando Cubango">Cuando Cubango</option>
+                                                <option value="Cuanza Norte">Cuanza Norte</option>
+                                                <option value="Cuanza Sul">Cuanza Sul</option>
+                                                <option value="Cunene">Cunene</option>
+                                                <option value="Huambo">Huambo</option>
+                                                <option value="Huíla">Huíla</option>
+                                                <option value="Luanda">Luanda</option>
+                                                <option value="Lunda Norte">Lunda Norte</option>
+                                                <option value="Lunda Sul">Lunda Sul</option>
+                                                <option value="Malanje">Malanje</option>
+                                                <option value="Moxico">Moxico</option>
+                                                <option value="Namibe">Namibe</option>
+                                                <option value="Uíge">Uíge</option>
+                                                <option value="Zaire">Zaire</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold text-muted">MUNICÍPIO *</label>
+                                            <select name="municipio" id="id_municipio" class="form-select bg-light border-0 py-2 shadow-none rounded-3" required disabled>
+                                                <option value="">Selecione primeiro a província...</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -372,6 +402,113 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentStep = 1;
     const totalSteps = 5;
     const form = document.getElementById('inscricaoForm');
+    // Adicionar dados de províncias e municípios de Angola
+    const angolaData = {
+        "Bengo": ["Ambriz", "Bula Atumba", "Dande", "Dembos", "Nambuangongo", "Pango Aluquém"],
+        "Benguela": ["Balombo", "Baía Farta", "Benguela", "Bocoio", "Caimbambo", "Catumbela", "Chongoroi", "Ganda", "Lobito", "Mariano Machado"],
+        "Bié": ["Andulo", "Camacupa", "Catabola", "Chitembo", "Chinguar", "Cuemba", "Cunhinga", "Kuito", "Nharea"],
+        "Cabinda": ["Belize", "Buco-Zau", "Cabinda", "Cacongo"],
+        "Cuando Cubango": ["Calai", "Cuangar", "Cuchi", "Cuito Cuanavale", "Dirico", "Mavinga", "Menongue", "Nancova", "Rivungo"],
+        "Cuanza Norte": ["Ambaca", "Bangue", "Bolongongo", "Cambambe", "Cazengo", "Golungo Alto", "Gonguembo", "Lucala", "Quiculungo", "Samba Caju"],
+        "Cuanza Sul": ["Amboim", "Cassongue", "Cela", "Conda", "Ebo", "Libolo", "Mussende", "Porto Amboim", "Quibala", "Quilenda", "Seles", "Sumbe"],
+        "Cunene": ["Cahama", "Cuanhama", "Curoca", "Cuvelai", "Namacunde", "Ombadja"],
+        "Huambo": ["Bailundo", "Caála", "Catchiungo", "Ecunha", "Huambo", "Londuimbale", "Longonjo", "Mungo", "Tchicala-Tcholoanga", "Tchindjenje", "Ucuma"],
+        "Huíla": ["Caconda", "Cacula", "Caluquembe", "Chiange", "Chibia", "Chicomba", "Chipindo", "Cuvango", "Humpata", "Jamba", "Lubango", "Matala", "Quilengues", "Quipungo"],
+        "Luanda": ["Belas", "Cacuaco", "Cazenga", "Icolo e Bengo", "Luanda", "Quiçama", "Kilamba Kiaxi", "Talatona", "Viana"],
+        "Lunda Norte": ["Cambulo", "Capenda-Camulemba", "Caungula", "Chitato", "Cuilo", "Cuango", "Lubalo", "Lucapa", "Xá-Muteba"],
+        "Lunda Sul": ["Cacolo", "Dala", "Muconda", "Saurimo"],
+        "Malanje": ["Cacuso", "Calandula", "Cambundi-Catembo", "Cangandala", "Caombo", "Cuaba Nzogo", "Cunda-dia-Baze", "Luquembo", "Malanje", "Marimba", "Massango", "Mucari", "Quela", "Quirima"],
+        "Moxico": ["Alto Zambeze", "Bundas", "Camanongue", "Cameia", "Léua", "Luau", "Luacano", "Luchazes", "Moxico"],
+        "Namibe": ["Bibala", "Camucuio", "Moçâmedes", "Tômbua", "Virei"],
+        "Uíge": ["Alto Cauale", "Ambuíla", "Bembe", "Buengas", "Bungo", "Cangola", "Damba", "Mucaba", "Negage", "Puri", "Quimbele", "Quitexe", "Sanza Pombo", "Songo", "Uíge", "Zombo"],
+        "Zaire": ["Cuimba", "M'banza Kongo", "Noqui", "N'zeto", "Soyo", "Sumbula"]
+    };
+
+    const nacionalidadeSelect = document.getElementById('id_nacionalidade');
+    const provinciaSelect = document.getElementById('id_provincia');
+    const municipioSelect = document.getElementById('id_municipio');
+
+    function toggleProvinciaMunicipio() {
+        const isAngolana = nacionalidadeSelect.value === 'Angolana';
+        
+        if (isAngolana) {
+            // Transformar em selects se forem inputs
+            if (provinciaSelect.tagName === 'INPUT') {
+                const newProvincia = document.createElement('select');
+                newProvincia.name = 'provincia';
+                newProvincia.id = 'id_provincia';
+                newProvincia.className = 'form-select bg-light border-0 py-2 shadow-none rounded-3';
+                newProvincia.required = true;
+                newProvincia.innerHTML = '<option value="">Selecione a província...</option>' + 
+                    Object.keys(angolaData).map(p => `<option value="${p}">${p}</option>`).join('');
+                provinciaSelect.replaceWith(newProvincia);
+                newProvincia.addEventListener('change', updateMunicipios);
+            }
+            if (municipioSelect.tagName === 'INPUT') {
+                const newMunicipio = document.createElement('select');
+                newMunicipio.name = 'municipio';
+                newMunicipio.id = 'id_municipio';
+                newMunicipio.className = 'form-select bg-light border-0 py-2 shadow-none rounded-3';
+                newMunicipio.required = true;
+                newMunicipio.disabled = true;
+                newMunicipio.innerHTML = '<option value="">Selecione primeiro a província...</option>';
+                municipioSelect.replaceWith(newMunicipio);
+            }
+        } else {
+            // Transformar em inputs se forem selects
+            if (provinciaSelect.tagName === 'SELECT') {
+                const newProvincia = document.createElement('input');
+                newProvincia.type = 'text';
+                newProvincia.name = 'provincia';
+                newProvincia.id = 'id_provincia';
+                newProvincia.className = 'form-control bg-light border-0 py-2 shadow-none rounded-3';
+                newProvincia.required = true;
+                newProvincia.placeholder = 'Digite a província';
+                provinciaSelect.replaceWith(newProvincia);
+            }
+            if (municipioSelect.tagName === 'SELECT') {
+                const newMunicipio = document.createElement('input');
+                newMunicipio.type = 'text';
+                newMunicipio.name = 'municipio';
+                newMunicipio.id = 'id_municipio';
+                newMunicipio.className = 'form-control bg-light border-0 py-2 shadow-none rounded-3';
+                newMunicipio.required = true;
+                newMunicipio.placeholder = 'Digite o município';
+                municipioSelect.replaceWith(newMunicipio);
+            }
+        }
+    }
+
+    function updateMunicipios() {
+        const selectedProvincia = this.value;
+        const currentMunicipioSelect = document.getElementById('id_municipio');
+        
+        if (currentMunicipioSelect.tagName === 'SELECT') {
+            currentMunicipioSelect.innerHTML = '<option value="">Selecione o município...</option>';
+            
+            if (selectedProvincia && angolaData[selectedProvincia]) {
+                angolaData[selectedProvincia].forEach(municipio => {
+                    const option = document.createElement('option');
+                    option.value = municipio;
+                    option.textContent = municipio;
+                    currentMunicipioSelect.appendChild(option);
+                });
+                currentMunicipioSelect.disabled = false;
+            } else {
+                currentMunicipioSelect.disabled = true;
+                currentMunicipioSelect.innerHTML = '<option value="">Selecione primeiro a província...</option>';
+            }
+        }
+    }
+
+    if (nacionalidadeSelect) {
+        nacionalidadeSelect.addEventListener('change', toggleProvinciaMunicipio);
+    }
+
+    if (provinciaSelect) {
+        provinciaSelect.addEventListener('change', updateMunicipios);
+    }
+
     const btnNext = document.getElementById('btn_next');
     const btnPrev = document.getElementById('btn_prev');
     const btnSubmit = document.getElementById('btn_submit');

@@ -61,21 +61,21 @@
             </a>
         </div>
 
-        <!-- Matrícula (Green) -->
+        <!-- Consultar Aprovação (Purple) -->
         <div class="col-md-6 col-lg-4">
-            <a href="{% url 'matricula' %}" class="text-decoration-none">
-                <div class="card border-0 h-100" style="background-color: #16A085; color: white; border-radius: 2px; overflow: hidden; min-height: 120px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <a href="{% url 'lancamento_notas' %}" class="text-decoration-none">
+                <div class="card border-0 h-100" style="background-color: #8E44AD; color: white; border-radius: 2px; overflow: hidden; min-height: 120px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <div class="card-body p-3 d-flex">
-                        <div class="flex-shrink-0 me-3">
-                            <i class="bi bi-person-badge-fill" style="font-size: 50px; line-height: 1; opacity: 1;"></i>
+                        <div class="flex-shrink-0 me-3 d-flex align-items-center">
+                            <i class="bi bi-search" style="font-size: 50px; line-height: 1; opacity: 1;"></i>
                         </div>
                         <div class="flex-grow-1 text-end">
-                            <h2 style="font-weight: 300; font-size: 24px; margin-bottom: 5px; letter-spacing: -1px;">Matrícula</h2>
-                            <p style="font-size: 12px; opacity: 0.9; margin: 0; line-height: 1.2;">Alunos aprovados para matrícula definitiva.</p>
+                            <h2 style="font-weight: 300; font-size: 24px; margin-bottom: 5px; letter-spacing: -1px;">Aprovação</h2>
+                            <p style="font-size: 12px; opacity: 0.9; margin: 0; line-height: 1.2;">Lançamento de Notas e Resultados.</p>
                         </div>
                     </div>
                     <div class="card-footer border-0 py-2 px-3 d-flex justify-content-between align-items-center" style="background-color: rgba(0,0,0,0.15);">
-                        <span style="font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Efetuar Matrícula</span>
+                        <span style="font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Lançar Notas</span>
                         <i class="bi bi-arrow-right-circle" style="font-size: 16px;"></i>
                     </div>
                 </div>
@@ -103,42 +103,21 @@
             </a>
         </div>
 
-        <!-- Consultar Aprovação (Purple) -->
+        <!-- Matrícula (Green) -->
         <div class="col-md-6 col-lg-4">
-            <a href="{% url 'lancamento_notas' %}" class="text-decoration-none">
-                <div class="card border-0 h-100" style="background-color: #8E44AD; color: white; border-radius: 2px; overflow: hidden; min-height: 120px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                    <div class="card-body p-3 d-flex">
-                        <div class="flex-shrink-0 me-3 d-flex align-items-center">
-                            <i class="bi bi-search" style="font-size: 50px; line-height: 1; opacity: 1;"></i>
-                        </div>
-                        <div class="flex-grow-1 text-end">
-                            <h2 style="font-weight: 300; font-size: 24px; margin-bottom: 5px; letter-spacing: -1px;">Aprovação</h2>
-                            <p style="font-size: 12px; opacity: 0.9; margin: 0; line-height: 1.2;">Lançamento de Notas e Resultados.</p>
-                        </div>
-                    </div>
-                    <div class="card-footer border-0 py-2 px-3 d-flex justify-content-between align-items-center" style="background-color: rgba(0,0,0,0.15);">
-                        <span style="font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Lançar Notas</span>
-                        <i class="bi bi-arrow-right-circle" style="font-size: 16px;"></i>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <!-- Aluno Selecionado (Orange) -->
-        <div class="col-md-6 col-lg-4">
-            <a href="{% url 'lancamento_notas' %}" class="text-decoration-none">
-                <div class="card border-0 h-100" style="background-color: #F39C12; color: white; border-radius: 2px; overflow: hidden; min-height: 120px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <a href="{% url 'matricula' %}" class="text-decoration-none">
+                <div class="card border-0 h-100" style="background-color: #16A085; color: white; border-radius: 2px; overflow: hidden; min-height: 120px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <div class="card-body p-3 d-flex">
                         <div class="flex-shrink-0 me-3">
-                            <i class="bi bi-pencil-square" style="font-size: 50px; line-height: 1; opacity: 1;"></i>
+                            <i class="bi bi-person-badge-fill" style="font-size: 50px; line-height: 1; opacity: 1;"></i>
                         </div>
                         <div class="flex-grow-1 text-end">
-                            <h2 style="font-weight: 300; font-size: 24px; margin-bottom: 5px; letter-spacing: -1px;">Selecionado</h2>
-                            <p style="font-size: 12px; opacity: 0.9; margin: 0; line-height: 1.2;">Lançar Notas e Processar Aprovações.</p>
+                            <h2 style="font-weight: 300; font-size: 24px; margin-bottom: 5px; letter-spacing: -1px;">Matrícula</h2>
+                            <p style="font-size: 12px; opacity: 0.9; margin: 0; line-height: 1.2;">Alunos aprovados para matrícula definitiva.</p>
                         </div>
                     </div>
                     <div class="card-footer border-0 py-2 px-3 d-flex justify-content-between align-items-center" style="background-color: rgba(0,0,0,0.15);">
-                        <span style="font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Gestão de Notas</span>
+                        <span style="font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Efetuar Matrícula</span>
                         <i class="bi bi-arrow-right-circle" style="font-size: 16px;"></i>
                     </div>
                 </div>

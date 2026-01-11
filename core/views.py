@@ -617,12 +617,16 @@ def lancamento_notas(request):
                             nota = float(raw_value)
                             # Validação de segurança no servidor
                             if 0 <= nota <= 20:
+                                # Usar update() para persistir no banco e garantir que o modelo saiba da mudança
                                 Inscricao.objects.filter(id=inscricao_id).update(nota_teste=nota)
+                                # Também atualizar o objeto se necessário para processamentos imediatos
+                                # mas o update() acima já é suficiente para o banco de dados.
                             else:
                                 continue
                         except (ValueError, Inscricao.DoesNotExist): pass
                 except (ValueError, Inscricao.DoesNotExist): pass
         messages.success(request, 'Notas atualizadas com sucesso!')
+        # Redirecionar mantendo o parâmetro do curso para que a lista seja recarregada com os novos dados
         return redirect(f"{request.path}?curso={request.POST.get('curso_id', '')}")
     
     curso_id = request.GET.get('curso')
@@ -1198,7 +1202,7 @@ def logout_view(request):
 
 @login_required
 def notificacoes_view(request):
-    """View para listar notificações do usuário"""
+    """View para listar notificações do usuário e estatísticas de inscrições"""
     notificacoes = Notificacao.objects.filter(
         Q(global_notificacao=True) | Q(destinatarios=request.user),
         ativa=True
@@ -1206,6 +1210,21 @@ def notificacoes_view(request):
     
     nao_lidas = notificacoes.exclude(lida_por=request.user)
     
+    # Estatísticas de inscrições por dia (últimos 30 dias)
+    from django.db.models.functions import TruncDay
+    from django.db.models import Count
+    from django.utils import timezone
+    from datetime import timedelta
+    
+    data_limite = timezone.now() - timedelta(days=30)
+    estatisticas_diarias = Inscricao.objects.filter(
+        data_inscricao__gte=data_limite
+    ).annotate(
+        dia=TruncDay('data_inscricao')
+    ).values('dia').annotate(
+        total=Count('id')
+    ).order_by('-dia')
+
     # Ao marcar como lida ou voltar, redireciona para o perfil
     if request.GET.get('action') == 'marcar_lida':
         notificacao_id = request.GET.get('id')
@@ -1217,6 +1236,7 @@ def notificacoes_view(request):
     context = {
         'notificacoes': notificacoes,
         'nao_lidas_count': nao_lidas.count(),
+        'estatisticas_diarias': estatisticas_diarias,
         'active_tab': 'notificacoes'
     }
     return render(request, 'core/notificacoes.html', context)

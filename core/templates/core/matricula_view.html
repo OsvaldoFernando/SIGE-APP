@@ -23,12 +23,6 @@
             </div>
             <h2 class="h3 fw-bold mb-0 text-dark" style="letter-spacing: -0.5px;">Gestão de Matrículas</h2>
         </div>
-        <div class="col-md-4 text-md-end mt-3 mt-md-0">
-            <a href="{% url 'nova_matricula' %}" class="btn btn-primary d-inline-flex align-items-center gap-2 px-4 shadow-sm py-2" style="border-radius: 10px; font-weight: 500;">
-                <i class="bi bi-plus-circle"></i>
-                <span>Nova Matrícula</span>
-            </a>
-        </div>
     </div>
 
     <!-- Modern Stats Section -->
@@ -181,23 +175,25 @@
                                     <td class="text-end px-3">
                                         <div class="d-flex gap-2 justify-content-end">
                                             {% if inscricao.status != 'Matriculado' %}
-                                                <form method="POST" class="m-0">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="inscricao_id" value="{{ inscricao.id }}">
-                                                    <input type="hidden" name="action" value="confirmar_matricula">
-                                                    <button type="submit" class="btn btn-success btn-sm px-3 d-flex align-items-center gap-2 shadow-sm" style="border-radius: 8px; font-weight: 500;" onclick="return confirm('Confirmar matrícula de {{ inscricao.nome_completo }}?')">
-                                                        <i class="bi bi-check-lg"></i> Confirmar
-                                                    </button>
-                                                </form>
+                                                <button type="button" 
+                                                        class="btn btn-success btn-sm px-3 d-flex align-items-center gap-2 shadow-sm" 
+                                                        style="border-radius: 8px; font-weight: 500;"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#modalConfirmarMatricula"
+                                                        data-id="{{ inscricao.id }}"
+                                                        data-nome="{{ inscricao.nome_completo }}">
+                                                    <i class="bi bi-check-lg"></i> Confirmar
+                                                </button>
                                             {% else %}
-                                                <form method="POST" class="m-0">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="inscricao_id" value="{{ inscricao.id }}">
-                                                    <input type="hidden" name="action" value="cancelar_matricula">
-                                                    <button type="submit" class="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-2" style="border-radius: 8px;" onclick="return confirm('Cancelar matrícula?')">
-                                                        <i class="bi bi-x-circle"></i> Cancelar
-                                                    </button>
-                                                </form>
+                                                <button type="button" 
+                                                        class="btn btn-outline-danger btn-sm px-3 d-flex align-items-center gap-2" 
+                                                        style="border-radius: 8px;"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#modalCancelarMatricula"
+                                                        data-id="{{ inscricao.id }}"
+                                                        data-nome="{{ inscricao.nome_completo }}">
+                                                    <i class="bi bi-x-circle"></i> Cancelar
+                                                </button>
                                             {% endif %}
                                             <a href="{% url 'painel_candidato' %}?identificador={{ inscricao.numero_inscricao }}" class="btn btn-light btn-sm px-3 shadow-none border" style="border-radius: 8px;" title="Ver Perfil">
                                                 <i class="bi bi-eye"></i>
@@ -259,4 +255,88 @@
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     }
 </style>
+
+<!-- Modal Confirmar Matrícula -->
+<div class="modal fade" id="modalConfirmarMatricula" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold text-dark">Confirmar Matrícula</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
+                    <i class="bi bi-person-check-fill text-success fs-1"></i>
+                </div>
+                <h5 class="fw-bold mb-3" id="confirmarNomeDisplay">...</h5>
+                <p class="text-muted">Deseja realmente confirmar a matrícula deste candidato no sistema?</p>
+            </div>
+            <div class="modal-footer border-0 pb-4 px-4">
+                <form method="POST" class="w-100 d-flex gap-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="inscricao_id" id="confirmarIdInput">
+                    <input type="hidden" name="action" value="confirmar_matricula">
+                    <button type="button" class="btn btn-light w-100 py-2 fw-medium" style="border-radius: 10px;" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success w-100 py-2 fw-medium" style="border-radius: 10px;">Confirmar Agora</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cancelar Matrícula -->
+<div class="modal fade" id="modalCancelarMatricula" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold text-dark">Cancelar Matrícula</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
+                    <i class="bi bi-exclamação-circle text-danger fs-1"></i>
+                </div>
+                <h5 class="fw-bold mb-3" id="cancelarNomeDisplay">...</h5>
+                <p class="text-muted text-danger fw-medium">Atenção: Esta ação irá reverter o estado do aluno para pendente.</p>
+            </div>
+            <div class="modal-footer border-0 pb-4 px-4">
+                <form method="POST" class="w-100 d-flex gap-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="inscricao_id" id="cancelarIdInput">
+                    <input type="hidden" name="action" value="cancelar_matricula">
+                    <button type="button" class="btn btn-light w-100 py-2 fw-medium" style="border-radius: 10px;" data-bs-dismiss="modal">Manter Matrícula</button>
+                    <button type="submit" class="btn btn-danger w-100 py-2 fw-medium" style="border-radius: 10px;">Cancelar Matrícula</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modalConfirmar = document.getElementById('modalConfirmarMatricula');
+    if (modalConfirmar) {
+        modalConfirmar.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const id = button.getAttribute('data-id');
+            const nome = button.getAttribute('data-nome');
+            
+            document.getElementById('confirmarIdInput').value = id;
+            document.getElementById('confirmarNomeDisplay').textContent = nome;
+        });
+    }
+
+    const modalCancelar = document.getElementById('modalCancelarMatricula');
+    if (modalCancelar) {
+        modalCancelar.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const id = button.getAttribute('data-id');
+            const nome = button.getAttribute('data-nome');
+            
+            document.getElementById('cancelarIdInput').value = id;
+            document.getElementById('cancelarNomeDisplay').textContent = nome;
+        });
+    }
+});
+</script>
 {% endblock %}
