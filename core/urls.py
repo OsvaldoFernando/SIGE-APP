@@ -7,7 +7,7 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('inscricao/<int:curso_id>/', views.inscricao_create, name='inscricao_create'),
-    path('inscricao/<int:numero>/pdf/', views.gerar_pdf_confirmacao, name='gerar_pdf_confirmacao'),
+    path('inscricao/<str:numero>/pdf/', views.gerar_pdf_confirmacao, name='gerar_pdf_confirmacao'),
     path('minha-conta/', views.perfil_usuario, name='perfil_usuario'),
     path('pagamento/', views.pagamento_subscricao_view, name='pagamento_subscription'),
     path('documentos/', views.gestao_documentos, name='gestao_documentos'),
@@ -39,6 +39,11 @@ urlpatterns = [
     
     # URLs para Menus do Painel Principal
     path('nova-matricula/', views.selecionar_tipo_matricula, name='nova_matricula'),
+    path('candidatos/perfil/', views.perfil_candidato_login, name='perfil_candidato_login'),
+    path('candidatos/painel/', views.painel_candidato, name='painel_candidato'),
+    path('candidatos/lista/', views.lista_inscritos, name='lista_inscritos'),
+    path('candidatos/lancamento-notas/', views.lancamento_notas, name='lancamento_notas'),
+    path('candidatos/processar-aprovacao/', views.processar_aprovacao_vagas, name='processar_aprovacao_vagas'),
     path('consultar-aprovacao/', views.consultar_aprovacao, name='consultar_aprovacao'),
     path('admissao-estudantes/', views.admissao_estudantes, name='admissao_estudantes'),
     path('termo-renovacao/', views.termo_renovacao, name='termo_renovacao'),

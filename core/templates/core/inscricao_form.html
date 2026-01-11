@@ -8,11 +8,17 @@
         <div class="col-lg-10 mb-5">
             <!-- Formulário com Barra de Progresso -->
             <div class="card shadow">
-                <div class="card-header bg-custom text-white py-2">
-                    <h5 class="mb-1">Formulário de Inscrição - {{ curso.nome }}</h5>
+                <div class="card-header bg-custom text-white py-2 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Formulário de Inscrição - {{ curso.nome }}</h5>
+                    <span class="badge bg-white text-primary">Processo Nº: {% if inscricao %}{{ inscricao.numero_inscricao }}{% else %}NOVO{% endif %}</span>
                 </div>
                 
-                <!-- Barra de Progresso -->
+                <!-- Barra de Progresso Visual -->
+                <div class="progress rounded-0" style="height: 6px;">
+                    <div id="wizard_progress_bar" class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" style="width: 20%;"></div>
+                </div>
+
+                <!-- Barra de Passos -->
                 <div class="py-3 px-2" style="background-color: #f8f9fa; border-bottom: 1px solid #dee2e6;">
                     <div class="progress-wizard">
                         <div class="wizard-step active" data-step="1">
@@ -32,8 +38,8 @@
                             <div class="wizard-label">Conta</div>
                         </div>
                         <div class="wizard-step" data-step="5">
-                            <div class="wizard-icon"><i class="bi bi-gear"></i></div>
-                            <div class="wizard-label">Configurações</div>
+                            <div class="wizard-icon"><i class="bi bi-cash-coin"></i></div>
+                            <div class="wizard-label">Pagamento</div>
                         </div>
                     </div>
                 </div>
@@ -72,52 +78,52 @@
                                     <div class="row">
                                         <div class="col-md-12 mb-3">
                                             <label class="form-label">Nome Completo *</label>
-                                            <input type="text" name="nome_completo_display" id="id_nome_completo_display" class="form-control" required placeholder="Digite o nome completo">
-                                            <input type="hidden" name="primeiro_nome" id="id_primeiro_nome">
-                                            <input type="hidden" name="nomes_meio" id="id_nomes_meio">
-                                            <input type="hidden" name="apelido" id="id_apelido">
+                                            <input type="text" name="nome_completo_display" id="id_nome_completo_display" class="form-control" required placeholder="Digite o nome completo" value="{{ form_data.nome_completo_display|default:'' }}">
+                                            <input type="hidden" name="primeiro_nome" id="id_primeiro_nome" value="{{ form_data.primeiro_nome|default:'' }}">
+                                            <input type="hidden" name="nomes_meio" id="id_nomes_meio" value="{{ form_data.nomes_meio|default:'' }}">
+                                            <input type="hidden" name="apelido" id="id_apelido" value="{{ form_data.apelido|default:'' }}">
                                         </div>
                                         
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Sexo *</label>
                                             <select name="sexo" class="form-select" required>
                                                 <option value="">Selecione...</option>
-                                                <option value="M">Masculino</option>
-                                                <option value="F">Feminino</option>
+                                                <option value="M" {% if form_data.sexo == 'M' %}selected{% endif %}>Masculino</option>
+                                                <option value="F" {% if form_data.sexo == 'F' %}selected{% endif %}>Feminino</option>
                                             </select>
                                         </div>
 
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Data de Nascimento *</label>
-                                            <input type="date" name="data_nascimento" id="data_nascimento" class="form-control" required>
+                                            <input type="date" name="data_nascimento" id="data_nascimento" class="form-control" required value="{{ form_data.data_nascimento|default:'' }}">
                                         </div>
 
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Tipo de Documento *</label>
                                             <select name="tipo_documento" id="id_tipo_documento" class="form-select" required>
-                                                <option value="BI" selected>BI (Bilhete de Identidade)</option>
-                                                <option value="Passaporte">Passaporte</option>
+                                                <option value="BI" {% if form_data.tipo_documento == 'BI' or not form_data.tipo_documento %}selected{% endif %}>BI (Bilhete de Identidade)</option>
+                                                <option value="Passaporte" {% if form_data.tipo_documento == 'Passaporte' %}selected{% endif %}>Passaporte</option>
                                             </select>
                                         </div>
 
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Número do Documento *</label>
-                                            <input type="text" name="bilhete_identidade" id="bilhete_identidade" class="form-control check-exists" data-campo="bilhete_identidade" required placeholder="Digite o número do documento">
+                                            <input type="text" name="bilhete_identidade" id="bilhete_identidade" class="form-control check-exists" data-campo="bilhete_identidade" required placeholder="Digite o número do documento" value="{{ form_data.bilhete_identidade|default:'' }}">
                                             <small class="text-muted" id="doc_help_text">O número do BI deve ser único no sistema.</small>
                                         </div>
 
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Data de Validade (BI) *</label>
-                                            <input type="date" name="data_validade_bi" id="id_data_validade_bi" class="form-control" required>
+                                            <input type="date" name="data_validade_bi" id="id_data_validade_bi" class="form-control" required value="{{ form_data.data_validade_bi|default:'' }}">
                                         </div>
 
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Nacionalidade *</label>
                                             <select name="nacionalidade" id="id_nacionalidade" class="form-select" required>
-                                                <option value="Angolana" selected>Angolana</option>
-                                                <option value="Brasil">Brasil</option>
-                                                <option value="Portugal">Portugal</option>
-                                                <option value="Outra">Outra</option>
+                                                <option value="Angolana" {% if form_data.nacionalidade == 'Angolana' or not form_data.nacionalidade %}selected{% endif %}>Angolana</option>
+                                                <option value="Brasil" {% if form_data.nacionalidade == 'Brasil' %}selected{% endif %}>Brasil</option>
+                                                <option value="Portugal" {% if form_data.nacionalidade == 'Portugal' %}selected{% endif %}>Portugal</option>
+                                                <option value="Outra" {% if form_data.nacionalidade == 'Outra' %}selected{% endif %}>Outra</option>
                                             </select>
                                         </div>
                                         
@@ -138,16 +144,16 @@
                                         <!-- Campos de Entrada Manual -->
                                         <div class="col-md-6 mb-3 d-none" id="div_provincia_manual">
                                             <label class="form-label">Província / Estado</label>
-                                            <input type="text" id="provincia_nascimento_manual" class="form-control" placeholder="Digite a província">
+                                            <input type="text" id="provincia_nascimento_manual" class="form-control" placeholder="Digite a província" value="{{ form_data.provincia_nascimento|default:'' }}">
                                         </div>
                                         <div class="col-md-6 mb-3 d-none" id="div_municipio_manual">
                                             <label class="form-label">Município / Cidade</label>
-                                            <input type="text" id="municipio_nascimento_manual" class="form-control" placeholder="Digite o município">
+                                            <input type="text" id="municipio_nascimento_manual" class="form-control" placeholder="Digite o município" value="{{ form_data.local_nascimento|default:'' }}">
                                         </div>
                                         
                                         <!-- Campos ocultos enviados ao backend -->
-                                        <input type="hidden" name="local_nascimento" id="id_local_nascimento_final">
-                                        <input type="hidden" name="provincia_nascimento" id="id_provincia_nascimento_final">
+                                        <input type="hidden" name="local_nascimento" id="id_local_nascimento_final" value="{{ form_data.local_nascimento|default:'' }}">
+                                        <input type="hidden" name="provincia_nascimento" id="id_provincia_nascimento_final" value="{{ form_data.provincia_nascimento|default:'' }}">
                                         
                                         <div class="d-none">
                                             <input type="number" name="ano_conclusao" value="2024">
@@ -165,17 +171,17 @@
                             <p class="text-muted mb-4">Para comunicação e recuperação de conta.</p>
                             
                             <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Telefone Principal *</label>
-                                    <input type="tel" name="telefone" class="form-control" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Telefone Alternativo (Opcional)</label>
-                                    <input type="tel" name="telefone_alternativo" class="form-control">
-                                </div>
-                                <div class="col-md-12 mb-3">
-                                    <label class="form-label">E-mail *</label>
-                                    <input type="email" name="email_recuperacao" class="form-control" required>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Telefone Principal *</label>
+                                            <input type="tel" name="telefone" class="form-control check-exists {% if error_field == 'telefone' %}is-invalid{% endif %}" data-campo="telefone" required value="{{ form_data.telefone|default:'' }}">
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Telefone Alternativo (Opcional)</label>
+                                            <input type="tel" name="telefone_alternativo" class="form-control check-exists" data-campo="telefone" value="{{ form_data.telefone_alternativo|default:'' }}">
+                                        </div>
+                                        <div class="col-md-12 mb-3">
+                                            <label class="form-label">E-mail *</label>
+                                            <input type="email" name="email_recuperacao" id="email_recuperacao" class="form-control check-exists {% if error_field == 'email_recuperacao' %}is-invalid{% endif %}" data-campo="email_recuperacao" required value="{{ form_data.email_recuperacao|default:'' }}">
                                     <div class="mt-3 p-3 bg-light rounded border">
                                         <p class="mb-2 fw-bold">📌 O e-mail será usado como:</p>
                                         <ul class="mb-0 list-unstyled ps-3">
@@ -196,17 +202,17 @@
                                     <label class="form-label">Nível Pretendido *</label>
                                     <select name="nivel_academico" class="form-select" required>
                                         <option value="">Selecione o nível...</option>
-                                        <option value="Técnico">Técnico</option>
-                                        <option value="Licenciatura">Licenciatura</option>
-                                        <option value="Pós-graduação">Pós-graduação</option>
+                                        <option value="Técnico" {% if form_data.nivel_academico == 'Técnico' %}selected{% endif %}>Técnico</option>
+                                        <option value="Licenciatura" {% if form_data.nivel_academico == 'Licenciatura' %}selected{% endif %}>Licenciatura</option>
+                                        <option value="Pós-graduação" {% if form_data.nivel_academico == 'Pós-graduação' %}selected{% endif %}>Pós-graduação</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Curso Pretendido *</label>
                                     <select name="curso" class="form-select" required>
                                         <option value="">Selecione um curso...</option>
-                                        {% for curso in cursos %}
-                                            <option value="{{ curso.id }}">{{ curso.nome }}</option>
+                                        {% for curso_opt in cursos %}
+                                            <option value="{{ curso_opt.id }}" {% if form_data.curso|slugify == curso_opt.id|slugify %}selected{% endif %}>{{ curso_opt.nome }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -215,16 +221,16 @@
                                     <select name="ano_academico" id="id_ano_academico" class="form-select" required>
                                         <option value="">Selecione o ano...</option>
                                         {% for ano in anos_academicos %}
-                                            <option value="{{ ano.id }}">{{ ano.codigo }}</option>
+                                            <option value="{{ ano.id }}" {% if form_data.ano_academico|slugify == ano.id|slugify %}selected{% endif %}>{{ ano.codigo }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Turno *</label>
                                     <select name="turno" class="form-select" required>
-                                        <option value="Manhã">Manhã</option>
-                                        <option value="Tarde">Tarde</option>
-                                        <option value="Noite">Noite</option>
+                                        <option value="Manhã" {% if form_data.turno == 'Manhã' %}selected{% endif %}>Manhã</option>
+                                        <option value="Tarde" {% if form_data.turno == 'Tarde' %}selected{% endif %}>Tarde</option>
+                                        <option value="Noite" {% if form_data.turno == 'Noite' %}selected{% endif %}>Noite</option>
                                     </select>
                                 </div>
                             </div>
@@ -260,16 +266,47 @@
                             </div>
                         </div>
 
-                        <!-- Etapa 5: Configurações -->
+                        <!-- Etapa 5: Pagamento e Configurações -->
                         <div class="form-step" data-step="5">
-                            <h5 class="mb-3"><i class="bi bi-gear me-2"></i>Configurações</h5>
+                            <h5 class="mb-3"><i class="bi bi-cash-coin me-2"></i>Pagamento da Inscrição</h5>
+                            <div class="row">
+                                <div class="col-md-12 mb-4">
+                                    <div class="alert alert-warning border-0 bg-warning bg-opacity-10 text-dark">
+                                        <i class="bi bi-info-circle-fill me-2"></i>
+                                        Para validar sua inscrição, é necessário anexar o comprovativo de pagamento ou usar uma referência.
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Método de Pagamento *</label>
+                                    <select name="metodo_pagamento" id="id_metodo_pagamento" class="form-select" required>
+                                        <option value="multicaixa">Multicaixa (Transferência/Depósito)</option>
+                                        <option value="referencia">Referência Bancária (PREPARAÇÃO)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3" id="div_numero_comprovante">
+                                    <label class="form-label">Número do Comprovante *</label>
+                                    <input type="text" name="numero_comprovante" class="form-control" placeholder="Digite o nº do comprovativo">
+                                </div>
+                                <div class="col-md-12 mb-3" id="div_comprovativo_file">
+                                    <label class="form-label">Anexar Comprovativo (PDF/Imagem) *</label>
+                                    <input type="file" name="comprovativo_pagamento" class="form-control" accept="image/*,.pdf">
+                                </div>
+                                <div class="col-md-12 mb-3 d-none" id="div_referencia_info">
+                                    <div class="p-3 bg-light border rounded">
+                                        <p class="mb-1"><strong>Entidade:</strong> 00000</p>
+                                        <p class="mb-1"><strong>Referência:</strong> <span class="text-primary fw-bold" id="ref_gerada">---</span></p>
+                                        <p class="mb-0 small text-muted">A referência será validada automaticamente após o pagamento.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h5 class="mt-4 mb-3"><i class="bi bi-gear me-2"></i>Configurações Finais</h5>
                             <div class="row">
                                 <div class="col-md-12 mb-3">
                                     <div class="form-check form-switch mb-3">
-                                        <input class="form-check-input" type="checkbox" name="receber_emails_sistema" id="id_receber_emails_sistema" checked>
+                                        <input class="form-check-input" type="checkbox" name="receber_emails_sistema" id="id_receber_emails_sistema" {% if form_data.receber_emails_sistema %}checked{% endif %}>
                                         <label class="form-check-label" for="id_receber_emails_sistema">Deseja receber emails do sistema?</label>
                                     </div>
-                                    <small class="text-muted">Ao ativar esta opção, o estudante receberá notificações automáticas.</small>
                                 </div>
                             </div>
                         </div>
@@ -480,7 +517,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Wizard Logic
-    let currentStep = 1;
+    let currentStep = {{ current_step|default:1 }};
     const btnNext = document.getElementById('btn_next');
     const btnPrev = document.getElementById('btn_prev');
     const btnSubmit = document.getElementById('btn_submit');
@@ -491,42 +528,54 @@ document.addEventListener('DOMContentLoaded', () => {
             s.classList.toggle('active', s.dataset.step == currentStep);
             s.classList.toggle('completed', s.dataset.step < currentStep);
         });
+
+        // Atualizar Barra de Progresso Dinâmica
+        const progressPercent = (currentStep / 5) * 100;
+        document.getElementById('wizard_progress_bar').style.width = progressPercent + '%';
+
         btnPrev.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
         btnNext.classList.toggle('d-none', currentStep === 5);
         btnSubmit.classList.toggle('d-none', currentStep !== 5);
     }
 
-    btnNext.addEventListener('click', () => {
-        const step = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+    // Inicializar o wizard no passo correto
+    updateWizard();
+
+    btnNext.addEventListener('click', async () => {
+        const stepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
         let valid = true;
-        step.querySelectorAll('[required]').forEach(i => {
-            if (!i.value) { i.classList.add('is-invalid'); valid = false; }
-            else i.classList.remove('is-invalid');
+        
+        // Limpar mensagens de erro anteriores
+        stepEl.querySelectorAll('.invalid-feedback.ajax-error').forEach(e => e.remove());
+        stepEl.querySelectorAll('.is-invalid').forEach(i => i.classList.remove('is-invalid'));
+
+        stepEl.querySelectorAll('[required]').forEach(i => {
+            if (!i.value.trim()) { i.classList.add('is-invalid'); valid = false; }
         });
 
-        if (currentStep === 2 && valid) {
-            // Sincronizar e-mail com username
-            const email = document.getElementsByName('email_recuperacao')[0].value;
-            document.getElementById('id_username').value = email;
-        }
+        if (!valid) return;
 
-        if (currentStep === 3 && valid) {
-            // Gerar senha automática: Apelido + Ano de Nascimento
-            const apelido = document.getElementById('id_apelido').value || 'estudante';
-            const dataNascimento = document.getElementById('data_nascimento').value;
-            let anoInvertido = '0000';
-            if (dataNascimento) {
-                const ano = dataNascimento.split('-')[0];
-                anoInvertido = ano.split('').reverse().join('');
+        // Validação de Duplicidade (Lado do Cliente)
+        if (currentStep === 1) {
+            const biInput = document.getElementById('bilhete_identidade');
+            if (biInput && biInput.value) {
+                try {
+                    const response = await fetch(`/api/verificar-existente/?q=${biInput.value}&campo=bilhete_identidade`);
+                    const data = await response.json();
+                    if (data.encontrado) {
+                        biInput.classList.add('is-invalid');
+                        const error = document.createElement('div');
+                        error.className = 'invalid-feedback ajax-error';
+                        error.textContent = 'Este BI já está registrado no sistema.';
+                        biInput.after(error);
+                        valid = false;
+                    }
+                } catch (e) { console.error("Erro na validação de BI"); }
             }
-            const autoPass = apelido.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '') + anoInvertido;
-            document.getElementById('id_password_display').value = autoPass;
-            document.getElementById('id_password').value = autoPass;
-        }
-
-        if (currentStep === 1 && valid) {
+            
+            // Validação de BI vencido
             const dataValidade = document.getElementById('id_data_validade_bi').value;
-            if (dataValidade) {
+            if (dataValidade && valid) {
                 const validade = new Date(dataValidade);
                 const hoje = new Date();
                 hoje.setHours(0, 0, 0, 0);
@@ -567,8 +616,65 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        if (currentStep === 2 && valid) {
+            const emailInput = document.getElementsByName('email_recuperacao')[0];
+            if (emailInput && emailInput.value) {
+                try {
+                    const response = await fetch(`/api/verificar-username/?q=${emailInput.value}`);
+                    const data = await response.json();
+                    if (!data.disponivel) {
+                        emailInput.classList.add('is-invalid');
+                        const error = document.createElement('div');
+                        error.className = 'invalid-feedback ajax-error';
+                        error.textContent = 'Este e-mail já possui uma conta no sistema.';
+                        emailInput.after(error);
+                        valid = false;
+                    }
+                } catch (e) { console.error("Erro na validação de e-mail"); }
+            }
+            if (valid) {
+                document.getElementById('id_username').value = emailInput.value;
+            }
+        }
+
+        if (currentStep === 3 && valid) {
+            // Gerar senha automática: Apelido + Ano de Nascimento
+            const apelido = document.getElementById('id_apelido').value || 'estudante';
+            const dataNascimento = document.getElementById('data_nascimento').value;
+            let anoInvertido = '0000';
+            if (dataNascimento) {
+                const ano = dataNascimento.split('-')[0];
+                anoInvertido = ano.split('').reverse().join('');
+            }
+            const autoPass = apelido.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '') + anoInvertido;
+            document.getElementById('id_password_display').value = autoPass;
+            document.getElementById('id_password').value = autoPass;
+        }
+
         if (valid && currentStep < 5) { currentStep++; updateWizard(); }
     });
+
+    const metodoPagamento = document.getElementById('id_metodo_pagamento');
+    const divNumeroComprovante = document.getElementById('div_numero_comprovante');
+    const divComprovativoFile = document.getElementById('div_comprovativo_file');
+    const divReferenciaInfo = document.getElementById('div_referencia_info');
+    const refGerada = document.getElementById('ref_gerada');
+
+    if (metodoPagamento) {
+        metodoPagamento.addEventListener('change', function() {
+            if (this.value === 'referencia') {
+                divNumeroComprovante.classList.add('d-none');
+                divComprovativoFile.classList.add('d-none');
+                divReferenciaInfo.classList.remove('d-none');
+                const docNum = document.getElementById('bilhete_identidade').value || '000000';
+                refGerada.innerText = '999' + docNum.substring(0, 6).replace(/\D/g, '') + '001';
+            } else {
+                divNumeroComprovante.classList.remove('d-none');
+                divComprovativoFile.classList.remove('d-none');
+                divReferenciaInfo.classList.add('d-none');
+            }
+        });
+    }
 
     btnPrev.addEventListener('click', () => { if (currentStep > 1) { currentStep--; updateWizard(); } });
 

@@ -12,9 +12,10 @@ from django.db import IntegrityError
 import json
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import cm
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
-from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from reportlab.lib.units import cm, mm
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+from reportlab.lib import colors
 from io import BytesIO
 from datetime import datetime, date
 from django.conf import settings
@@ -93,24 +94,38 @@ def inscricao_create(request, curso_id):
         context['prerequisitos'] = curso.prerequisitos.all()
     
     if request.method == 'POST':
+        # Adicionar dados do POST ao contexto para persistência
+        context.update({
+            'form_data': request.POST
+        })
         # ... (validações BI, email, telefone permanecem iguais)
         bilhete_identidade = request.POST.get('bilhete_identidade')
         if bilhete_identidade and Inscricao.objects.filter(bilhete_identidade=bilhete_identidade).exists():
             messages.error(request, 'Este Bilhete de Identidade já está registrado no sistema!')
+            context['current_step'] = 1
+            context['error_field'] = 'bilhete_identidade'
             return render(request, 'core/inscricao_form.html', context)
         
         email_check = request.POST.get('email_recuperacao') or request.POST.get('email')
         if email_check and Inscricao.objects.filter(email=email_check).exists():
             messages.error(request, 'Este email já está sendo usado em outra inscrição!')
+            context['current_step'] = 2
+            context['error_field'] = 'email_recuperacao'
             return render(request, 'core/inscricao_form.html', context)
         
         telefone = request.POST.get('telefone')
         if telefone and Inscricao.objects.filter(telefone=telefone).exists():
             messages.error(request, 'Este telefone já está sendo usado em outra inscrição!')
+            context['current_step'] = 2
+            context['error_field'] = 'telefone'
             return render(request, 'core/inscricao_form.html', context)
 
         # 1. Informações Pessoais
         try:
+            # Obter escola selecionada
+            escola_id = request.POST.get('escola')
+            escola = get_object_or_404(Escola, id=escola_id) if escola_id else None
+
             # Criar usuário para o candidato
             username = request.POST.get('username')
             password = request.POST.get('password')
@@ -118,6 +133,8 @@ def inscricao_create(request, curso_id):
             
             if User.objects.filter(username=username).exists():
                 messages.error(request, 'Este e-mail já possui uma conta no sistema!')
+                context['current_step'] = 2
+                context['error_field'] = 'email_recuperacao'
                 return render(request, 'core/inscricao_form.html', context)
             
             user = User.objects.create_user(
@@ -151,7 +168,9 @@ def inscricao_create(request, curso_id):
                 endereco=request.POST.get('endereco', 'N/A'),
                 telefone=request.POST.get('telefone'),
                 email=request.POST.get('email_recuperacao') or request.POST.get('email'),
-                # Documentos
+                criado_por=request.user if request.user.is_authenticated else None,
+                # Foto e Documentos
+                foto=request.FILES.get('foto'),
                 arquivo_bi=request.FILES.get('arquivo_bi'),
                 arquivo_certificado=request.FILES.get('arquivo_certificado'),
                 status_inscricao='submetida',
@@ -162,6 +181,8 @@ def inscricao_create(request, curso_id):
                 historico_escolar=request.POST.get('historico_escolar', ''),
                 turno_preferencial=request.POST.get('turno', 'Manhã'),
                 # 3. Informações Financeiras
+                metodo_pagamento=request.POST.get('metodo_pagamento', 'multicaixa'),
+                comprovativo_pagamento=request.FILES.get('comprovativo_pagamento'),
                 numero_comprovante=request.POST.get('numero_comprovante', ''),
                 responsavel_financeiro_nome=request.POST.get('responsavel_financeiro_nome', ''),
                 responsavel_financeiro_telefone=request.POST.get('responsavel_financeiro_telefone', ''),
@@ -176,6 +197,21 @@ def inscricao_create(request, curso_id):
             )
             
             inscricao.save()
+
+            # Se houver foto em base64 (capturada pela webcam), salvar agora
+            foto_base64 = request.POST.get('foto_base64')
+            if foto_base64 and not request.FILES.get('foto'):
+                try:
+                    import base64
+                    from django.core.files.base import ContentFile
+                    format, imgstr = foto_base64.split(';base64,')
+                    ext = format.split('/')[-1]
+                    data = ContentFile(base64.b64decode(imgstr), name=f'inscricao_{inscricao.numero_inscricao}.{ext}')
+                    inscricao.foto = data
+                    inscricao.save()
+                except Exception as e:
+                    print(f"Erro ao salvar foto base64: {e}")
+
         except Exception as e:
             messages.error(request, f'Erro ao processar inscrição: {str(e)}')
             return render(request, 'core/inscricao_form.html', context)
@@ -220,96 +256,349 @@ def inscricao_buscar(request):
     
     return render(request, 'core/inscricao_buscar.html')
 
+import qrcode
+from django.core.files.base import ContentFile
+
+def gerar_lista_inscritos_pdf(request):
+    """Gera uma lista de inscritos em PDF para um curso específico"""
+    curso_id = request.GET.get('curso')
+    if not curso_id:
+        messages.error(request, 'Curso não especificado.')
+        return redirect('lancamento_notas')
+    
+    curso = get_object_or_404(Curso, id=curso_id)
+    inscricoes = Inscricao.objects.filter(curso=curso).order_by('nome_completo')
+    config = ConfiguracaoEscola.objects.first()
+    
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=2*cm, bottomMargin=2*cm, leftMargin=2*cm, rightMargin=2*cm)
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    # Título
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=16,
+        alignment=TA_CENTER,
+        spaceAfter=20
+    )
+    elements.append(Paragraph(f"Lista de Inscritos - {curso.nome}", title_style))
+    
+    # Tabela de Estudantes
+    data = [['Nome Completo', 'BI', 'Nota', 'Estado']]
+    for i in inscricoes:
+        estado = "Aprovado" if i.aprovado else ("Não Selecionado" if i.nota_teste is not None else "Sem Nota")
+        data.append([
+            i.nome_completo,
+            i.bilhete_identidade,
+            str(i.nota_teste) if i.nota_teste is not None else "-",
+            estado
+        ])
+    
+    t = Table(data, colWidths=[8*cm, 4*cm, 2*cm, 3*cm])
+    t.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e3a8a')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('FONTSIZE', (0, 1), (-1, -1), 9),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+    elements.append(t)
+    
+    doc.build(elements)
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=True, filename=f'lista_inscritos_{curso.nome}.pdf')
+
 def gerar_pdf_confirmacao(request, numero):
     inscricao = get_object_or_404(Inscricao, numero_inscricao=numero)
     config = ConfiguracaoEscola.objects.first()
     
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=2*cm, bottomMargin=2*cm)
+    # Margens reduzidas para caber duas partes
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=1*cm, bottomMargin=1*cm, leftMargin=1.5*cm, rightMargin=1.5*cm)
     story = []
     styles = getSampleStyleSheet()
     
-    title_style = ParagraphStyle(
-        'CustomTitle',
-        parent=styles['Heading1'],
-        fontSize=18,
-        textColor='#1a1a1a',
-        spaceAfter=30,
-        alignment=TA_CENTER
-    )
-    
-    heading_style = ParagraphStyle(
-        'CustomHeading',
-        parent=styles['Heading2'],
-        fontSize=14,
-        textColor='#333333',
-        spaceAfter=12,
-        alignment=TA_LEFT
-    )
-    
-    normal_style = ParagraphStyle(
-        'CustomNormal',
-        parent=styles['Normal'],
-        fontSize=11,
-        textColor='#000000',
-        spaceAfter=8,
-        alignment=TA_LEFT
-    )
-    
-    logo_path = os.path.join(settings.BASE_DIR, 'core', 'static', 'core', 'images', 'siga-logo.png')
-    if os.path.exists(logo_path):
+    def criar_parte(titulo_adicional=""):
+        parte = []
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=16,
+            textColor='#1a1a1a',
+            alignment=TA_CENTER
+        )
+        
+        heading_style = ParagraphStyle(
+            'CustomHeading',
+            parent=styles['Heading2'],
+            fontSize=12,
+            textColor='#333333',
+            alignment=TA_CENTER
+        )
+        
+        normal_style = ParagraphStyle(
+            'CustomNormal',
+            parent=styles['Normal'],
+            fontSize=10,
+            textColor='#000000',
+            alignment=TA_LEFT
+        )
+
+        # Logo
+        logo_path = os.path.join(settings.BASE_DIR, 'core', 'static', 'core', 'images', 'siga-logo.png')
+        if os.path.exists(logo_path):
+            try:
+                img = Image(logo_path, width=3*cm, height=1.2*cm)
+                img.hAlign = 'CENTER'
+                parte.append(img)
+            except: pass
+        
+        escola_nome = config.nome_escola if config else "Sistema Escolar"
+        parte.append(Paragraph(escola_nome.upper(), title_style))
+        parte.append(Paragraph(f"COMPROVATIVO DE INSCRIÇÃO {titulo_adicional}", heading_style))
+        parte.append(Spacer(1, 0.3*cm))
+        
+        # QR Code
+        # Dados: RECIBO, CANDIDATURA, VALOR, ANO LECTIVO
+        valor_inscricao = "5.000,00 Kz" # Valor padrão ou buscar do modelo se existir
+        ano_lectivo = str(inscricao.ano_academico) if hasattr(inscricao, 'ano_academico') else "2025/2026"
+        qr_data = f"RECIBO: {inscricao.numero_inscricao}\nCANDIDATURA: {inscricao.nome_completo}\nVALOR: {valor_inscricao}\nANO: {ano_lectivo}"
+        
         try:
-            img = Image(logo_path, width=4*cm, height=1.5*cm)
-            img.hAlign = 'CENTER'
-            story.append(img)
-            story.append(Spacer(1, 0.5*cm))
-        except:
-            pass
-    
-    escola_nome = config.nome_escola if config else "Sistema Escolar"
-    story.append(Paragraph(escola_nome, title_style))
-    story.append(Paragraph("CONFIRMAÇÃO DE INSCRIÇÃO", heading_style))
-    story.append(Spacer(1, 0.5*cm))
-    
-    if config and config.template_confirmacao_inscricao:
-        template = config.template_confirmacao_inscricao
-    else:
-        template = "CONFIRMAÇÃO DE INSCRIÇÃO\n\nNome: {nome}\nCurso: {curso}\nNúmero de Inscrição: {numero}\nData: {data}"
-    
-    conteudo = template.format(
-        nome=inscricao.nome_completo,
-        curso=inscricao.curso.nome,
-        numero=inscricao.numero_inscricao,
-        data=inscricao.data_inscricao.strftime('%d/%m/%Y')
-    )
-    
-    for linha in conteudo.split('\n'):
-        if linha.strip():
-            story.append(Paragraph(linha, normal_style))
-    
-    story.append(Spacer(1, 1*cm))
-    story.append(Paragraph(f"Data de Nascimento: {inscricao.data_nascimento.strftime('%d/%m/%Y')}", normal_style))
-    story.append(Paragraph(f"Bilhete de Identidade: {inscricao.bilhete_identidade}", normal_style))
-    story.append(Paragraph(f"Telefone: {inscricao.telefone}", normal_style))
-    if inscricao.email:
-        story.append(Paragraph(f"Email: {inscricao.email}", normal_style))
-    
-    if inscricao.nota_teste is not None:
-        story.append(Spacer(1, 0.5*cm))
-        story.append(Paragraph(f"Nota do Teste: {inscricao.nota_teste}", normal_style))
-        status = "APROVADO" if inscricao.aprovado else "NÃO APROVADO"
-        story.append(Paragraph(f"Status: {status}", normal_style))
+            from qrcode.main import QRCode
+            from reportlab.platypus import Table, TableStyle
+            qr = QRCode(version=1, box_size=10, border=1)
+            qr.add_data(qr_data)
+            qr.make(fit=True)
+            img_qr = qr.make_image(fill_color="black", back_color="white")
+            
+            qr_buffer = BytesIO()
+            img_qr.save(qr_buffer, format='PNG')
+            qr_buffer.seek(0)
+            qr_img = Image(qr_buffer, width=3*cm, height=3*cm)
+            qr_img.hAlign = 'RIGHT'
+        except Exception as e:
+            print(f"Erro QR Code: {e}")
+            qr_img = Spacer(3*cm, 3*cm)
+
+        # Tabela de dados
+        dados_tabela = [
+            [Paragraph(f"<b>Candidato:</b> {inscricao.nome_completo}", normal_style), qr_img],
+            [Paragraph(f"<b>Curso:</b> {inscricao.curso.nome}", normal_style), ""],
+            [Paragraph(f"<b>Inscrição Nº:</b> {inscricao.numero_inscricao}", normal_style), ""],
+            [Paragraph(f"<b>Data:</b> {inscricao.data_inscricao.strftime('%d/%m/%Y')}", normal_style), ""],
+            [Paragraph(f"<b>BI:</b> {inscricao.bilhete_identidade}", normal_style), ""],
+            [Paragraph(f"<b>Valor Pago:</b> {valor_inscricao}", normal_style), ""],
+        ]
+        
+        from reportlab.platypus import Table, TableStyle
+        t = Table(dados_tabela, colWidths=[12*cm, 4*cm])
+        t.setStyle(TableStyle([
+            ('VALIGN', (0,0), (-1,-1), 'TOP'),
+            ('SPAN', (1,0), (1,5)),
+            ('ALIGN', (1,0), (1,5), 'RIGHT'),
+        ]))
+        parte.append(t)
+        
+        parte.append(Spacer(1, 0.5*cm))
+        parte.append(Paragraph("-" * 100, normal_style))
+        parte.append(Paragraph(f"<font size='8'>Autenticado por: {request.user.get_full_name() or request.user.username} em {datetime.now().strftime('%d/%m/%Y %H:%M')}</font>", normal_style))
+        
+        return parte
+
+    # Parte 1: Instituição
+    story.extend(criar_parte("(VIA INSTITUIÇÃO)"))
+    story.append(Spacer(1, 1.5*cm))
+    story.append(Paragraph("-" * 80 + " CORTE AQUI " + "-" * 80, ParagraphStyle('Corte', alignment=TA_CENTER, fontSize=8)))
+    story.append(Spacer(1, 1.5*cm))
+    # Parte 2: Estudante
+    story.extend(criar_parte("(VIA ESTUDANTE)"))
     
     doc.build(story)
-    
     buffer.seek(0)
     response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="confirmacao_{inscricao.numero_inscricao}.pdf"'
+    response['Content-Disposition'] = f'attachment; filename="comprovativo_{inscricao.numero_inscricao}.pdf"'
+    return response
+
+def gerar_recibo_termico(request, numero):
+    """Gera um recibo em formato PDF otimizado para impressoras térmicas (80mm)"""
+    inscricao = get_object_or_404(Inscricao, numero_inscricao=numero)
+    config = ConfiguracaoEscola.objects.first()
     
+    # Largura de 80mm em pontos (1mm ≈ 2.83 pontos) -> ~226 pontos
+    largura_recibo = 80 * 1.0 * mm 
+    buffer = BytesIO()
+    
+    # Altura dinâmica ou fixa grande o suficiente, margens mínimas
+    doc = SimpleDocTemplate(
+        buffer, 
+        pagesize=(largura_recibo, 150 * mm),
+        rightMargin=2*mm, 
+        leftMargin=2*mm, 
+        topMargin=2*mm, 
+        bottomMargin=2*mm
+    )
+    
+    story = []
+    styles = getSampleStyleSheet()
+    
+    # Estilos específicos para recibo térmico
+    estilo_cabecalho = ParagraphStyle(
+        'TermicoCabecalho',
+        parent=styles['Normal'],
+        fontSize=10,
+        alignment=TA_CENTER,
+        leading=12,
+        fontName='Helvetica-Bold'
+    )
+    
+    estilo_corpo = ParagraphStyle(
+        'TermicoCorpo',
+        parent=styles['Normal'],
+        fontSize=8,
+        alignment=TA_LEFT,
+        leading=10
+    )
+
+    estilo_negrito = ParagraphStyle(
+        'TermicoNegrito',
+        parent=estilo_corpo,
+        fontName='Helvetica-Bold'
+    )
+
+    escola_nome = config.nome_escola if config else "SIGA - GESTÃO ACADÉMICA"
+    story.append(Paragraph(escola_nome.upper(), estilo_cabecalho))
+    story.append(Paragraph("--------------------------------------------------", estilo_cabecalho))
+    story.append(Paragraph("COMPROVATIVO DE INSCRIÇÃO", estilo_cabecalho))
+    story.append(Paragraph(f"Nº: {inscricao.numero_inscricao}", estilo_cabecalho))
+    story.append(Paragraph("--------------------------------------------------", estilo_cabecalho))
+    story.append(Spacer(1, 2*mm))
+
+    story.append(Paragraph(f"<b>CANDIDATO:</b> {inscricao.nome_completo.upper()}", estilo_corpo))
+    story.append(Paragraph(f"<b>CURSO:</b> {inscricao.curso.nome}", estilo_corpo))
+    story.append(Paragraph(f"<b>DATA:</b> {inscricao.data_inscricao.strftime('%d/%m/%Y %H:%i')}", estilo_corpo))
+    story.append(Paragraph(f"<b>DOC. ID:</b> {inscricao.bilhete_identidade}", estilo_corpo))
+    
+    story.append(Spacer(1, 2*mm))
+    story.append(Paragraph("--------------------------------------------------", estilo_cabecalho))
+    
+    if inscricao.criado_por:
+        nome_atendente = inscricao.criado_por.get_full_name() or inscricao.criado_por.username
+        story.append(Paragraph(f"Atendente: {nome_atendente}", estilo_corpo))
+    
+    story.append(Spacer(1, 5*mm))
+    story.append(Paragraph("OBRIGADO PELA PREFERÊNCIA", estilo_cabecalho))
+    
+    doc.build(story)
+    buffer.seek(0)
+    
+    response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="recibo_{inscricao.numero_inscricao}.pdf"'
     return response
 
 @login_required
 def admissao_estudantes(request):
+    cursos = Curso.objects.filter(ativo=True)
+    config = ConfiguracaoEscola.objects.first()
+    return render(request, 'core/admissao.html', {
+        'cursos': cursos,
+        'config': config
+    })
+
+@login_required
+def lista_inscritos(request):
+    """Lista todos os estudantes inscritos (Candidatos)"""
+    inscricoes = Inscricao.objects.all().order_by('-data_inscricao')
+    return render(request, 'core/lista_inscritos.html', {'inscricoes': inscricoes})
+
+def perfil_candidato_login(request):
+    """Área para candidato buscar seu perfil pelo BI ou Número de Inscrição"""
+    if request.method == 'POST':
+        query = request.POST.get('identificador', '').strip()
+        inscricao = Inscricao.objects.filter(Q(numero_inscricao=query) | Q(bilhete_identidade=query)).first()
+        if inscricao:
+            request.session['candidato_id'] = inscricao.id
+            return redirect('painel_candidato')
+        messages.error(request, 'Candidato não encontrado.')
+    return render(request, 'core/candidato_login.html')
+
+def painel_candidato(request):
+    """Painel onde o candidato vê o estado da sua candidatura"""
+    candidato_id = request.session.get('candidato_id')
+    if not candidato_id:
+        return redirect('perfil_candidato_login')
+    inscricao = get_object_or_404(Inscricao, id=candidato_id)
+    return render(request, 'core/painel_candidato.html', {'inscricao': inscricao})
+
+@login_required
+def lancamento_notas(request):
+    """Área para lançar notas dos testes de admissão"""
+    cursos = Curso.objects.filter(ativo=True)
+    if request.method == 'POST':
+        # Verificar permissão: Se não for superuser, não pode alterar se já tiver aprovado? 
+        # Ou simplesmente permitir se for superuser.
+        for key, value in request.POST.items():
+            if key.startswith('nota_'):
+                inscricao_id = key.split('_')[1]
+                try:
+                    raw_value = value.strip().replace(',', '.')
+                    if raw_value == '':
+                        # Limpar a nota se o campo estiver vazio
+                        Inscricao.objects.filter(id=inscricao_id).update(nota_teste=None, aprovado=False)
+                    else:
+                        nota = float(raw_value)
+                        Inscricao.objects.filter(id=inscricao_id).update(nota_teste=nota)
+                except (ValueError, Inscricao.DoesNotExist): pass
+        messages.success(request, 'Notas atualizadas com sucesso!')
+        return redirect(f"{request.path}?curso={request.POST.get('curso_id', '')}")
+    
+    curso_id = request.GET.get('curso')
+    inscricoes = []
+    if curso_id:
+        inscricoes = Inscricao.objects.filter(curso_id=curso_id)
+    
+    return render(request, 'core/lancamento_notas.html', {
+        'cursos': cursos,
+        'inscricoes': inscricoes,
+        'curso_selecionado': curso_id
+    })
+
+@login_required
+def processar_aprovacao_vagas(request):
+    """Lógica de aprovação: Maior nota até preencher as vagas do curso"""
+    if request.method == 'POST':
+        curso_id = request.POST.get('curso_id')
+        curso = get_object_or_404(Curso, id=curso_id)
+        
+        # Resetar aprovações anteriores para este curso
+        Inscricao.objects.filter(curso=curso).update(aprovado=False)
+        
+        # Pegar inscritos com nota válida, ordenados pela maior nota
+        candidatos = Inscricao.objects.filter(
+            curso=curso, 
+            nota_teste__isnull=False,
+            nota_teste__gte=curso.nota_minima
+        ).order_by('-nota_teste')
+        
+        vagas = curso.vagas
+        aprovados_count = 0
+        
+        for i, cand in enumerate(candidatos):
+            if i < vagas:
+                cand.aprovado = True
+                cand.data_resultado = timezone.now()
+                cand.save()
+                aprovados_count += 1
+        
+        messages.success(request, f'Processamento concluído: {aprovados_count} candidatos aprovados no curso {curso.nome}.')
+        return redirect('lancamento_notas')
+    return redirect('painel_principal')
     cursos = Curso.objects.filter(ativo=True)
     config = ConfiguracaoEscola.objects.first()
     return render(request, 'core/admissao.html', {
@@ -325,6 +614,7 @@ def admissao_inscricao(request):
     if request.method == 'POST':
         curso_id = request.POST.get('curso_id')
         if curso_id:
+            # Redireciona diretamente para o formulário de inscrição do curso selecionado
             return redirect('inscricao_create', curso_id=curso_id)
     
     return render(request, 'core/admissao_inscricao.html', {
@@ -468,25 +758,40 @@ def verificar_existente(request):
     query = request.GET.get('q', '').strip()
     campo = request.GET.get('campo', '').strip()
     
-    if len(query) < 3 or campo not in ['nome_completo', 'bilhete_identidade', 'telefone']:
+    if len(query) < 3:
         return JsonResponse({'encontrado': False})
     
-    if campo == 'nome_completo':
-        existente = Inscricao.objects.filter(nome_completo__icontains=query).first()
-    elif campo == 'bilhete_identidade':
-        existente = Inscricao.objects.filter(bilhete_identidade=query).first()
-    else: # telefone
-        existente = Inscricao.objects.filter(telefone__contains=query).first()
+    # Mapeamento de campos para validação universal
+    filtros = {
+        'bilhete_identidade': Q(bilhete_identidade=query),
+        'telefone': Q(telefone=query) | Q(telefone_alternativo=query),
+        'email_recuperacao': Q(email=query) | Q(email_recuperacao=query),
+        'nome_completo': Q(nome_completo__icontains=query)
+    }
+    
+    if campo not in filtros:
+        return JsonResponse({'encontrado': False})
+        
+    existente = Inscricao.objects.filter(filtros[campo]).first()
         
     if existente:
         return JsonResponse({
             'encontrado': True,
-            'valor': getattr(existente, campo),
+            'valor': query,
             'nome': existente.nome_completo,
             'id': existente.id
         })
         
     return JsonResponse({'encontrado': False})
+
+@require_http_methods(["GET"])
+def verificar_username_disponivel(request):
+    username = request.GET.get('q', '').strip()
+    if not username:
+        return JsonResponse({'disponivel': True})
+    
+    existe = User.objects.filter(username=username).exists()
+    return JsonResponse({'disponivel': not existe})
 
 @require_http_methods(["GET"])
 def escolas_autocomplete(request):
@@ -1177,6 +1482,14 @@ def painel_principal(request):
     
     subscricao = Subscricao.objects.filter(estado__in=['ativo', 'teste']).first()
     
+    # Dados para o gráfico de inscrições por curso
+    from django.db.models import Count
+    estatisticas_cursos = Curso.objects.filter(ativo=True).annotate(total_inscritos=Count('inscricoes'))
+    dados_grafico = {
+        'labels': [c.nome for c in estatisticas_cursos],
+        'valores': [c.total_inscritos for c in estatisticas_cursos]
+    }
+
     context = {
         'total_inscricoes': total_inscricoes,
         'total_aprovados': total_aprovados,
@@ -1187,7 +1500,8 @@ def painel_principal(request):
         'notificacoes_nao_lidas': notificacoes_nao_lidas,
         'notificacoes_recentes': notificacoes_recentes,
         'subscricao': subscricao,
-        'now': date.today()
+        'now': date.today(),
+        'dados_grafico': json.dumps(dados_grafico)
     }
     return render(request, 'core/painel_principal.html', context)
 

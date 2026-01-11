@@ -1,0 +1,99 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">Lançamento de Notas e Aprovação</h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" class="row g-3 mb-4">
+                <div class="col-md-8">
+                    <select name="curso" class="form-select">
+                        <option value="">Selecione o Curso...</option>
+                        {% for c in cursos %}
+                        <option value="{{ c.id }}" {% if curso_selecionado == c.id|stringformat:"s" %}selected{% endif %}>{{ c.nome }} ({{ c.vagas }} vagas)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary w-100">Listar Candidatos</button>
+                </div>
+            </form>
+
+            {% if inscricoes %}
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="curso_id" value="{{ curso_selecionado }}">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nome</th>
+                                <th>BI</th>
+                                <th style="width: 150px;">Nota do Teste (0-20)</th>
+                                <th>Estado Atual</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in inscricoes %}
+                            <tr>
+                                <td>{{ i.nome_completo }}</td>
+                                <td>{{ i.bilhete_identidade }}</td>
+                                <td>
+                                    <input type="text" name="nota_{{ i.id }}" value="{{ i.nota_teste|default:'' }}" class="form-control form-control-sm text-center">
+                                </td>
+                                <td>
+                                    {% if i.aprovado %}<span class="badge bg-success">Aprovado</span>
+                                    {% elif i.nota_teste is not None %}<span class="badge bg-danger">Não Selecionado</span>
+                                    {% else %}<span class="badge bg-secondary">Sem Nota</span>{% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="d-flex justify-content-between mt-3 gap-2">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">Salvar Notas</button>
+                        {% if curso_selecionado %}
+                        <a href="{% url 'gerar_lista_inscritos_pdf' %}?curso={{ curso_selecionado }}" class="btn btn-outline-primary d-inline-flex align-items-center">
+                            <i class="bi bi-file-earmark-pdf me-2"></i>Gerar Lista PDF
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% if curso_selecionado %}
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalAprovar">
+                        Processar Aprovações por Vagas
+                    </button>
+                    {% endif %}
+                </div>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmação -->
+<div class="modal fade" id="modalAprovar" tabindex="-1">
+    <div class="modal-dialog">
+        <form method="POST" action="{% url 'processar_aprovacao_vagas' %}">
+            {% csrf_token %}
+            <input type="hidden" name="curso_id" value="{{ curso_selecionado }}">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Processamento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>O sistema irá aprovar automaticamente os candidatos com as <strong>maiores notas</strong> dentro do número de vagas deste curso.</p>
+                    <p class="text-danger small">Atenção: Notas abaixo de 10 não serão consideradas.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Processar Agora</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

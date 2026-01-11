@@ -215,6 +215,15 @@ class Documento(models.Model):
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True)
     
+    @classmethod
+    def obter_variaveis_disponiveis(cls, *args, **kwargs):
+        return {
+            'Geral': ['{escola_nome}', '{data_atual}'],
+            'Inscrição': ['{nome_candidato}', '{numero_inscricao}', '{curso_nome}', '{data_inscricao}'],
+            'Financeiro': ['{valor_pagamento}', '{data_pagamento}', '{numero_comprovante}'],
+            'Académico': ['{nome_estudante}', '{curso_nome}', '{semestre_atual}'],
+        }
+
     class Meta:
         verbose_name = "Documento"
         verbose_name_plural = "Documentos"
@@ -459,6 +468,7 @@ class Inscricao(models.Model):
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Usuário de Acesso")
     ano_academico = models.ForeignKey(AnoAcademico, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Ano Académico")
     periodo_lectivo = models.ForeignKey(PeriodoLectivo, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Período Lectivo")
+    criado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='inscricoes_criadas', verbose_name="Registado por")
     
     # Documentos
     arquivo_bi = models.FileField(
@@ -488,6 +498,14 @@ class Inscricao(models.Model):
     turno_preferencial = models.CharField(max_length=1, choices=TURNO_CHOICES, verbose_name="Turno Preferencial", default='M')
     
     # 3. Informações Financeiras
+    METODO_PAGAMENTO_CHOICES = [
+        ('referencia', 'Referência Bancária'),
+        ('multicaixa', 'Multicaixa (Transferência/Depósito)'),
+    ]
+    metodo_pagamento = models.CharField(max_length=20, choices=METODO_PAGAMENTO_CHOICES, default='multicaixa', verbose_name="Método de Pagamento")
+    comprovativo_pagamento = models.FileField(upload_to='estudantes/pagamentos/', blank=True, null=True, verbose_name="Comprovativo de Pagamento")
+    hash_seguranca = models.CharField(max_length=64, blank=True, editable=False, verbose_name="Hash de Segurança")
+    
     numero_comprovante = models.CharField(max_length=100, verbose_name="Número do Comprovante/Boleto", blank=True)
     responsavel_financeiro_nome = models.CharField(max_length=200, verbose_name="Nome do Responsável Financeiro", blank=True)
     responsavel_financeiro_telefone = models.CharField(max_length=20, verbose_name="Telefone do Responsável Financeiro", blank=True)
