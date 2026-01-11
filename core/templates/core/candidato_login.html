@@ -1,24 +1,79 @@
 {% extends 'core/base.html' %}
+
+{% block title %}Portal do Candidato - SIGE{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-dark text-white text-center">
-                    <h5 class="mb-0">Portal do Candidato</h5>
+<div class="container-fluid px-4 py-5" style="background-color: #f0f2f5; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+    <div class="w-100" style="max-width: 480px;">
+        <!-- Back Button -->
+        <div class="mb-4">
+            <a href="{% url 'nova_matricula' %}" class="d-inline-flex align-items-center text-decoration-none text-muted fw-medium transition-all hover-translate">
+                <div class="bg-dark shadow-sm rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                    <i class="bi bi-arrow-left text-white"></i>
                 </div>
-                <div class="card-body p-4">
-                    <p class="text-muted text-center">Insira seu BI ou Número de Inscrição para ver seu estado.</p>
-                    <form method="POST">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <input type="text" name="identificador" class="form-control form-control-lg text-center" placeholder="BI ou Nº Inscrição" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100 btn-lg">Consultar Perfil</button>
-                    </form>
+                <span>Dashboard</span>
+            </a>
+        </div>
+
+        <!-- Login Card -->
+        <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 24px;">
+            <div class="card-header bg-dark py-4 text-center border-0">
+                <div class="bg-white bg-opacity-10 d-inline-flex p-3 rounded-circle mb-3">
+                    <i class="bi bi-person-badge text-white fs-2"></i>
                 </div>
+                <h4 class="text-white fw-bold mb-0" style="letter-spacing: -0.5px;">Portal do Candidato</h4>
+                <p class="text-white-50 small mb-0 mt-1">Consulte o estado da sua candidatura</p>
             </div>
+            
+            <div class="card-body p-4 p-md-5 bg-white">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} border-0 small rounded-3 mb-4 d-flex align-items-center gap-2">
+                            <i class="bi bi-exclamation-circle-fill"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="POST" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted text-uppercase mb-2" style="letter-spacing: 0.5px;">Identificação do Candidato</label>
+                        <div class="input-group input-group-lg shadow-sm rounded-3 overflow-hidden border">
+                            <span class="input-group-text bg-light border-0 text-muted px-3"><i class="bi bi-shield-lock"></i></span>
+                            <input type="text" name="identificador" class="form-control border-0 bg-light py-3 fs-6 shadow-none" 
+                                   placeholder="Nº Inscrição ou Bilhete de Identidade" required>
+                        </div>
+                        <div class="form-text mt-2 text-center small text-muted">
+                            <i class="bi bi-info-circle me-1"></i> Use os dados fornecidos no ato da inscrição.
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" 
+                            style="border-radius: 14px; background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); border: none;">
+                        <span>Consultar Agora</span>
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+            
+            <div class="card-footer bg-light border-0 py-4 text-center">
+                <p class="mb-0 small text-muted">Ainda não tem uma conta? <a href="{% url 'nova_matricula' %}" class="text-primary fw-bold text-decoration-none">Inicie uma inscrição</a></p>
+            </div>
+        </div>
+
+        <!-- Footer Info -->
+        <div class="text-center mt-4">
+            <p class="text-muted small mb-0">&copy; 2026 SIGE - Gestão Educacional</p>
         </div>
     </div>
 </div>
+
+<style>
+    .transition-all { transition: all 0.3s ease; }
+    .hover-translate:hover { transform: translateX(-5px); color: #000 !important; }
+    .form-control:focus { background-color: #fff !important; }
+    .input-group:focus-within { border-color: #2563eb !important; ring: 4px rgba(37, 99, 235, 0.1); }
+    body { background-color: #f0f2f5 !important; }
+</style>
 {% endblock %}

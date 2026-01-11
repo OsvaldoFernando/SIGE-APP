@@ -4,6 +4,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from core import views
 
+handler404 = 'core.views.handler404'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index_redirect, name='index_redirect'),
@@ -19,6 +21,8 @@ urlpatterns = [
     path('inscricao/buscar/', views.inscricao_buscar, name='inscricao_buscar'),
     path('inscricao/pdf/<str:numero>/', views.gerar_pdf_confirmacao, name='gerar_pdf_confirmacao'),
     path('inscricao/recibo-termico/<str:numero>/', views.gerar_recibo_termico, name='gerar_recibo_termico'),
+    path('candidatos/exportar-inscritos/', views.gerar_lista_inscritos_pdf, name='exportar_inscritos'),
+    path('candidatos/exportar-aprovados/', views.gerar_lista_aprovados_pdf, name='exportar_aprovados'),
     # path('dashboard/', views.dashboard, name='dashboard'),
     path('painel/', views.painel_principal, name='painel_principal'),
     path('trocar-ano/', views.trocar_ano, name='trocar_ano'),

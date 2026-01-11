@@ -1,66 +1,190 @@
 {% extends 'core/base.html' %}
+
+{% block title %}Estado da Candidatura - SIGE{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card shadow mb-4">
-                <div class="card-body text-center">
-                    <div class="mb-3">
-                        <i class="fas fa-user-circle fa-5x text-secondary"></i>
+<div class="container-fluid px-4 py-4" style="background-color: #f0f2f5; min-height: 100vh;">
+    <!-- Modern Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="{% url 'nova_matricula' %}" class="d-inline-flex align-items-center text-decoration-none text-muted fw-medium mb-3 transition-all hover-translate">
+                <div class="bg-dark shadow-sm rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                    <i class="bi bi-arrow-left text-white"></i>
+                </div>
+                <span>Dashboard</span>
+            </a>
+            <h2 class="h3 fw-bold text-dark mb-0" style="letter-spacing: -0.5px;">Painel do Candidato</h2>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Sidebar Info -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px;">
+                <div class="card-body p-4 text-center">
+                    <div class="mb-4 position-relative d-inline-block">
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center border shadow-sm" style="width: 100px; height: 100px; margin: 0 auto;">
+                            <i class="bi bi-person-circle text-secondary" style="font-size: 3.5rem;"></i>
+                        </div>
+                        <span class="position-absolute bottom-0 end-0 bg-success border border-white border-2 rounded-circle p-2" title="Candidatura Ativa"></span>
                     </div>
-                    <h4>{{ inscricao.nome_completo }}</h4>
-                    <p class="text-muted">{{ inscricao.curso.nome }}</p>
-                    <hr>
-                    <div class="text-start">
-                        <p><strong>Nº Processo:</strong> {{ inscricao.numero_inscricao }}</p>
-                        <p><strong>BI:</strong> {{ inscricao.bilhete_identidade }}</p>
-                        <p><strong>Inscrito em:</strong> {{ inscricao.data_inscricao|date:"d/m/Y" }}</p>
+                    
+                    <h4 class="fw-bold text-dark mb-1">{{ inscricao.nome_completo }}</h4>
+                    <p class="text-primary fw-medium small mb-4">{{ inscricao.curso.nome }}</p>
+                    
+                    <div class="bg-light rounded-4 p-3 text-start mb-0">
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom border-white">
+                            <span class="text-muted small fw-bold">PROCESSO</span>
+                            <span class="fw-bold text-dark small">{{ inscricao.numero_inscricao }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2 pb-2 border-bottom border-white">
+                            <span class="text-muted small fw-bold">DOCUMENTO</span>
+                            <span class="fw-bold text-dark small">{{ inscricao.bilhete_identidade }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted small fw-bold">DATA</span>
+                            <span class="fw-bold text-dark small">{{ inscricao.data_cadastro|date:"d/m/Y" }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-light">
-                    <h5 class="mb-0">Estado da Candidatura</h5>
+
+        <!-- Status & Timeline -->
+        <div class="col-lg-8">
+            <!-- Main Status Card -->
+            <div class="card border-0 shadow-sm mb-4 overflow-hidden" style="border-radius: 20px;">
+                <div class="card-header bg-white border-0 p-4 pb-0">
+                    <h5 class="fw-bold mb-0 text-dark">Estado da Candidatura</h5>
                 </div>
-                <div class="card-body">
-                    <div class="alert {% if inscricao.aprovado %}alert-success{% elif inscricao.nota_teste is not None %}alert-danger{% else %}alert-info{% endif %}">
-                        <h4 class="alert-heading">
-                            {% if inscricao.aprovado %}
-                                Parabéns! Você foi Selecionado(a).
-                            {% elif inscricao.nota_teste is not None %}
-                                Não Selecionado(a).
-                            {% else %}
-                                Em Processamento...
-                            {% endif %}
-                        </h4>
-                        <p>
-                            {% if inscricao.aprovado %}
-                                Sua candidatura foi aprovada com a nota <strong>{{ inscricao.nota_teste }}</strong>. 
-                                Dirija-se à secretaria para realizar sua matrícula.
-                            {% elif inscricao.nota_teste is not None %}
-                                Infelizmente sua nota ({{ inscricao.nota_teste }}) não foi suficiente para as vagas disponíveis.
-                            {% else %}
-                                Sua inscrição foi recebida com sucesso. Aguarde o lançamento das notas dos testes de admissão.
-                            {% endif %}
-                        </p>
-                    </div>
-                    
-                    {% if not inscricao.aprovado and inscricao.nota_teste is None %}
-                    <div class="mt-4">
-                        <h6>Próximos Passos:</h6>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item"><i class="fas fa-check-circle text-success me-2"></i> Submissão de Candidatura</li>
-                            <li class="list-group-item"><i class="fas fa-hourglass-half text-warning me-2"></i> Realização do Teste</li>
-                            <li class="list-group-item text-muted"><i class="far fa-circle me-2"></i> Lançamento de Resultados</li>
-                            <li class="list-group-item text-muted"><i class="far fa-circle me-2"></i> Matrícula Final</li>
-                        </ul>
-                    </div>
+                <div class="card-body p-4">
+                    {% if inscricao.aprovado %}
+                        <div class="alert alert-success border-0 p-4 d-flex align-items-center gap-4 mb-0" style="border-radius: 16px; background-color: #ecfdf5;">
+                            <div class="bg-success rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 60px; height: 60px;">
+                                <i class="bi bi-patch-check-fill text-white fs-2"></i>
+                            </div>
+                            <div>
+                                <h4 class="alert-heading fw-bold text-success mb-1">Parabéns! Você foi Selecionado(a).</h4>
+                                <p class="mb-0 text-success-emphasis opacity-75">Sua candidatura foi aprovada com a nota <strong>{{ inscricao.nota_teste }}</strong>. Dirija-se à secretaria para realizar sua matrícula definitiva.</p>
+                            </div>
+                        </div>
+                    {% elif inscricao.nota_teste is not None %}
+                        <div class="alert alert-danger border-0 p-4 d-flex align-items-center gap-4 mb-0" style="border-radius: 16px; background-color: #fef2f2;">
+                            <div class="bg-danger rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 60px; height: 60px;">
+                                <i class="bi bi-x-circle-fill text-white fs-2"></i>
+                            </div>
+                            <div>
+                                <h4 class="alert-heading fw-bold text-danger mb-1">Não Selecionado(a)</h4>
+                                <p class="mb-0 text-danger-emphasis opacity-75">Infelizmente sua nota ({{ inscricao.nota_teste }}) não foi suficiente para as vagas disponíveis no momento.</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info border-0 p-4 d-flex align-items-center gap-4 mb-0" style="border-radius: 16px; background-color: #eff6ff;">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 60px; height: 60px;">
+                                <i class="bi bi-hourglass-split text-white fs-2"></i>
+                            </div>
+                            <div>
+                                <h4 class="alert-heading fw-bold text-primary mb-1">Em Processamento...</h4>
+                                <p class="mb-0 text-primary-emphasis opacity-75">Sua inscrição foi recebida com sucesso. Aguarde o lançamento das notas dos testes de admissão.</p>
+                            </div>
+                        </div>
                     {% endif %}
+                </div>
+            </div>
+
+            <!-- Timeline/Next Steps -->
+            <div class="card border-0 shadow-sm" style="border-radius: 20px;">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4 text-dark">Fluxo do Processo</h5>
+                    <div class="timeline-modern">
+                        <div class="timeline-item active">
+                            <div class="timeline-icon bg-success text-white"><i class="bi bi-check-lg"></i></div>
+                            <div class="timeline-content">
+                                <h6 class="fw-bold mb-0">Submissão de Candidatura</h6>
+                                <p class="text-muted small mb-0">Concluído em {{ inscricao.data_cadastro|date:"d/m/Y" }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item {% if inscricao.nota_teste is not None %}active{% endif %}">
+                            <div class="timeline-icon {% if inscricao.nota_teste is not None %}bg-success text-white{% else %}bg-light text-muted{% endif %}">
+                                {% if inscricao.nota_teste is not None %}<i class="bi bi-check-lg"></i>{% else %}<i class="bi bi-pencil-square"></i>{% endif %}
+                            </div>
+                            <div class="timeline-content">
+                                <h6 class="fw-bold mb-0">Realização do Teste</h6>
+                                <p class="text-muted small mb-0">{% if inscricao.nota_teste is not None %}Avaliação concluída{% else %}Aguardando cronograma{% endif %}</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item {% if inscricao.nota_teste is not None %}active{% endif %}">
+                            <div class="timeline-icon {% if inscricao.nota_teste is not None %}bg-success text-white{% else %}bg-light text-muted{% endif %}">
+                                {% if inscricao.nota_teste is not None %}<i class="bi bi-check-lg"></i>{% else %}<i class="bi bi-megaphone"></i>{% endif %}
+                            </div>
+                            <div class="timeline-content">
+                                <h6 class="fw-bold mb-0">Lançamento de Resultados</h6>
+                                <p class="text-muted small mb-0">{% if inscricao.nota_teste is not None %}Resultados publicados{% else %}Em processamento{% endif %}</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item {% if inscricao.status == 'Matriculado' %}active{% endif %}">
+                            <div class="timeline-icon {% if inscricao.status == 'Matriculado' %}bg-success text-white{% else %}bg-light text-muted{% endif %}">
+                                {% if inscricao.status == 'Matriculado' %}<i class="bi bi-check-lg"></i>{% else %}<i class="bi bi-mortarboard"></i>{% endif %}
+                            </div>
+                            <div class="timeline-content border-0">
+                                <h6 class="fw-bold mb-0">Matrícula Final</h6>
+                                <p class="text-muted small mb-0">{% if inscricao.status == 'Matriculado' %}Matrícula Confirmada!{% else %}Aguardando seleção{% endif %}</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .transition-all { transition: all 0.3s ease; }
+    .hover-translate:hover { transform: translateX(-5px); color: #000 !important; }
+    
+    .timeline-modern { position: relative; padding-left: 1.5rem; }
+    .timeline-modern::before {
+        content: '';
+        position: absolute;
+        left: 0.75rem;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e2e8f0;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-bottom: 2rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .timeline-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        z-index: 1;
+        flex-shrink: 0;
+        border: 2px solid white;
+    }
+    
+    .timeline-content {
+        flex: 1;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .timeline-item.active .timeline-icon {
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+    }
+</style>
 {% endblock %}

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, FileResponse
 from django.utils import timezone
 from .models import Curso, Inscricao, ConfiguracaoEscola, Escola, AnoAcademico, Notificacao, PerfilUsuario, Subscricao, PagamentoSubscricao, RecuperacaoSenha, Documento, Semestre, PeriodoLectivo
 from django.views.decorators.http import require_http_methods
@@ -20,6 +20,9 @@ from io import BytesIO
 from datetime import datetime, date
 from django.conf import settings
 import os
+
+def handler404(request, exception):
+    return render(request, '404.html', status=404)
 
 def processar_aprovacoes_curso(curso_id):
     curso = Curso.objects.get(id=curso_id)
@@ -259,6 +262,59 @@ def inscricao_buscar(request):
 import qrcode
 from django.core.files.base import ContentFile
 
+def gerar_lista_aprovados_pdf(request):
+    """Gera uma lista de candidatos aprovados em PDF para um curso específico"""
+    curso_id = request.GET.get('curso')
+    if not curso_id:
+        messages.error(request, 'Curso não especificado.')
+        return redirect('lancamento_notas')
+    
+    curso = get_object_or_404(Curso, id=curso_id)
+    inscricoes = Inscricao.objects.filter(curso=curso, aprovado=True).order_by('primeiro_nome', 'apelido')
+    
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=2*cm, bottomMargin=2*cm, leftMargin=2*cm, rightMargin=2*cm)
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=16,
+        alignment=TA_CENTER,
+        spaceAfter=20
+    )
+    elements.append(Paragraph(f"Lista de Candidatos Aprovados/Admitidos", title_style))
+    elements.append(Paragraph(f"Curso: {curso.nome}", styles['Heading2']))
+    elements.append(Paragraph(f"Ano Académico: {inscricoes.first().ano_academico if inscricoes.exists() else '-'}", styles['Normal']))
+    elements.append(Spacer(1, 0.5*cm))
+    
+    data = [['Nº', 'Nome Completo', 'BI', 'Nota']]
+    for i, insc in enumerate(inscricoes, 1):
+        data.append([
+            str(i),
+            f"{insc.primeiro_nome} {insc.nomes_meio} {insc.apelido}".strip(),
+            insc.bilhete_identidade,
+            str(insc.nota_teste) if insc.nota_teste is not None else "-"
+        ])
+    
+    t = Table(data, colWidths=[1*cm, 9*cm, 4*cm, 3*cm])
+    t.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#059669')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+    elements.append(t)
+    
+    doc.build(elements)
+    buffer.seek(0)
+    response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="aprovados_{curso.codigo}.pdf"'
+    return response
+
 def gerar_lista_inscritos_pdf(request):
     """Gera uma lista de inscritos em PDF para um curso específico"""
     curso_id = request.GET.get('curso')
@@ -267,7 +323,7 @@ def gerar_lista_inscritos_pdf(request):
         return redirect('lancamento_notas')
     
     curso = get_object_or_404(Curso, id=curso_id)
-    inscricoes = Inscricao.objects.filter(curso=curso).order_by('nome_completo')
+    inscricoes = Inscricao.objects.filter(curso=curso).order_by('primeiro_nome', 'apelido')
     config = ConfiguracaoEscola.objects.first()
     
     buffer = BytesIO()
@@ -286,17 +342,17 @@ def gerar_lista_inscritos_pdf(request):
     elements.append(Paragraph(f"Lista de Inscritos - {curso.nome}", title_style))
     
     # Tabela de Estudantes
-    data = [['Nome Completo', 'BI', 'Nota', 'Estado']]
-    for i in inscricoes:
-        estado = "Aprovado" if i.aprovado else ("Não Selecionado" if i.nota_teste is not None else "Sem Nota")
+    data = [['Nº', 'Nome Completo', 'BI', 'Estado']]
+    for i, insc in enumerate(inscricoes, 1):
+        estado = "Aprovado" if insc.aprovado else ("Não Selecionado" if insc.nota_teste is not None else "Sem Nota")
         data.append([
-            i.nome_completo,
-            i.bilhete_identidade,
-            str(i.nota_teste) if i.nota_teste is not None else "-",
+            str(i),
+            f"{insc.primeiro_nome} {insc.nomes_meio} {insc.apelido}".strip(),
+            insc.bilhete_identidade,
             estado
         ])
     
-    t = Table(data, colWidths=[8*cm, 4*cm, 2*cm, 3*cm])
+    t = Table(data, colWidths=[1*cm, 9.5*cm, 4*cm, 3.5*cm])
     t.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e3a8a')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
@@ -307,12 +363,16 @@ def gerar_lista_inscritos_pdf(request):
         ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
         ('FONTSIZE', (0, 1), (-1, -1), 9),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 5),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 5),
     ]))
     elements.append(t)
     
     doc.build(elements)
     buffer.seek(0)
-    return FileResponse(buffer, as_attachment=True, filename=f'lista_inscritos_{curso.nome}.pdf')
+    response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="lista_inscritos_{curso.nome}.pdf"'
+    return response
 
 def gerar_pdf_confirmacao(request, numero):
     inscricao = get_object_or_404(Inscricao, numero_inscricao=numero)
@@ -552,8 +612,15 @@ def lancamento_notas(request):
                         # Limpar a nota se o campo estiver vazio
                         Inscricao.objects.filter(id=inscricao_id).update(nota_teste=None, aprovado=False)
                     else:
-                        nota = float(raw_value)
-                        Inscricao.objects.filter(id=inscricao_id).update(nota_teste=nota)
+                        try:
+                            # Converte para float mas mantém a precisão decimal sem arredondamento manual
+                            nota = float(raw_value)
+                            # Validação de segurança no servidor
+                            if 0 <= nota <= 20:
+                                Inscricao.objects.filter(id=inscricao_id).update(nota_teste=nota)
+                            else:
+                                continue
+                        except (ValueError, Inscricao.DoesNotExist): pass
                 except (ValueError, Inscricao.DoesNotExist): pass
         messages.success(request, 'Notas atualizadas com sucesso!')
         return redirect(f"{request.path}?curso={request.POST.get('curso_id', '')}")
@@ -1810,55 +1877,52 @@ def selecionar_tipo_matricula(request):
 
 @login_required
 def matricula(request):
-    """View para matrícula de estudantes"""
-    # Get all enrollments with filtering
-    inscricoes = Inscricao.objects.all().select_related('curso')
-    
-    # Filter options
+    """Área de gestão de matrículas para candidatos aprovados"""
     status_filter = request.GET.get('status', 'todos')
     curso_filter = request.GET.get('curso', '')
     
-    if status_filter == 'pendente':
-        inscricoes = inscricoes.filter(aprovado=False)
-    elif status_filter == 'aprovado':
-        inscricoes = inscricoes.filter(aprovado=True)
+    # Filtra inscritos que foram aprovados nos testes
+    inscricoes = Inscricao.objects.filter(aprovado=True).select_related('curso')
     
     if curso_filter:
         inscricoes = inscricoes.filter(curso_id=curso_filter)
     
-    # Handle approval/rejection
+    if status_filter == 'confirmada':
+        inscricoes = inscricoes.filter(status='Matriculado')
+    elif status_filter == 'pendente':
+        inscricoes = inscricoes.filter(status='Ativo')
+
     if request.method == 'POST':
-        action = request.POST.get('action')
         inscricao_id = request.POST.get('inscricao_id')
+        action = request.POST.get('action')
+        insc = get_object_or_404(Inscricao, id=inscricao_id)
         
-        try:
-            inscricao = Inscricao.objects.get(id=inscricao_id)
+        if action == 'confirmar_matricula':
+            if insc.curso.vagas_disponiveis() > 0:
+                insc.status = 'Matriculado'
+                # A vaga é reduzida automaticamente porque vagas_disponiveis() 
+                # em models.py conta aprovados que ocupam vaga.
+                insc.save()
+                messages.success(request, f'Matrícula de {insc.nome_completo} confirmada com sucesso!')
+            else:
+                messages.error(request, f'Não há vagas disponíveis para o curso {insc.curso.nome}.')
+        elif action == 'cancelar_matricula':
+            insc.status = 'Ativo'
+            insc.save()
+            messages.success(request, f'Matrícula de {insc.nome_completo} cancelada.')
             
-            if action == 'aprovar':
-                inscricao.aprovado = True
-                inscricao.data_resultado = timezone.now()
-                inscricao.save()
-                messages.success(request, f'Matrícula de {inscricao.nome_completo} aprovada com sucesso!')
-            elif action == 'rejeitar':
-                inscricao.aprovado = False
-                inscricao.data_resultado = None
-                inscricao.save()
-                messages.success(request, f'Matrícula de {inscricao.nome_completo} rejeitada!')
-        except Inscricao.DoesNotExist:
-            messages.error(request, 'Matrícula não encontrada!')
-        
         return redirect('matricula')
-    
-    cursos = Curso.objects.all()
+
+    cursos = Curso.objects.filter(ativo=True)
     
     context = {
         'inscricoes': inscricoes,
         'cursos': cursos,
         'status_filter': status_filter,
         'curso_filter': curso_filter,
-        'total': Inscricao.objects.count(),
-        'aprovadas': Inscricao.objects.filter(aprovado=True).count(),
-        'pendentes': Inscricao.objects.filter(aprovado=False).count(),
+        'total': inscricoes.count(),
+        'confirmadas': inscricoes.filter(status='Matriculado').count(),
+        'pendentes': inscricoes.filter(status='Ativo').count(),
     }
     return render(request, 'core/matricula_view.html', context)
 
