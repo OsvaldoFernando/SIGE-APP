@@ -304,11 +304,30 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
-        footer {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            padding: 20px 0;
-            margin-top: auto;
+        .breadcrumb {
+            background: transparent;
+            padding: 0;
+            margin-bottom: 1rem;
+        }
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: "›";
+            color: #94a3b8;
+            font-weight: bold;
+        }
+        .breadcrumb-item a {
+            color: #64748b;
+            text-decoration: none;
+            transition: color 0.2s;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .breadcrumb-item a:hover {
+            color: var(--primary-color);
+        }
+        .breadcrumb-item.active {
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 0.875rem;
         }
     </style>
 </head>
@@ -320,7 +339,7 @@
                 <div class="user-info">
                     <a href="/" class="user-logo" style="height: 48px; display: flex; align-items: center; text-decoration: none;">
                         {% if config.logo %}
-                            <img src="{{ config.logo.url }}" alt="Logo" style="height: 100%; max-width: 150px; object-fit: contain;" onerror="this.onerror=null; this.outerHTML='<span class=\'fw-bold fs-4 text-white\'>SIGE</span>';">
+                            <img src="{{ config.logo.url }}" alt="Logo" style="height: 100%; max-width: 150px; object-fit: contain;" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\'fw-bold fs-4 text-white\'>SIGE</span>';">
                         {% else %}
                             <span class="fw-bold fs-4 text-white">SIGE</span>
                         {% endif %}
@@ -347,9 +366,11 @@
                 <div class="dropdown">
                     <div class="user-avatar" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer; background: white; border: 2px solid rgba(255,255,255,0.5); width: 48px; height: 48px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative;">
                         {% if user_perfil.foto %}
-                            <img src="{{ user_perfil.foto.url }}" alt="{{ user.username }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ user.username }}&background=random';">
+                            <img src="{{ user_perfil.foto.url }}" alt="{{ user.username }}" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'d-flex align-items-center justify-content-center w-100 h-100 fw-bold text-primary\' style=\'background: #e0f2fe; font-size: 1.2rem;\'>{{ user.username|slice:":2"|upper }}</div><div class=\'online-indicator\'></div>';">
                         {% else %}
-                            <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=random" alt="{{ user.username }}">
+                            <div class="d-flex align-items-center justify-content-center w-100 h-100 fw-bold text-primary" style="background: #e0f2fe; font-size: 1.2rem;">
+                                {{ user.username|slice:":2"|upper }}
+                            </div>
                         {% endif %}
                         <div class="online-indicator"></div>
                     </div>
@@ -358,9 +379,11 @@
                         <div class="user-dropdown-header">
                             <div class="user-dropdown-avatar">
                                 {% if user_perfil.foto %}
-                                    <img src="{{ user_perfil.foto.url }}" alt="{{ user.username }}" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name={{ user.username }}&background=random';">
+                                    <img src="{{ user_perfil.foto.url }}" alt="{{ user.username }}" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'d-flex align-items-center justify-content-center w-100 h-100 fw-bold text-primary\' style=\'background: #e0f2fe; font-size: 1rem;\'>{{ user.username|slice:":2"|upper }}</div>';">
                                 {% else %}
-                                    <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=random" alt="{{ user.username }}">
+                                    <div class="d-flex align-items-center justify-content-center w-100 h-100 fw-bold text-primary" style="background: #e0f2fe; font-size: 1rem;">
+                                        {{ user.username|slice:":2"|upper }}
+                                    </div>
                                 {% endif %}
                             </div>
                             <div class="user-dropdown-info">

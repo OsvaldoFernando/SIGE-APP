@@ -18,15 +18,17 @@
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb mb-1">
-                        <li class="breadcrumb-item"><a href="{% url 'painel_principal' %}">Painel</a></li>
-                        <li class="breadcrumb-item"><a href="{% url 'cursos_disciplinas' %}">Gestão Académica</a></li>
-                        <li class="breadcrumb-item active">Plano Curricular</li>
+                    <ol class="breadcrumb mb-2">
+                        <li class="breadcrumb-item"><a href="{% url 'painel_principal' %}"><i class="bi bi-house-door me-1"></i>Painel</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Plano Curricular</li>
                     </ol>
                 </nav>
                 <h2 class="fw-bold mb-0" style="color: #1e3a8a;">Plano Curricular Detalhado</h2>
             </div>
             <div class="d-flex gap-2">
+                <a href="{% url 'painel_principal' %}" class="btn btn-light px-4 me-2" style="border-radius: 10px;">
+                    <i class="bi bi-arrow-left me-2"></i>Voltar
+                </a>
                 <form class="d-flex gap-2">
                     <select name="curso" class="form-select" onchange="this.form.submit()" style="border-radius: 10px; min-width: 250px;">
                         <option value="">Todos os Cursos</option>

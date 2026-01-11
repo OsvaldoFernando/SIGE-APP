@@ -84,11 +84,11 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-2">
                         <li class="breadcrumb-item"><a href="{% url 'painel_principal' %}"><i class="bi bi-house-door me-1"></i>Painel</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Disciplinas</li>
+                        <li class="breadcrumb-item active" aria-current="page">Cursos</li>
                     </ol>
                 </nav>
-                <h2 class="fw-bold mb-1" style="color: #1e3a8a;">Disciplinas</h2>
-                <p class="text-muted mb-0">Gerencie a estrutura das disciplinas acadêmicas</p>
+                <h2 class="fw-bold mb-1" style="color: #1e3a8a;">Cursos</h2>
+                <p class="text-muted mb-0">Gerencie os cursos oferecidos pela instituição</p>
             </div>
             <div class="d-flex gap-3">
                 <a href="{% url 'painel_principal' %}" class="btn-header btn-header-light text-decoration-none">
@@ -104,38 +104,77 @@
 
 <div class="container pb-5">
     <div class="tab-content" id="managementTabsContent">
-        <!-- DISCIPLINAS VIEW -->
+        <!-- CURSOS VIEW -->
         <div class="card academic-card">
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-modern mb-0">
                         <thead>
                             <tr>
-                                <th>Disciplina</th>
                                 <th>Curso</th>
-                                <th>Carga Horária</th>
+                                <th>Grau</th>
+                                <th>Vagas</th>
+                                <th>Duração</th>
+                                <th>Regime</th>
+                                <th>Modalidade</th>
+                                <th class="text-center">Status</th>
                                 <th class="text-end pe-4">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for disciplina in disciplinas %}
+                            {% for curso in cursos %}
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
-                                            <i class="bi bi-book text-primary"></i>
+                                            <i class="bi bi-graduation-cap text-primary"></i>
                                         </div>
-                                        <span class="fw-bold text-dark">{{ disciplina.nome }}</span>
+                                        <div>
+                                            <span class="fw-bold text-dark d-block">{{ curso.nome }}</span>
+                                            <small class="text-muted">{{ curso.codigo }}</small>
+                                        </div>
                                     </div>
                                 </td>
-                                <td>
-                                    <span class="badge bg-light text-dark border">{{ disciplina.curso.codigo }}</span>
-                                    <small class="ms-1">{{ disciplina.curso.nome }}</small>
+                                <td>{{ curso.get_grau_display|default:'' }}</td>
+                                <td>{{ curso.vagas }}</td>
+                                <td>{{ curso.get_duracao_meses_display }}</td>
+                                <td>{{ curso.get_regime_display|default:'' }}</td>
+                                <td>{{ curso.get_modalidade_display|default:'' }}</td>
+                                <td class="text-center">
+                                    <button class="btn btn-link p-0 text-decoration-none btn-toggle-curso" data-curso-id="{{ curso.id }}">
+                                        {% if curso.ativo %}
+                                        <span class="status-badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">
+                                            <i class="bi bi-check-circle me-1"></i>Ativo
+                                        </span>
+                                        {% else %}
+                                        <span class="status-badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25">
+                                            <i class="bi bi-circle me-1"></i>Inativo
+                                        </span>
+                                        {% endif %}
+                                    </button>
                                 </td>
-                                <td>{{ disciplina.carga_horaria }}h</td>
                                 <td class="text-end pe-4">
-                                    <button class="btn-action btn btn-outline-info"><i class="bi bi-pencil-square"></i></button>
-                                    <button class="btn-action btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                    <a href="{% url 'grelha_curricular' %}" class="btn-action btn btn-outline-primary" title="Ver Plano Curricular">
+                                        <i class="bi bi-card-checklist"></i>
+                                    </a>
+                                    <button class="btn-action btn btn-outline-info btn-editar-curso" 
+                                            data-curso-id="{{ curso.id }}" 
+                                            data-curso-codigo="{{ curso.codigo }}"
+                                            data-curso-nome="{{ curso.nome }}"
+                                            data-curso-vagas="{{ curso.vagas }}"
+                                            data-curso-duracao="{{ curso.duracao_meses }}"
+                                            data-curso-nota="{{ curso.nota_minima }}"
+                                            data-curso-grau="{{ curso.grau }}"
+                                            data-curso-regime="{{ curso.regime }}"
+                                            data-curso-modalidade="{{ curso.modalidade }}"
+                                            data-curso-requer="{{ curso.requer_prerequisitos|yesno:'True,False' }}"
+                                            data-bs-toggle="modal" data-bs-target="#modalEditarCurso">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button class="btn-action btn btn-outline-danger btn-deletar-curso" 
+                                            data-curso-id="{{ curso.id }}" data-curso-nome="{{ curso.nome }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </td>
                             </tr>
                             {% endfor %}

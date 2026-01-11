@@ -1549,6 +1549,7 @@ def get_perfis_pendentes_count(request):
 def painel_principal(request):
     """View para o painel principal com menu lateral"""
     from datetime import date
+    from django.db.models import Count, Q
     total_inscricoes = Inscricao.objects.count()
     total_aprovados = Inscricao.objects.filter(aprovado=True).count()
     total_reprovados = Inscricao.objects.filter(aprovado=False, nota_teste__isnull=False).count()
@@ -1569,12 +1570,18 @@ def painel_principal(request):
     
     subscricao = Subscricao.objects.filter(estado__in=['ativo', 'teste']).first()
     
-    # Dados para o gráfico de inscrições por curso
-    from django.db.models import Count
-    estatisticas_cursos = Curso.objects.filter(ativo=True).annotate(total_inscritos=Count('inscricoes'))
+    # Dados para o gráfico de inscrições e matrículas por curso
+    estatisticas_cursos = Curso.objects.filter(ativo=True).annotate(
+        total_inscritos=Count('inscricoes'),
+        total_matriculados=Count('inscricoes', filter=Q(inscricoes__aprovado=True))
+    )
     dados_grafico = {
         'labels': [c.nome for c in estatisticas_cursos],
         'valores': [c.total_inscritos for c in estatisticas_cursos]
+    }
+    dados_grafico_matriculas = {
+        'labels': [c.nome for c in estatisticas_cursos],
+        'valores': [c.total_matriculados for c in estatisticas_cursos]
     }
 
     context = {
@@ -1588,7 +1595,8 @@ def painel_principal(request):
         'notificacoes_recentes': notificacoes_recentes,
         'subscricao': subscricao,
         'now': date.today(),
-        'dados_grafico': json.dumps(dados_grafico)
+        'dados_grafico': json.dumps(dados_grafico),
+        'dados_grafico_matriculas': json.dumps(dados_grafico_matriculas)
     }
     return render(request, 'core/painel_principal.html', context)
 

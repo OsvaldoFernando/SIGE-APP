@@ -4,19 +4,36 @@
 
 {% block content %}
 <div class="container-fluid px-4 py-5">
-    <!-- Gráfico de Inscrições -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm rounded-4">
+    <!-- Gráficos de Visão Geral -->
+    <div class="row g-4 mb-5">
+        <!-- Estudantes Inscritos -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-4">
                         <div class="bg-success bg-opacity-10 p-2 rounded-3 me-3">
-                            <i class="bi bi-graph-up text-success fs-4"></i>
+                            <i class="bi bi-person-plus text-success fs-4"></i>
                         </div>
                         <h5 class="mb-0 fw-bold text-dark">Estudantes Inscritos por Curso</h5>
                     </div>
                     <div style="height: 300px;">
                         <canvas id="inscricoesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Estudantes Matriculados -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
+                            <i class="bi bi-person-check text-primary fs-4"></i>
+                        </div>
+                        <h5 class="mb-0 fw-bold text-dark">Estudantes Matriculados por Curso</h5>
+                    </div>
+                    <div style="height: 300px;">
+                        <canvas id="matriculasChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -83,9 +100,48 @@
                 <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
                     <i class="bi bi-gear text-primary fs-4"></i>
                 </div>
-                <h3 class="mb-0 fw-bold text-dark">Configurações</h3>
+                <h3 class="mb-0 fw-bold text-dark">Configurações Académica</h3>
             </div>
             <div class="row g-3 menu-items">
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="{% url 'listar_cursos' %}" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-mortarboard text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Cursos</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Gestão de cursos</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="{% url 'cursos_disciplinas' %}" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-book text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Disciplinas</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Gestão de disciplinas</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="{% url 'grelha_curricular' %}" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-diagram-3 text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Plano Curricular</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Grelha curricular</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
                 <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
                     <a href="{% url 'painel_admin' %}" class="text-decoration-none h-100 d-block">
                         <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
@@ -108,6 +164,227 @@
                                 </div>
                                 <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Ano Lectivo</h6>
                                 <p class="text-muted mb-0" style="font-size: 0.75rem;">Configurações</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="#" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-people text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Turmas</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Gestão de turmas</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="#" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-bar-chart-steps text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Níveis Acadêmicos</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Configurações</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="#" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-door-open text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Salas</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Gestão de salas</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="#" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-clock-history text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Regimes</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Configurações</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="#" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-exclamation-triangle text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Atrasos de Disciplinas</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Controle</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="#" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-journal-text text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Programas</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Planos de ensino</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="#" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-file-earmark-check text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Provas</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Gestão de exames</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="#" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-list-check text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Rubricas</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Critérios de avaliação</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="#" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-building text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Departamentos</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Unidades acadêmicas</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="#" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-star text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Avaliações</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Gestão de notas</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="#" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-diagram-2 text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Precedências</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Escola de precedências</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="#" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-trophy text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Aproveitamentos</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Rendimento escolar</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="#" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-calendar3 text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Calendário</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Eventos e datas</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="#" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-tags text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Tipos de Disciplinas</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Classificação</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="#" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-infinity text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Avaliação Contínua</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Acompanhamento</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="#" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-shield-lock text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Acessos</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Permissões</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-2 col-lg-3 col-md-4 col-6 menu-item">
+                    <a href="#" class="text-decoration-none h-100 d-block">
+                        <div class="card border-0 shadow-sm rounded-3 h-100 card-menu transition-hover">
+                            <div class="card-body p-3 text-center">
+                                <div class="bg-light rounded-circle p-3 d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-person-badge text-primary" style="font-size: 1.5rem;"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1" style="font-size: 0.9rem;">Avaliação Docente</h6>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">Desempenho de professores</p>
                             </div>
                         </div>
                     </a>
@@ -193,62 +470,81 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('inscricoesChart').getContext('2d');
-        const dados = JSON.parse('{{ dados_grafico|safe|default:"{\"labels\":[], \"valores\":[]}" }}');
+        const inscricoesCtx = document.getElementById('inscricoesChart').getContext('2d');
+        const matriculasCtx = document.getElementById('matriculasChart').getContext('2d');
         
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: dados.labels,
-                datasets: [{
-                    label: 'Inscrições',
-                    data: dados.valores,
-                    backgroundColor: 'rgba(30, 58, 138, 0.7)',
-                    borderColor: 'rgb(30, 58, 138)',
-                    borderWidth: 1,
-                    borderRadius: 6,
-                    hoverBackgroundColor: 'rgba(5, 150, 105, 0.8)',
-                }]
+        const dadosInscricoes = JSON.parse('{{ dados_grafico|safe|default:"{\"labels\":[], \"valores\":[]}" }}');
+        const dadosMatriculas = JSON.parse('{{ dados_grafico_matriculas|safe|default:"{\"labels\":[], \"valores\":[]}" }}');
+        
+        const gradientInscricoes = inscricoesCtx.createLinearGradient(0, 0, 400, 0);
+        gradientInscricoes.addColorStop(0, 'rgba(16, 185, 129, 0.8)');
+        gradientInscricoes.addColorStop(1, 'rgba(5, 150, 105, 0.9)');
+
+        const gradientMatriculas = matriculasCtx.createLinearGradient(0, 0, 400, 0);
+        gradientMatriculas.addColorStop(0, 'rgba(59, 130, 246, 0.8)');
+        gradientMatriculas.addColorStop(1, 'rgba(30, 64, 175, 0.9)');
+        
+        const commonOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    padding: 12,
+                    cornerRadius: 8,
+                    titleFont: { size: 13, weight: '700', family: "'Inter', sans-serif" },
+                    bodyFont: { size: 12, family: "'Inter', sans-serif" },
+                    displayColors: false,
+                    boxPadding: 6
+                }
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                indexAxis: 'y',
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: '#1e3a8a',
-                        padding: 12,
-                        titleFont: { size: 14, weight: 'bold' },
-                        bodyFont: { size: 13 },
-                        displayColors: false
-                    }
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: { display: true, drawBorder: false, color: '#f1f5f9' },
+                    ticks: { stepSize: 1, font: { size: 11, family: "'Inter', sans-serif" }, color: '#64748b' }
                 },
-                scales: {
-                    x: {
-                        beginAtZero: true,
-                        grid: {
-                            display: true,
-                            drawBorder: false,
-                            color: 'rgba(0,0,0,0.05)'
-                        },
-                        ticks: {
-                            stepSize: 1,
-                            font: { size: 12 }
-                        }
-                    },
-                    y: {
-                        grid: {
-                            display: false
-                        },
-                        ticks: {
-                            font: { size: 12, weight: '500' }
-                        }
-                    }
+                y: {
+                    grid: { display: false },
+                    ticks: { font: { size: 11, weight: '600', family: "'Inter', sans-serif" }, color: '#334155' }
                 }
             }
+        };
+
+        new Chart(inscricoesCtx, {
+            type: 'bar',
+            data: {
+                labels: dadosInscricoes.labels,
+                datasets: [{
+                    label: 'Inscrições',
+                    data: dadosInscricoes.valores,
+                    backgroundColor: gradientInscricoes,
+                    hoverBackgroundColor: 'rgba(5, 150, 105, 1)',
+                    borderWidth: 0,
+                    borderRadius: 4,
+                    barThickness: 20
+                }]
+            },
+            options: commonOptions
+        });
+
+        new Chart(matriculasCtx, {
+            type: 'bar',
+            data: {
+                labels: dadosMatriculas.labels,
+                datasets: [{
+                    label: 'Matrículas',
+                    data: dadosMatriculas.valores,
+                    backgroundColor: gradientMatriculas,
+                    hoverBackgroundColor: 'rgba(30, 64, 175, 1)',
+                    borderWidth: 0,
+                    borderRadius: 4,
+                    barThickness: 20
+                }]
+            },
+            options: commonOptions
         });
     });
 </script>
