@@ -58,6 +58,14 @@ def index(request):
     config = ConfiguracaoEscola.objects.first()
     anos_academicos = AnoAcademico.objects.all()
     
+    # Estatísticas de Inscrições Reais
+    stats_inscricoes = {
+        'submetidas': Inscricao.objects.filter(status_inscricao='submetida').count(),
+        'aprovadas': Inscricao.objects.filter(aprovado=True).count(),
+        'pendentes': Inscricao.objects.filter(status_inscricao='pendente').count(),
+    }
+    stats_inscricoes['total'] = stats_inscricoes['submetidas'] + stats_inscricoes['aprovadas'] + stats_inscricoes['pendentes']
+    
     # Adicionar cálculo de receita diária (exemplo simplificado)
     # Aqui você pode buscar do modelo de Pagamentos se existir
     receita_hoje = 0.00
@@ -68,7 +76,8 @@ def index(request):
         'anos_academicos': anos_academicos,
         'ano_atual': ano_atual,
         'semestre_atual': semestre_atual,
-        'receita_hoje': receita_hoje
+        'receita_hoje': receita_hoje,
+        'stats_inscricoes': stats_inscricoes
     })
 
 def inscricao_create(request, curso_id):

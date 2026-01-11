@@ -20,7 +20,7 @@ urlpatterns = [
     # URLs para Gestão de Cursos
     path('cursos/', views.listar_cursos, name='listar_cursos'),
     path('cursos/novo/', views.criar_curso, name='criar_curso'),
-    path('cursos/<int:curso_id>/', views.detalhe_curso, name='detalhe_curso'),
+    path('cursos/<int:curso_id>/detalhe/', views.detalhe_curso, name='detalhe_curso'),
     path('cursos/<int:curso_id>/editar/', views.editar_curso, name='editar_curso'),
     path('cursos/<int:curso_id>/deletar/', views.deletar_curso, name='deletar_curso'),
     

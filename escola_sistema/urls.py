@@ -122,7 +122,9 @@ urlpatterns = [
     # Alias para URLs dos Menus do Painel (compatibilidade com template)
     path('listar-cursos/', views.listar_cursos, name='listar_cursos'),
     path('criar-curso/', views.criar_curso, name='criar_curso'),
-    path('editar-curso/', views.editar_curso, name='editar_curso'),
+    path('detalhe-curso/<int:curso_id>/', views.detalhe_curso, name='detalhe_curso'),
+    path('editar-curso/<int:curso_id>/', views.editar_curso, name='editar_curso'),
+    path('deletar-curso/<int:curso_id>/', views.deletar_curso, name='deletar_curso'),
 ]
 
 if settings.DEBUG:
