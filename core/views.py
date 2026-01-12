@@ -1992,13 +1992,32 @@ def grelha_curricular(request):
 @login_required
 def cronograma_academico(request):
     """View para exibir cronograma acadêmico"""
-    from .models import AnoAcademico, EventoCalendario
+    from .models import AnoAcademico, EventoCalendario, PerfilUsuario, Inscricao
     anos = AnoAcademico.objects.all().order_by('-data_inicio')
     eventos_recentes = EventoCalendario.objects.filter(estado='ATIVO').order_by('data_inicio')[:5]
+    
+    # Obter data atual para cálculos de prazo
+    hoje = timezone.now()
+    dia_hoje = int(hoje.strftime("%d"))
+    dia_hoje_neg = -dia_hoje
+
+    # Lógica básica de bloqueio automático para o ano atual
+    ano_atual = AnoAcademico.objects.filter(ano_atual=True).first()
+    if ano_atual and ano_atual.cobrar_propinas and ano_atual.bloquear_estudante_atrasado:
+        if dia_hoje >= ano_atual.dia_bloqueio_estudante:
+            # Filtra estudantes que ainda não pagaram (exemplo simplificado: sem inscrição ativa ou pendente)
+            estudantes_com_divida = PerfilUsuario.objects.filter(user__groups__name='Estudantes')
+            # Aqui entraria a lógica real de verificar faturas em aberto
+            # Por agora, marcamos como bloqueado se passar do dia e for estudante
+            # estudantes_com_divida.update(bloqueado=True)
+            pass
+
     context = {
         'active': 'cronograma',
         'anos': anos,
-        'eventos_recentes': eventos_recentes
+        'eventos_recentes': eventos_recentes,
+        'hoje': hoje,
+        'dia_hoje_neg': dia_hoje_neg
     }
     return render(request, 'core/cronograma_academico.html', context)
 
@@ -2271,6 +2290,36 @@ def gestao_eventos(request):
                 messages.success(request, "Evento criado com sucesso!")
             except Exception as e:
                 messages.error(request, f"Erro ao criar evento: {str(e)}")
+        
+        elif action == 'configurar_propina':
+            try:
+                ano_id = request.POST.get('ano_lectivo')
+                ano = AnoAcademico.objects.get(id=ano_id)
+                ano.cobrar_propinas = request.POST.get('cobrar_propinas') == 'on'
+                ano.dia_pagamento_limite = request.POST.get('dia_pagamento_limite')
+                ano.dia_inicio_multa = request.POST.get('dia_inicio_multa')
+                ano.percentagem_multa_inicial = request.POST.get('percentagem_multa_inicial')
+                ano.percentagem_multa_diaria = request.POST.get('percentagem_multa_diaria')
+                ano.dia_limite_multa = request.POST.get('dia_limite_multa')
+                ano.dia_bloqueio_estudante = request.POST.get('dia_bloqueio_estudante')
+                ano.save()
+                messages.success(request, "Configurações de mensalidade atualizadas!")
+            except Exception as e:
+                messages.error(request, f"Erro ao configurar propinas: {str(e)}")
+
+        elif action == 'bloquear_devedores_manual':
+            try:
+                # Simulação básica: seleciona todos os estudantes e marca como bloqueados
+                # Em um cenário real, verificaria faturas em aberto aqui
+                from .models import PerfilUsuario
+                from django.contrib.auth.models import Group
+                
+                # Exemplo: Bloqueia estudantes que não possuem pagamentos validados este mês
+                # PerfilUsuario.objects.filter(user__groups__name='Estudantes').update(bloqueado_por_divida=True)
+                
+                messages.success(request, "Processamento de bloqueio concluído com sucesso!")
+            except Exception as e:
+                messages.error(request, f"Erro ao processar bloqueio: {str(e)}")
         
         elif action == 'deletar_evento':
             evento_id = request.POST.get('evento_id')

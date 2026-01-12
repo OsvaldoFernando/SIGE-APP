@@ -16,6 +16,21 @@ class AnoAcademico(models.Model):
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='PLANEADO', verbose_name="Estado")
     ano_atual = models.BooleanField(default=False, verbose_name="Ano Atual")
     
+    # Configurações de Mensalidades e Multas
+    cobrar_propinas = models.BooleanField(default=True, verbose_name="Cobrar Propinas/Mensalidades")
+    dia_pagamento_limite = models.PositiveIntegerField(default=10, verbose_name="Dia Limite de Pagamento (sem multa)")
+    dia_inicio_multa = models.PositiveIntegerField(default=11, verbose_name="Dia de Início da Multa")
+    percentagem_multa_inicial = models.DecimalField(max_digits=5, decimal_places=2, default=10.00, verbose_name="% Multa Inicial")
+    percentagem_multa_diaria = models.DecimalField(max_digits=5, decimal_places=2, default=1.00, verbose_name="% Multa Diária Adicional")
+    dia_limite_multa = models.PositiveIntegerField(default=30, verbose_name="Dia Limite para Pagamento com Multa")
+
+    # Bloqueio de Estudantes
+    dia_bloqueio_estudante = models.PositiveIntegerField(default=15, verbose_name="Dia de Bloqueio Automático")
+    bloquear_estudante_atrasado = models.BooleanField(default=True, verbose_name="Bloquear Estudante em Atraso")
+    
+    # Campo para bloqueio manual ou automático por dívida
+    bloqueado_por_divida = models.BooleanField(default=False, verbose_name="Bloqueado por Dívida")
+    
     criado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Criado por")
     data_criacao = models.DateTimeField(auto_now_add=True, verbose_name="Data de Criação")
     

@@ -1,74 +1,105 @@
 {% extends 'core/base.html' %}
-
-{% block title %}Gestão de Eventos Académicos - SIGE{% endblock %}
+{% load static %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
+<div class="container-fluid py-4 bg-light min-vh-100">
+    <!-- Header Section -->
+    <div class="row mb-4 align-items-center">
+        <div class="col-lg-6 mb-3 mb-lg-0">
             <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-2">
-                    <li class="breadcrumb-item"><a href="{% url 'painel_principal' %}" class="text-decoration-none">Painel</a></li>
-                    <li class="breadcrumb-item active">Gestão de Eventos</li>
+                <ol class="breadcrumb bg-transparent p-0 mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'painel_principal' %}" class="text-decoration-none text-muted">Painel</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'cronograma_academico' %}" class="text-decoration-none text-muted">Calendário</a></li>
+                    <li class="breadcrumb-item active fw-bold text-primary">Gestão de Eventos</li>
                 </ol>
             </nav>
-            <h2 class="fw-bold"><i class="bi bi-calendar-check me-2"></i>Gestão de Eventos</h2>
+            <h1 class="h3 fw-bold mb-1"><i class="bi bi-calendar-check-fill text-primary me-2"></i>Gestão de Eventos</h1>
+            <p class="text-muted small mb-0">Gerencie marcos acadêmicos e configurações financeiras</p>
         </div>
-        <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#novoEventoModal">
-            <i class="bi bi-plus-lg me-2"></i>Novo Evento
-        </button>
+        <div class="col-lg-6 d-flex justify-content-lg-end gap-2 flex-wrap">
+            <a href="{% url 'cronograma_academico' %}" class="btn btn-white border shadow-sm rounded-pill px-3">
+                <i class="bi bi-arrow-left me-1"></i>Voltar
+            </a>
+            <button type="button" class="btn btn-soft-danger rounded-pill px-3 shadow-sm border-0" data-bs-toggle="modal" data-bs-target="#bloquearDevedoresModal">
+                <i class="bi bi-person-x-fill me-1"></i>Bloquear Devedores
+            </button>
+            <button type="button" class="btn btn-soft-primary rounded-pill px-3 shadow-sm border-0" data-bs-toggle="modal" data-bs-target="#configPropinaModal">
+                <i class="bi bi-cash-stack me-1"></i>Configurar Mensalidades
+            </button>
+            <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm border-0" data-bs-toggle="modal" data-bs-target="#novoEventoModal">
+                <i class="bi bi-plus-lg me-1"></i>Novo Evento
+            </button>
+        </div>
     </div>
 
-    <div class="card border-0 shadow-sm" style="border-radius: 15px;">
-        <div class="card-body p-4">
+    <!-- Main Content Card -->
+    <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px;">
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="bg-light">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-gray-50 border-bottom">
                         <tr>
-                            <th>Evento</th>
-                            <th>Ano Lectivo</th>
-                            <th>Período</th>
-                            <th>Estado</th>
-                            <th class="text-end">Ações</th>
+                            <th class="ps-4 py-3 text-uppercase small fw-bold text-muted">Evento / Descrição</th>
+                            <th class="py-3 text-uppercase small fw-bold text-muted">Ano Lectivo</th>
+                            <th class="py-3 text-uppercase small fw-bold text-muted">Período</th>
+                            <th class="py-3 text-uppercase small fw-bold text-muted text-center">Estado</th>
+                            <th class="pe-4 py-3 text-uppercase small fw-bold text-muted text-end">Ações</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="border-0">
                         {% for evento in eventos %}
-                        <tr>
-                            <td>
+                        <tr class="transition-all hover-bg-light">
+                            <td class="ps-4 py-4">
                                 <div class="d-flex align-items-center">
-                                    <div class="rounded-circle bg-opacity-10 p-2 me-3 {% if evento.tipo_evento == 'INSCRICAO' %}bg-info text-info{% elif evento.tipo_evento == 'MATRICULA' %}bg-success text-success{% elif evento.tipo_evento == 'TESTE' %}bg-warning text-warning{% else %}bg-secondary text-secondary{% endif %}">
-                                        <i class="bi bi-calendar-event"></i>
+                                    <div class="icon-shape bg-primary-soft text-primary rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                                        <i class="bi bi-calendar-event fs-5"></i>
                                     </div>
                                     <div>
-                                        <span class="d-block fw-bold">{{ evento.descricao }}</span>
-                                        <small class="text-muted">{{ evento.get_tipo_evento_display }}</small>
+                                        <h6 class="mb-0 fw-bold">{{ evento.descricao }}</h6>
+                                        <span class="text-muted small">{{ evento.get_tipo_evento_display }}</span>
                                     </div>
                                 </div>
                             </td>
-                            <td>{{ evento.ano_lectivo.codigo }}</td>
-                            <td>{{ evento.data_inicio|date:"d/m/Y" }} - {{ evento.data_fim|date:"d/m/Y" }}</td>
-                            <td>
+                            <td class="py-4">
+                                <span class="badge bg-light text-dark border fw-medium rounded-pill px-3 py-2">
+                                    {{ evento.ano_lectivo.codigo }}
+                                </span>
+                            </td>
+                            <td class="py-4">
+                                <div class="small">
+                                    <div class="text-dark fw-medium"><i class="bi bi-clock me-1 text-primary"></i>{{ evento.data_inicio|date:"d/m/Y" }}</div>
+                                    <div class="text-muted"><i class="bi bi-arrow-right-short me-1"></i>{{ evento.data_fim|date:"d/m/Y" }}</div>
+                                </div>
+                            </td>
+                            <td class="py-4 text-center">
                                 {% if evento.esta_ocorrendo %}
-                                <span class="badge bg-success rounded-pill">Ativo</span>
+                                <span class="badge bg-success-soft text-success rounded-pill px-3 py-2 fw-bold">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Ativo
+                                </span>
                                 {% else %}
-                                <span class="badge bg-secondary rounded-pill">Inativo</span>
+                                <span class="badge bg-warning-soft text-warning rounded-pill px-3 py-2 fw-bold">
+                                    <i class="bi bi-pause-fill me-1"></i>Inativo
+                                </span>
                                 {% endif %}
                             </td>
-                            <td class="text-end">
-                                <form method="POST" class="d-inline">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="action" value="deletar_evento">
-                                    <input type="hidden" name="evento_id" value="{{ evento.id }}">
-                                    <button type="submit" class="btn btn-sm btn-outline-danger border-0" onclick="return confirm('Tem certeza que deseja remover este evento?')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
+                            <td class="pe-4 py-4 text-end">
+                                <button type="button" class="btn btn-icon btn-soft-danger rounded-circle" 
+                                        data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" 
+                                        data-evento-id="{{ evento.id }}" 
+                                        data-evento-nome="{{ evento.descricao }}">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="5" class="text-center py-4 text-muted">Nenhum evento registrado no sistema.</td>
+                            <td colspan="5" class="text-center py-5">
+                                <div class="py-4">
+                                    <i class="bi bi-calendar-x text-muted display-1 mb-3"></i>
+                                    <h5 class="text-muted">Nenhum evento registrado</h5>
+                                    <p class="text-muted small">Comece criando um novo evento para o ano lectivo.</p>
+                                </div>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -78,12 +109,175 @@
     </div>
 </div>
 
+<style>
+    .bg-primary-soft { background-color: rgba(13, 110, 253, 0.1); }
+    .bg-success-soft { background-color: rgba(25, 135, 84, 0.1); }
+    .bg-warning-soft { background-color: rgba(255, 193, 7, 0.1); }
+    .bg-danger-soft { background-color: rgba(220, 53, 69, 0.1); }
+    .btn-soft-primary { background-color: rgba(13, 110, 253, 0.1); color: #0d6efd; transition: all 0.3s; }
+    .btn-soft-primary:hover { background-color: #0d6efd; color: white; }
+    .btn-soft-danger { background-color: rgba(220, 53, 69, 0.1); color: #dc3545; transition: all 0.3s; }
+    .btn-soft-danger:hover { background-color: #dc3545; color: white; }
+    .btn-white { background-color: white; color: #6c757d; }
+    .btn-icon { width: 38px; height: 38px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border: none; transition: all 0.2s; }
+    .btn-icon:hover { transform: scale(1.1); }
+    .hover-bg-light:hover { background-color: #f8f9fa; }
+    .transition-all { transition: all 0.2s ease-in-out; }
+    .bg-gray-50 { background-color: #fcfcfd; }
+    .icon-shape { flex-shrink: 0; }
+</style>
+
+<!-- Modal Bloquear Devedores -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 25px;">
+            <div class="modal-body p-5 text-center">
+                <div class="icon-shape bg-danger-soft text-danger rounded-circle mb-4 mx-auto d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                    <i class="bi bi-trash3-fill fs-1"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Remover Evento</h4>
+                <p class="text-muted mb-4">Tem certeza que deseja remover o evento <strong id="deleteEventoNome"></strong>? Esta ação não pode ser desfeita.</p>
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="deletar_evento">
+                    <input type="hidden" name="evento_id" id="deleteEventoId">
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger btn-lg rounded-pill fw-bold py-3 shadow-sm">Sim, Remover Evento</button>
+                        <button type="button" class="btn btn-link text-muted text-decoration-none fw-bold" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const confirmDeleteModal = document.getElementById('confirmDeleteModal');
+    if (confirmDeleteModal) {
+        confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const id = button.getAttribute('data-evento-id');
+            const nome = button.getAttribute('data-evento-nome');
+            
+            document.getElementById('deleteEventoId').value = id;
+            document.getElementById('deleteEventoNome').textContent = nome;
+        });
+    }
+</script>
+
+<!-- Modal Bloquear Devedores -->
+<div class="modal fade" id="bloquearDevedoresModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 25px;">
+            <div class="modal-body p-5 text-center">
+                <div class="icon-shape bg-danger-soft text-danger rounded-circle mb-4 mx-auto d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                    <i class="bi bi-shield-lock-fill fs-1"></i>
+                </div>
+                <h4 class="fw-bold mb-3">Bloqueio Geral de Devedores</h4>
+                <p class="text-muted mb-4">Deseja executar o bloqueio automático de todos os estudantes que possuem dívidas pendentes? Isso afetará o acesso às notas e pagamentos online.</p>
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="bloquear_devedores_manual">
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger btn-lg rounded-pill fw-bold py-3 shadow-sm">Confirmar Bloqueio Agora</button>
+                        <button type="button" class="btn btn-link text-muted text-decoration-none fw-bold" data-bs-dismiss="modal">Cancelar Operação</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Configurar Propina -->
+<div class="modal fade" id="configPropinaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 25px;">
+            <div class="modal-header border-0 pt-4 px-4 pb-0">
+                <h5 class="modal-title fw-bold"><i class="bi bi-gear-fill text-primary me-2"></i>Regras Financeiras</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="configurar_propina">
+                <div class="modal-body p-4">
+                    <div class="mb-4 bg-light p-3 rounded-4">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Ano Lectivo Alvo</label>
+                        <select name="ano_lectivo" class="form-select border-0 bg-transparent fw-bold" required>
+                            {% for ano in anos %}
+                            <option value="{{ ano.id }}">{{ ano.codigo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4 d-flex align-items-center justify-content-between px-2">
+                        <div>
+                            <h6 class="mb-0 fw-bold">Cobrança Ativa</h6>
+                            <p class="text-muted small mb-0">Habilitar propinas para este ano</p>
+                        </div>
+                        <div class="form-check form-switch fs-4">
+                            <input class="form-check-input" type="checkbox" name="cobrar_propinas" id="cobrarPropinasCheck" checked>
+                        </div>
+                    </div>
+
+                    <div id="configuracoesPropina">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">Dia Limite (Normal)</label>
+                                <input type="number" name="dia_pagamento_limite" class="form-control rounded-3" value="10" min="1" max="31">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">Início da Multa</label>
+                                <input type="number" name="dia_inicio_multa" class="form-control rounded-3" value="11" min="1" max="31">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">% Multa Inicial</label>
+                                <input type="number" step="0.01" name="percentagem_multa_inicial" class="form-control rounded-3" value="10.00">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">% Multa Diária</label>
+                                <input type="number" step="0.01" name="percentagem_multa_diaria" class="form-control rounded-3" value="1.00">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">Prazo Final Multa</label>
+                                <input type="number" name="dia_limite_multa" class="form-control rounded-3" value="30" min="1" max="31">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold text-muted">Dia do Bloqueio</label>
+                                <input type="number" name="dia_bloqueio_estudante" class="form-control rounded-3" value="15" min="1" max="31">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pb-4 px-4">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-5 shadow-sm">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('cobrarPropinasCheck').addEventListener('change', function() {
+        const configSection = document.getElementById('configuracoesPropina');
+        if (this.checked) {
+            configSection.style.opacity = '1';
+            configSection.style.pointerEvents = 'auto';
+            configSection.querySelectorAll('input').forEach(i => i.disabled = false);
+        } else {
+            configSection.style.opacity = '0.4';
+            configSection.style.pointerEvents = 'none';
+            configSection.querySelectorAll('input').forEach(i => i.disabled = true);
+        }
+    });
+</script>
+
 <!-- Modal Novo Evento -->
 <div class="modal fade" id="novoEventoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow" style="border-radius: 15px;">
-            <div class="modal-header border-0 pt-4 px-4">
-                <h5 class="modal-title fw-bold">Novo Evento de Calendário</h5>
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 25px;">
+            <div class="modal-header border-0 pt-4 px-4 pb-0">
+                <h5 class="modal-title fw-bold"><i class="bi bi-plus-circle-fill text-primary me-2"></i>Novo Marco Acadêmico</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form method="POST">
@@ -91,39 +285,39 @@
                 <input type="hidden" name="action" value="criar_evento">
                 <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">Ano Lectivo</label>
-                        <select name="ano_lectivo" class="form-select" required>
+                        <label class="form-label small fw-bold text-muted text-uppercase">Ano Lectivo</label>
+                        <select name="ano_lectivo" class="form-select rounded-3" required>
                             {% for ano in anos %}
                             <option value="{{ ano.id }}">{{ ano.codigo }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">Tipo de Evento</label>
-                        <select name="tipo_evento" class="form-select" required>
-                            {% for code, label in tipos_evento %}
-                            <option value="{{ code }}">{{ label }}</option>
+                        <label class="form-label small fw-bold text-muted text-uppercase">Tipo de Evento</label>
+                        <select name="tipo_evento" class="form-select rounded-3" required>
+                            {% for value, label in tipos_evento %}
+                            <option value="{{ value }}">{{ label }}</option>
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted">Descrição</label>
-                        <input type="text" name="descricao" class="form-control" placeholder="Ex: Inscrições para Novos Alunos" required>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Início</label>
+                            <input type="date" name="data_inicio" class="form-control rounded-3" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Término</label>
+                            <input type="date" name="data_fim" class="form-control rounded-3" required>
+                        </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label small fw-bold text-muted">Data de Início</label>
-                            <input type="date" name="data_inicio" class="form-control" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label small fw-bold text-muted">Data de Fim</label>
-                            <input type="date" name="data_fim" class="form-control" required>
-                        </div>
+                    <div class="mb-0">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Descrição Detalhada</label>
+                        <textarea name="descricao" class="form-control rounded-3" rows="3" placeholder="Ex: Período de inscrições para o 1º semestre..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer border-0 pb-4 px-4">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary px-4">Salvar Evento</button>
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-5 shadow-sm">Criar Evento</button>
                 </div>
             </form>
         </div>
