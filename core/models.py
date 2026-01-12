@@ -344,8 +344,40 @@ class ConfiguracaoEscola(models.Model):
         return super().save(*args, **kwargs)
 
 class NivelAcademico(models.Model):
+    codigo = models.CharField(max_length=10, unique=True, null=True, blank=True, verbose_name="Código")
     nome = models.CharField(max_length=100, unique=True, verbose_name="Nome do Nível")
     descricao = models.TextField(blank=True, verbose_name="Descrição")
+    
+    # Estrutura Académica
+    duracao_padrao = models.PositiveIntegerField(default=4, verbose_name="Duração Padrão (Anos)")
+    periodos_por_ano = models.PositiveIntegerField(default=2, verbose_name="Número de Períodos por Ano")
+    creditos_minimos = models.PositiveIntegerField(default=0, verbose_name="Total Mínimo de Créditos")
+    
+    # Regras Académicas
+    nota_minima_aprovacao = models.DecimalField(max_digits=4, decimal_places=2, default=10.00, verbose_name="Nota Mínima de Aprovação")
+    escala_notas_min = models.IntegerField(default=0, verbose_name="Escala Mínima")
+    escala_notas_max = models.IntegerField(default=20, verbose_name="Escala Máxima")
+    media_minima_progressao = models.DecimalField(max_digits=4, decimal_places=2, default=10.00, verbose_name="Média Mínima para Progressão")
+    limite_reprovacoes = models.PositiveIntegerField(null=True, blank=True, verbose_name="Limite de Reprovações")
+    
+    # Regras de Admissão
+    nivel_entrada_exigido = models.CharField(max_length=100, blank=True, verbose_name="Nível de entrada exigido")
+    exige_teste_admissao = models.BooleanField(default=False, verbose_name="Exige teste de admissão?")
+    documentos_obrigatorios = models.TextField(blank=True, verbose_name="Documentos obrigatórios")
+    
+    # Regime de Funcionamento
+    regime_regular = models.BooleanField(default=True, verbose_name="Regular")
+    regime_pos_laboral = models.BooleanField(default=False, verbose_name="Pós-laboral")
+    regime_modular = models.BooleanField(default=False, verbose_name="Modular")
+    
+    turno_manha = models.BooleanField(default=True, verbose_name="Manhã")
+    turno_tarde = models.BooleanField(default=True, verbose_name="Tarde")
+    turno_noite = models.BooleanField(default=False, verbose_name="Noite")
+    
+    # Situação Legal / Institucional
+    base_legal = models.CharField(max_length=200, blank=True, verbose_name="Base legal")
+    entidade_acreditadora = models.CharField(max_length=100, blank=True, verbose_name="Entidade acreditadora")
+    
     data_criacao = models.DateTimeField(auto_now_add=True)
 
     class Meta:

@@ -1,39 +1,180 @@
 {% extends 'core/base.html' %}
 {% block title %}Níveis Académicos{% endblock %}
 {% block content %}
-<div class="container my-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Níveis Académicos</h2>
-        <a href="{% url 'nivel_academico_create' %}" class="btn btn-primary">Novo Nível</a>
+<div class="container-fluid px-4 py-5">
+    <!-- Header Section -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-5">
+        <div>
+            <h2 class="display-6 fw-bold text-dark mb-1">Níveis Académicos</h2>
+            <p class="text-muted mb-0">Gestão de graus académicos e parâmetros de ensino.</p>
+        </div>
+        <a href="{% url 'nivel_academico_create' %}" class="btn btn-primary btn-lg rounded-pill px-4 shadow-sm d-flex align-items-center gap-2">
+            <i class="bi bi-plus-lg"></i>
+            <span>Novo Nível</span>
+        </a>
     </div>
-    <div class="card shadow-sm border-0 rounded-4">
-        <div class="table-responsive p-4">
-            <table class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Descrição</th>
-                        <th class="text-end">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for nivel in niveis %}
-                    <tr>
-                        <td class="fw-bold">{{ nivel.nome }}</td>
-                        <td>{{ nivel.descricao|default:"---" }}</td>
-                        <td class="text-end">
-                            <a href="{% url 'nivel_academico_edit' nivel.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
-                            <a href="{% url 'nivel_academico_delete' nivel.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="3" class="text-center text-muted py-4">Nenhum nível académico registrado.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+
+    <!-- Stats Overview -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-primary bg-opacity-10">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-primary text-white p-3 rounded-3">
+                        <i class="bi bi-mortarboard fs-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold mb-0">{{ niveis.count }}</h3>
+                        <p class="text-muted small mb-0">Total de Níveis</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid Layout -->
+    <div class="row g-4">
+        {% for nivel in niveis %}
+        <div class="col-xl-4 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden hover-shadow transition">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill text-uppercase fw-bold">
+                            {{ nivel.codigo|default:"S/C" }}
+                        </span>
+                        <div class="dropdown">
+                            <button class="btn btn-link text-muted p-0" data-bs-toggle="dropdown">
+                                <i class="bi bi-three-dots-vertical fs-5"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm">
+                                <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3" href="{% url 'nivel_academico_edit' nivel.pk %}">
+                                    <i class="bi bi-pencil text-primary"></i> Editar
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item d-flex align-items-center gap-2 py-2 px-3 text-danger" href="javascript:void(0)" onclick="confirmDelete('{% url 'nivel_academico_delete' nivel.pk %}', '{{ nivel.nome }}')">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <h5 class="fw-bold text-dark mb-2">{{ nivel.nome }}</h5>
+                    <p class="text-muted small mb-4 line-clamp-2">{{ nivel.descricao|default:"Sem descrição adicional." }}</p>
+                    
+                    <div class="row g-2 border-top pt-4">
+                        <div class="col-6">
+                            <div class="p-2 rounded-3 bg-light text-center">
+                                <span class="d-block text-muted small">Duração</span>
+                                <span class="fw-bold text-dark">{{ nivel.duracao_padrao }} Anos</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-2 rounded-3 bg-light text-center">
+                                <span class="d-block text-muted small">Períodos</span>
+                                <span class="fw-bold text-dark">{{ nivel.periodos_por_ano }}/Ano</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-2 rounded-3 bg-light text-center">
+                                <span class="d-block text-muted small">Escala</span>
+                                <span class="fw-bold text-dark">0-{{ nivel.escala_notas_max }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-2 rounded-3 bg-light text-center">
+                                <span class="d-block text-muted small">Aprovação</span>
+                                <span class="fw-bold text-dark">{{ nivel.nota_minima_aprovacao }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-transparent border-0 px-4 pb-4 pt-0">
+                    <div class="d-flex align-items-center gap-2">
+                        {% if nivel.exige_teste_admissao %}
+                        <span class="badge bg-warning bg-opacity-10 text-warning border-0 px-2 py-1 rounded-1 small">
+                            <i class="bi bi-journal-check me-1"></i>Teste Exigido
+                        </span>
+                        {% endif %}
+                        {% if nivel.regime_pos_laboral %}
+                        <span class="badge bg-info bg-opacity-10 text-info border-0 px-2 py-1 rounded-1 small">
+                            <i class="bi bi-moon-stars me-1"></i>Pós-laboral
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <div class="bg-light d-inline-block p-4 rounded-circle mb-3">
+                    <i class="bi bi-folder2-open display-4 text-muted"></i>
+                </div>
+                <h4 class="text-muted">Nenhum nível académico encontrado</h4>
+                <p class="text-muted">Comece por criar o primeiro nível académico do sistema.</p>
+                <a href="{% url 'nivel_academico_create' %}" class="btn btn-primary rounded-pill px-4">Novo Nível</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Eliminação -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold">Confirmar Eliminação</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <div class="bg-danger bg-opacity-10 text-danger d-inline-block p-4 rounded-circle mb-3">
+                    <i class="bi bi-exclamation-triangle display-4"></i>
+                </div>
+                <h5 class="fw-bold mb-2">Tem a certeza?</h5>
+                <p class="text-muted">Está prestes a eliminar o nível académico <strong id="deleteObjectName" class="text-dark"></strong>. Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer border-0 pb-4 px-4 justify-content-center">
+                <form id="deleteForm" method="POST">
+                    {% csrf_token %}
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold" data-bs-modal="dismiss">Cancelar</button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold shadow-sm">Sim, Eliminar</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important;
+    }
+    .transition {
+        transition: all 0.3s ease;
+    }
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;  
+        overflow: hidden;
+    }
+    .dropdown-item {
+        color: #475569;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+    .dropdown-item:hover {
+        background: #f1f5f9;
+    }
+</style>
+
+<script>
+    function confirmDelete(url, name) {
+        const modal = new bootstrap.Modal(document.getElementById('deleteModal'));
+        document.getElementById('deleteForm').action = url;
+        document.getElementById('deleteObjectName').textContent = name;
+        modal.show();
+    }
+</script>
 {% endblock %}

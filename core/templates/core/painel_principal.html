@@ -4,68 +4,136 @@
 
 {% block content %}
 <div class="container-fluid px-4 py-5">
-    <!-- Gráficos de Visão Geral -->
+    <!-- Gráfico de Total de Estudantes por Estado e Evolução -->
     <div class="row g-4 mb-4">
-        <!-- Estudantes Inscritos -->
-        <div class="col-lg-3 col-md-6">
-            <div class="card border-0 shadow-sm rounded-4 h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="bg-success bg-opacity-10 p-2 rounded-3 me-3">
-                            <i class="bi bi-person-plus text-success fs-5"></i>
-                        </div>
-                        <h6 class="mb-0 fw-bold text-dark">Inscritos por Curso</h6>
-                    </div>
-                    <div style="height: 200px;">
-                        <canvas id="inscricoesChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Estudantes Matriculados -->
-        <div class="col-lg-3 col-md-6">
+        <div class="col-lg-6">
             <div class="card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-4">
                         <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
-                            <i class="bi bi-person-check text-primary fs-5"></i>
+                            <i class="bi bi-bar-chart-fill text-primary fs-5"></i>
                         </div>
-                        <h6 class="mb-0 fw-bold text-dark">Matriculados</h6>
+                        <h6 class="mb-0 fw-bold text-dark">Total de Estudantes (por estado)</h6>
                     </div>
-                    <div style="height: 200px;">
-                        <canvas id="matriculasChart"></canvas>
+                    <div style="height: 300px;">
+                        <canvas id="estadoEstudantesChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Distribuição por Sexo -->
-        <div class="col-lg-3 col-md-6">
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-success bg-opacity-10 p-2 rounded-3 me-3">
+                            <i class="bi bi-graph-up-arrow text-success fs-5"></i>
+                        </div>
+                        <h6 class="mb-0 fw-bold text-dark">Evolução de Matrículas por Ano Lectivo</h6>
+                    </div>
+                    <div style="height: 300px;">
+                        <canvas id="evolucaoMatriculasChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico de Estudantes por Curso e Inscrições por Curso -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
             <div class="card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-4">
                         <div class="bg-info bg-opacity-10 p-2 rounded-3 me-3">
-                            <i class="bi bi-gender-ambiguous text-info fs-5"></i>
+                            <i class="bi bi-mortarboard-fill text-info fs-5"></i>
                         </div>
-                        <h6 class="mb-0 fw-bold text-dark">Gênero</h6>
+                        <h6 class="mb-0 fw-bold text-dark">Estudantes por Curso</h6>
                     </div>
-                    <div style="height: 200px;">
-                        <canvas id="sexoChart"></canvas>
+                    <div style="height: 350px;">
+                        <canvas id="cursosChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Evolução de Inscrições -->
-        <div class="col-lg-3 col-md-6">
+        <div class="col-lg-6">
             <div class="card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-4">
                         <div class="bg-warning bg-opacity-10 p-2 rounded-3 me-3">
-                            <i class="bi bi-graph-up text-warning fs-5"></i>
+                            <i class="bi bi-person-plus-fill text-warning fs-5"></i>
                         </div>
-                        <h6 class="mb-0 fw-bold text-dark">Evolução (7d)</h6>
+                        <h6 class="mb-0 fw-bold text-dark">Inscrições por Curso</h6>
                     </div>
-                    <div style="height: 200px;">
-                        <canvas id="evolucaoChart"></canvas>
+                    <div style="height: 350px;">
+                        <canvas id="inscricoesCursoChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico de Taxa de Aprovação e Indicações -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
+                            <i class="bi bi-check-circle-fill text-primary fs-5"></i>
+                        </div>
+                        <h6 class="mb-0 fw-bold text-dark">Taxa de Aprovação no Teste</h6>
+                    </div>
+                    <div style="height: 300px;">
+                        <canvas id="taxaAprovacaoChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-secondary bg-opacity-10 p-2 rounded-3 me-3">
+                            <i class="bi bi-pie-chart-fill text-secondary fs-5"></i>
+                        </div>
+                        <h6 class="mb-0 fw-bold text-dark">Indicações por Via</h6>
+                    </div>
+                    <div style="height: 300px;">
+                        <canvas id="indicacoesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico de Receitas e Pagamentos -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-success bg-opacity-10 p-2 rounded-3 me-3">
+                            <i class="bi bi-cash-stack text-success fs-5"></i>
+                        </div>
+                        <h6 class="mb-0 fw-bold text-dark">Receitas por Ano</h6>
+                    </div>
+                    <div style="height: 300px;">
+                        <canvas id="receitasChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-danger bg-opacity-10 p-2 rounded-3 me-3">
+                            <i class="bi bi-wallet2 text-danger fs-5"></i>
+                        </div>
+                        <h6 class="mb-0 fw-bold text-dark">Status de Pagamentos</h6>
+                    </div>
+                    <div style="height: 300px;">
+                        <canvas id="pagamentosChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -176,26 +244,16 @@
     </style>
 
     <div id="menusContainer">
-        <!-- Mensagem de Feedback de Pesquisa -->
-        <div id="noResultsFeedback" class="text-center py-5 d-none animate__animated animate__fadeIn">
-            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
-                <i class="bi bi-search text-muted fs-1"></i>
-            </div>
-            <h4 class="fw-bold text-dark mb-2">Nenhum resultado encontrado</h4>
-            <p class="text-muted mb-4">Não encontramos nada correspondente a "<span id="searchTermDisplay" class="fw-bold"></span>".</p>
-            <button type="button" onclick="resetSearch()" class="btn btn-primary rounded-pill px-4">Limpar Pesquisa</button>
-        </div>
-
         <!-- SEÇÃO DE MATRÍCULA -->
-        <div class="menu-section">
+        <div class="menu-section animate__animated animate__fadeInUp">
             <div class="section-header d-flex align-items-center">
-                <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
+                <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3 animate__animated animate__pulse animate__infinite">
                     <i class="bi bi-file-earmark-text text-primary fs-4"></i>
                 </div>
                 <h3 class="mb-0 fw-bold">Secretária / DAAC</h3>
             </div>
             <div class="row g-4 menu-items">
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn">
                     <a href="{% url 'nova_matricula' %}" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -213,7 +271,7 @@
 
         <!-- SEÇÃO DE CONFIGURAÇÕES -->
         {% if user.perfil.nivel_acesso == 'admin' or user.perfil.nivel_acesso == 'super_admin' %}
-        <div class="menu-section">
+        <div class="menu-section animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
             <div class="section-header d-flex align-items-center">
                 <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
                     <i class="bi bi-gear text-primary fs-4"></i>
@@ -221,7 +279,7 @@
                 <h3 class="mb-0 fw-bold">Configurações Académicas</h3>
             </div>
             <div class="row g-4 menu-items">
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.2s;">
                     <a href="{% url 'listar_cursos' %}" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -234,7 +292,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.3s;">
                     <a href="{% url 'cursos_disciplinas' %}" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -247,7 +305,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.4s;">
                     <a href="{% url 'grelha_curricular' %}" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -260,7 +318,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.5s;">
                     <a href="{% url 'painel_admin' %}" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -273,7 +331,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.6s;">
                     <a href="{% url 'ano_academico_lista' %}" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -286,7 +344,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.7s;">
                     <a href="#" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -299,7 +357,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.8s;">
                     <a href="{% url 'nivel_academico_lista' %}" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -312,7 +370,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.9s;">
                     <a href="#" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -325,7 +383,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 1.0s;">
                     <a href="#" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -338,7 +396,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 1.1s;">
                     <a href="#" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -351,7 +409,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 1.2s;">
                     <a href="#" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -364,7 +422,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 1.3s;">
                     <a href="#" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -377,7 +435,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 1.4s;">
                     <a href="#" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -390,7 +448,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 1.5s;">
                     <a href="#" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -403,7 +461,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 1.6s;">
                     <a href="#" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -416,7 +474,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 1.7s;">
                     <a href="#" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -429,7 +487,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 1.8s;">
                     <a href="{% url 'cronograma_academico' %}" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -442,7 +500,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 1.9s;">
                     <a href="#" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -455,7 +513,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 2.0s;">
                     <a href="#" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -478,146 +536,459 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Gráfico de Inscrições
-    const dadosInscricoes = JSON.parse('{{ dados_grafico|safe }}');
-    new Chart(document.getElementById('inscricoesChart'), {
-        type: 'bar',
-        data: {
-            labels: dadosInscricoes.labels,
-            datasets: [{
-                label: 'Inscritos',
-                data: dadosInscricoes.valores,
-                backgroundColor: 'rgba(5, 150, 105, 0.6)',
-                borderRadius: 5
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } }
-        }
-    });
-
-    // Gráfico de Matrículas
-    const dadosMatriculas = JSON.parse('{{ dados_grafico_matriculas|safe }}');
-    new Chart(document.getElementById('matriculasChart'), {
-        type: 'bar',
-        data: {
-            labels: dadosMatriculas.labels,
-            datasets: [{
-                label: 'Matriculados',
-                data: dadosMatriculas.valores,
-                backgroundColor: 'rgba(30, 58, 138, 0.6)',
-                borderRadius: 5
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } }
-        }
-    });
-
-    // Gráfico de Sexo
-    const dadosSexo = JSON.parse('{{ dados_sexo|safe }}');
-    new Chart(document.getElementById('sexoChart'), {
-        type: 'doughnut',
-        data: {
-            labels: dadosSexo.labels,
-            datasets: [{
-                data: dadosSexo.valores,
-                backgroundColor: ['#3b82f6', '#ec4899'],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: true, position: 'bottom' } }
-        }
-    });
-
-    // Gráfico de Evolução
-    const dadosEvolucao = JSON.parse('{{ dados_evolucao|safe }}');
-    new Chart(document.getElementById('evolucaoChart'), {
-        type: 'line',
-        data: {
-            labels: dadosEvolucao.labels,
-            datasets: [{
-                label: 'Novas Inscrições',
-                data: dadosEvolucao.valores,
-                borderColor: '#f59e0b',
-                backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } }
-        }
-    });
-
-    // Lógica de Pesquisa
-    const searchInput = document.getElementById('searchMenu');
-    const sections = document.querySelectorAll('.menu-section');
-    const feedback = document.getElementById('noResultsFeedback');
-    const termDisplay = document.getElementById('searchTermDisplay');
-
-    function resetSearch() {
-        searchInput.value = '';
-        searchInput.dispatchEvent(new Event('input'));
-    }
-
-    searchInput.addEventListener('input', function(e) {
-        const term = e.target.value.toLowerCase();
-        let anyVisible = false;
-
-        sections.forEach(section => {
-            const items = section.querySelectorAll('.menu-item');
-            let sectionVisible = false;
-
-            items.forEach(item => {
-                const text = item.textContent.toLowerCase();
-                if (text.includes(term)) {
-                    item.classList.remove('d-none');
-                    sectionVisible = true;
-                    anyVisible = true;
-                } else {
-                    item.classList.add('d-none');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Gráfico de Estado dos Estudantes
+        const statsEstado = JSON.parse('{{ stats_estado|safe }}');
+        const ctx = document.getElementById('estadoEstudantesChart').getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: statsEstado.labels,
+                datasets: [{
+                    label: 'Total de Estudantes',
+                    data: statsEstado.valores,
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.7)', // Blue
+                        'rgba(16, 185, 129, 0.7)', // Green
+                        'rgba(245, 158, 11, 0.7)', // Amber
+                        'rgba(99, 102, 241, 0.7)'  // Indigo
+                    ],
+                    borderColor: [
+                        'rgb(59, 130, 246)',
+                        'rgb(16, 185, 129)',
+                        'rgb(245, 158, 11)',
+                        'rgb(99, 102, 241)'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#1e293b',
+                        bodyColor: '#64748b',
+                        borderColor: '#e2e8f0',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false,
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            stepSize: 1,
+                            color: '#64748b'
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#1e293b', font: { weight: '600' } }
+                    }
                 }
-            });
-
-            if (sectionVisible) {
-                section.classList.remove('d-none');
-            } else {
-                section.classList.add('d-none');
             }
         });
 
-        if (!anyVisible && term !== '') {
-            feedback.classList.remove('d-none');
-            termDisplay.textContent = term;
-        } else {
-            feedback.classList.add('d-none');
-        }
-    });
+        // Gráfico de Evolução de Matrículas
+        const statsEvolucao = JSON.parse('{{ evolucao_matriculas|safe }}');
+        const ctxEvolucao = document.getElementById('evolucaoMatriculasChart').getContext('2d');
+        
+        new Chart(ctxEvolucao, {
+            type: 'line',
+            data: {
+                labels: statsEvolucao.labels,
+                datasets: [{
+                    label: 'Crescimento',
+                    data: statsEvolucao.valores,
+                    borderColor: 'rgb(16, 185, 129)',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: 'rgb(16, 185, 129)',
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#1e293b',
+                        bodyColor: '#64748b',
+                        borderColor: '#e2e8f0',
+                        borderWidth: 1,
+                        padding: 12
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                        ticks: { stepSize: 1, color: '#64748b' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#1e293b', font: { weight: '600' } }
+                    }
+                }
+            }
+        });
 
-    // Toggle Menus
-    const toggleBtn = document.getElementById('toggleAllMenus');
-    const menusContainer = document.getElementById('menusContainer');
-    toggleBtn.addEventListener('click', function() {
-        const isHidden = menusContainer.classList.contains('d-none');
-        if (isHidden) {
-            menusContainer.classList.remove('d-none');
-            this.querySelector('span').textContent = 'Ocultar Menus';
-            this.querySelector('i').className = 'bi bi-eye-slash me-1';
-        } else {
-            menusContainer.classList.add('d-none');
-            this.querySelector('span').textContent = 'Mostrar Menus';
-            this.querySelector('i').className = 'bi bi-eye me-1';
+        // Gráfico de Estudantes por Curso
+        const statsCursos = JSON.parse('{{ stats_cursos|safe }}');
+        const ctxCursos = document.getElementById('cursosChart').getContext('2d');
+        
+        new Chart(ctxCursos, {
+            type: 'bar',
+            data: {
+                labels: statsCursos.labels,
+                datasets: [{
+                    label: 'Estudantes Matriculados',
+                    data: statsCursos.valores,
+                    backgroundColor: 'rgba(14, 165, 233, 0.7)',
+                    borderColor: 'rgb(14, 165, 233)',
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#1e293b',
+                        bodyColor: '#64748b',
+                        borderColor: '#e2e8f0',
+                        borderWidth: 1,
+                        padding: 12
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                        ticks: { stepSize: 1, color: '#64748b' }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: { color: '#1e293b', font: { weight: '600' } }
+                    }
+                }
+            }
+        });
+
+        // Gráfico de Inscrições por Curso
+        const statsInscricoesCurso = JSON.parse('{{ stats_inscricoes_curso|safe }}');
+        const ctxInscricoesCurso = document.getElementById('inscricoesCursoChart').getContext('2d');
+        
+        new Chart(ctxInscricoesCurso, {
+            type: 'bar',
+            data: {
+                labels: statsInscricoesCurso.labels,
+                datasets: [{
+                    label: 'Total de Inscrições',
+                    data: statsInscricoesCurso.valores,
+                    backgroundColor: 'rgba(245, 158, 11, 0.7)',
+                    borderColor: 'rgb(245, 158, 11)',
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#1e293b',
+                        bodyColor: '#64748b',
+                        borderColor: '#e2e8f0',
+                        borderWidth: 1,
+                        padding: 12
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                        ticks: { stepSize: 1, color: '#64748b' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#1e293b', font: { weight: '600' } }
+                    }
+                }
+            }
+        });
+
+        // Gráfico de Taxa de Aprovação
+        const statsTaxa = JSON.parse('{{ stats_taxa_aprovacao|safe }}');
+        const ctxTaxa = document.getElementById('taxaAprovacaoChart').getContext('2d');
+        
+        new Chart(ctxTaxa, {
+            type: 'bar',
+            data: {
+                labels: statsTaxa.labels,
+                datasets: [{
+                    label: 'Quantidade',
+                    data: statsTaxa.valores,
+                    backgroundColor: [
+                        'rgba(16, 185, 129, 0.7)', // Aprovados (Verde)
+                        'rgba(239, 68, 68, 0.7)',  // Reprovados (Vermelho)
+                        'rgba(245, 158, 11, 0.7)'   // Em espera (Amarelo)
+                    ],
+                    borderColor: [
+                        'rgb(16, 185, 129)',
+                        'rgb(239, 68, 68)',
+                        'rgb(245, 158, 11)'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#1e293b',
+                        bodyColor: '#64748b',
+                        borderColor: '#e2e8f0',
+                        borderWidth: 1,
+                        padding: 12
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                        ticks: { stepSize: 1, color: '#64748b' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#1e293b', font: { weight: '600' } }
+                    }
+                }
+            }
+        });
+
+        // Gráfico de Indicações (Pizza)
+        const statsIndicacoes = JSON.parse('{{ stats_indicacoes|safe }}');
+        const ctxIndicacoes = document.getElementById('indicacoesChart').getContext('2d');
+        
+        new Chart(ctxIndicacoes, {
+            type: 'pie',
+            data: {
+                labels: statsIndicacoes.labels,
+                datasets: [{
+                    data: statsIndicacoes.valores,
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.7)', // Online (Azul)
+                        'rgba(107, 114, 128, 0.7)' // Presencial (Cinza)
+                    ],
+                    borderColor: [
+                        'rgb(59, 130, 246)',
+                        'rgb(107, 114, 128)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#64748b',
+                            padding: 20,
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#1e293b',
+                        bodyColor: '#64748b',
+                        borderColor: '#e2e8f0',
+                        borderWidth: 1,
+                        padding: 12
+                    }
+                }
+            }
+        });
+
+        // Gráfico de Receitas
+        const statsReceitas = JSON.parse('{{ stats_receitas|safe }}');
+        const ctxReceitas = document.getElementById('receitasChart').getContext('2d');
+        
+        new Chart(ctxReceitas, {
+            type: 'bar',
+            data: {
+                labels: statsReceitas.labels,
+                datasets: [{
+                    label: 'Receita Total',
+                    data: statsReceitas.valores,
+                    backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                    borderColor: 'rgb(16, 185, 129)',
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#1e293b',
+                        bodyColor: '#64748b',
+                        borderColor: '#e2e8f0',
+                        borderWidth: 1,
+                        padding: 12
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                        ticks: { color: '#64748b' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#1e293b', font: { weight: '600' } }
+                    }
+                }
+            }
+        });
+
+        // Gráfico de Pagamentos (Donut)
+        const statsPagamentos = JSON.parse('{{ stats_pagamentos_estado|safe }}');
+        const ctxPagamentos = document.getElementById('pagamentosChart').getContext('2d');
+        
+        new Chart(ctxPagamentos, {
+            type: 'doughnut',
+            data: {
+                labels: statsPagamentos.labels,
+                datasets: [{
+                    data: statsPagamentos.valores,
+                    backgroundColor: [
+                        'rgba(16, 185, 129, 0.7)', // Aprovado
+                        'rgba(245, 158, 11, 0.7)', // Pendente
+                        'rgba(239, 68, 68, 0.7)'  // Rejeitado
+                    ],
+                    borderColor: [
+                        'rgb(16, 185, 129)',
+                        'rgb(245, 158, 11)',
+                        'rgb(239, 68, 68)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#64748b',
+                            padding: 20,
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        titleColor: '#1e293b',
+                        bodyColor: '#64748b',
+                        borderColor: '#e2e8f0',
+                        borderWidth: 1,
+                        padding: 12
+                    }
+                }
+            }
+        });
+
+        // Lógica de Pesquisa
+        const searchInput = document.getElementById('searchMenu');
+        const sections = document.querySelectorAll('.menu-section');
+        const feedback = document.getElementById('noResultsFeedback');
+        const termDisplay = document.getElementById('searchTermDisplay');
+
+        function resetSearch() {
+            searchInput.value = '';
+            searchInput.dispatchEvent(new Event('input'));
         }
+
+        searchInput.addEventListener('input', function(e) {
+            const term = e.target.value.toLowerCase();
+            let anyVisible = false;
+
+            sections.forEach(section => {
+                const items = section.querySelectorAll('.menu-item');
+                let sectionVisible = false;
+
+                items.forEach(item => {
+                    const text = item.textContent.toLowerCase();
+                    if (text.includes(term)) {
+                        item.classList.remove('d-none');
+                        sectionVisible = true;
+                        anyVisible = true;
+                    } else {
+                        item.classList.add('d-none');
+                    }
+                });
+
+                if (sectionVisible) {
+                    section.classList.remove('d-none');
+                } else {
+                    section.classList.add('d-none');
+                }
+            });
+
+            if (!anyVisible && term !== '') {
+                feedback.classList.remove('d-none');
+                termDisplay.textContent = term;
+            } else {
+                feedback.classList.add('d-none');
+            }
+        });
+
+        // Toggle Menus
+        const toggleBtn = document.getElementById('toggleAllMenus');
+        const menusContainer = document.getElementById('menusContainer');
+        toggleBtn.addEventListener('click', function() {
+            const isHidden = menusContainer.classList.contains('d-none');
+            if (isHidden) {
+                menusContainer.classList.remove('d-none');
+                this.querySelector('span').textContent = 'Ocultar Menus';
+                this.querySelector('i').className = 'bi bi-eye-slash me-1';
+            } else {
+                menusContainer.classList.add('d-none');
+                this.querySelector('span').textContent = 'Mostrar Menus';
+                this.querySelector('i').className = 'bi bi-eye me-1';
+            }
+        });
     });
 </script>
 {% endblock %}

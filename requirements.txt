@@ -2,3 +2,6 @@ asgiref==3.11.0
 charset-normalizer==3.4.4
 packaging==25.0
 sqlparse==0.5.5
+django
+gunicorn
+qrcode

@@ -1,28 +1,244 @@
 {% extends 'core/base.html' %}
 {% block title %}{% if nivel %}Editar{% else %}Novo{% endif %} Nível Académico{% endblock %}
 {% block content %}
-<div class="container my-4">
+<div class="container-fluid px-4 py-5">
     <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 rounded-4 p-4">
-                <h3 class="mb-4">{% if nivel %}Editar{% else %}Novo{% endif %} Nível Académico</h3>
-                <form method="POST">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="nome" class="form-label">Nome do Nível</label>
-                        <input type="text" class="form-control" id="nome" name="nome" value="{{ nivel.nome|default:'' }}" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="descricao" class="form-label">Descrição</label>
-                        <textarea class="form-control" id="descricao" name="descricao" rows="3">{{ nivel.descricao|default:'' }}</textarea>
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary px-4">Salvar</button>
-                        <a href="{% url 'nivel_academico_lista' %}" class="btn btn-light px-4">Cancelar</a>
-                    </div>
-                </form>
+        <div class="col-xl-8">
+            <!-- Header -->
+            <div class="mb-5">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'nivel_academico_lista' %}" class="text-decoration-none">Níveis Académicos</a></li>
+                        <li class="breadcrumb-item active">{% if nivel %}Editar{% else %}Novo{% endif %}</li>
+                    </ol>
+                </nav>
+                <h2 class="display-6 fw-bold text-dark mb-1">{% if nivel %}Editar{% else %}Configurar Novo{% endif %} Nível</h2>
+                <p class="text-muted">Defina os parâmetros estruturais, regras académicas e regimes de funcionamento.</p>
             </div>
+
+            <form method="POST" class="needs-validation" novalidate>
+                {% csrf_token %}
+                
+                <!-- 1. Identificação -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4">
+                        <h5 class="fw-bold mb-0 text-primary d-flex align-items-center gap-2">
+                            <i class="bi bi-info-circle"></i> 1️⃣ Identificação
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="codigo" class="form-label fw-semibold">Código</label>
+                                <input type="text" class="form-control form-control-lg text-uppercase shadow-none border-2" id="codigo" name="codigo" value="{{ nivel.codigo|default:'' }}" placeholder="Ex: LIC, TEC" required>
+                            </div>
+                            <div class="col-md-8">
+                                <label for="nome" class="form-label fw-semibold">Nome do Nível</label>
+                                <input type="text" class="form-control form-control-lg shadow-none border-2" id="nome" name="nome" value="{{ nivel.nome|default:'' }}" placeholder="Ex: Licenciatura" required>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <label for="descricao" class="form-label fw-semibold">Descrição</label>
+                                <textarea class="form-control shadow-none border-2" id="descricao" name="descricao" rows="2" placeholder="Breve descrição do nível académico...">{{ nivel.descricao|default:'' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Estrutura Académica -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4">
+                        <h5 class="fw-bold mb-0 text-primary d-flex align-items-center gap-2">
+                            <i class="bi bi-layers"></i> 2️⃣ Estrutura Académica
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="duracao_padrao" class="form-label fw-semibold">Duração padrão (Anos)</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control shadow-none border-2" id="duracao_padrao" name="duracao_padrao" value="{{ nivel.duracao_padrao|default:4 }}" min="1" required>
+                                    <span class="input-group-text bg-light border-2 border-start-0">anos</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="periodos_por_ano" class="form-label fw-semibold">Períodos por ano</label>
+                                <input type="number" class="form-control shadow-none border-2" id="periodos_por_ano" name="periodos_por_ano" value="{{ nivel.periodos_por_ano|default:2 }}" min="1" required>
+                                <div class="form-text">Ex: 2 para Semestres</div>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="creditos_minimos" class="form-label fw-semibold">Créditos mínimos</label>
+                                <input type="number" class="form-control shadow-none border-2" id="creditos_minimos" name="creditos_minimos" value="{{ nivel.creditos_minimos|default:0 }}" min="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Regras Académicas -->
+                <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4">
+                        <h5 class="fw-bold mb-0 text-primary d-flex align-items-center gap-2">
+                            <i class="bi bi-shield-check"></i> 3️⃣ Regras Académicas
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="nota_minima_aprovacao" class="form-label fw-semibold">Nota mínima de aprovação</label>
+                                <input type="number" step="0.1" class="form-control shadow-none border-2" id="nota_minima_aprovacao" name="nota_minima_aprovacao" value="{{ nivel.nota_minima_aprovacao|default:10.0 }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="escala_notas_max" class="form-label fw-semibold">Escala de notas (Máximo)</label>
+                                <input type="number" class="form-control shadow-none border-2" id="escala_notas_max" name="escala_notas_max" value="{{ nivel.escala_notas_max|default:20 }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="media_minima_progressao" class="form-label fw-semibold">Média mínima para progressão</label>
+                                <input type="number" step="0.1" class="form-control shadow-none border-2" id="media_minima_progressao" name="media_minima_progressao" value="{{ nivel.media_minima_progressao|default:10.0 }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="limite_reprovacoes" class="form-label fw-semibold">Limite de reprovações</label>
+                                <input type="number" class="form-control shadow-none border-2" id="limite_reprovacoes" name="limite_reprovacoes" value="{{ nivel.limite_reprovacoes|default:'' }}" placeholder="Opcional">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <!-- 4. Regras de Admissão -->
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                                <h5 class="fw-bold mb-0 text-primary d-flex align-items-center gap-2">
+                                    <i class="bi bi-person-check"></i> 4️⃣ Admissão
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <label for="nivel_entrada_exigido" class="form-label fw-semibold">Nível de entrada exigido</label>
+                                    <input type="text" class="form-control shadow-none border-2" id="nivel_entrada_exigido" name="nivel_entrada_exigido" value="{{ nivel.nivel_entrada_exigido|default:'' }}" placeholder="Ex: Ensino Médio">
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="exige_teste_admissao" name="exige_teste_admissao" {% if nivel.exige_teste_admissao %}checked{% endif %}>
+                                    <label class="form-check-label fw-semibold" for="exige_teste_admissao">Exige teste de admissão?</label>
+                                </div>
+                                <div>
+                                    <label for="documentos_obrigatorios" class="form-label fw-semibold">Documentos obrigatórios</label>
+                                    <textarea class="form-control shadow-none border-2" id="documentos_obrigatorios" name="documentos_obrigatorios" rows="2" placeholder="Certificado, BI, etc...">{{ nivel.documentos_obrigatorios|default:'' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Regime -->
+                    <div class="col-lg-6">
+                        <div class="card border-0 shadow-sm rounded-4 h-100">
+                            <div class="card-header bg-transparent border-0 pt-4 px-4">
+                                <h5 class="fw-bold mb-0 text-primary d-flex align-items-center gap-2">
+                                    <i class="bi bi-clock-history"></i> 5️⃣ Regime e Turnos
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <label class="form-label fw-semibold d-block mb-3">Regimes de funcionamento</label>
+                                <div class="d-flex flex-wrap gap-3 mb-4">
+                                    <div class="form-check form-check-inline p-2 px-3 rounded-pill border bg-light">
+                                        <input class="form-check-input" type="checkbox" id="regime_regular" name="regime_regular" {% if nivel.regime_regular|default:True %}checked{% endif %}>
+                                        <label class="form-check-label" for="regime_regular">Regular</label>
+                                    </div>
+                                    <div class="form-check form-check-inline p-2 px-3 rounded-pill border bg-light">
+                                        <input class="form-check-input" type="checkbox" id="regime_pos_laboral" name="regime_pos_laboral" {% if nivel.regime_pos_laboral %}checked{% endif %}>
+                                        <label class="form-check-label" for="regime_pos_laboral">Pós-laboral</label>
+                                    </div>
+                                    <div class="form-check form-check-inline p-2 px-3 rounded-pill border bg-light">
+                                        <input class="form-check-input" type="checkbox" id="regime_modular" name="regime_modular" {% if nivel.regime_modular %}checked{% endif %}>
+                                        <label class="form-check-label" for="regime_modular">Modular</label>
+                                    </div>
+                                </div>
+
+                                <label class="form-label fw-semibold d-block mb-3">Turnos permitidos</label>
+                                <div class="d-flex flex-wrap gap-3">
+                                    <div class="form-check form-check-inline p-2 px-3 rounded-pill border bg-light">
+                                        <input class="form-check-input" type="checkbox" id="turno_manha" name="turno_manha" {% if nivel.turno_manha|default:True %}checked{% endif %}>
+                                        <label class="form-check-label" for="turno_manha">Manhã</label>
+                                    </div>
+                                    <div class="form-check form-check-inline p-2 px-3 rounded-pill border bg-light">
+                                        <input class="form-check-input" type="checkbox" id="turno_tarde" name="turno_tarde" {% if nivel.turno_tarde|default:True %}checked{% endif %}>
+                                        <label class="form-check-label" for="turno_tarde">Tarde</label>
+                                    </div>
+                                    <div class="form-check form-check-inline p-2 px-3 rounded-pill border bg-light">
+                                        <input class="form-check-input" type="checkbox" id="turno_noite" name="turno_noite" {% if nivel.turno_noite %}checked{% endif %}>
+                                        <label class="form-check-label" for="turno_noite">Noite</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Situação Legal -->
+                <div class="card border-0 shadow-sm rounded-4 mb-5">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4">
+                        <h5 class="fw-bold mb-0 text-primary d-flex align-items-center gap-2">
+                            <i class="bi bi-bank"></i> 6️⃣ Situação Legal / Institucional
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="base_legal" class="form-label fw-semibold">Base legal</label>
+                                <input type="text" class="form-control shadow-none border-2" id="base_legal" name="base_legal" value="{{ nivel.base_legal|default:'' }}" placeholder="Decreto, Despacho, etc.">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="entidade_acreditadora" class="form-label fw-semibold">Entidade acreditadora</label>
+                                <input type="text" class="form-control shadow-none border-2" id="entidade_acreditadora" name="entidade_acreditadora" value="{{ nivel.entidade_acreditadora|default:'' }}" placeholder="MESCTI, MED, etc.">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Actions -->
+                <div class="card border-0 shadow-sm rounded-4 p-4 mb-5 sticky-bottom bg-white">
+                    <div class="d-flex justify-content-end gap-3">
+                        <a href="{% url 'nivel_academico_lista' %}" class="btn btn-light btn-lg rounded-pill px-5 fw-bold">Cancelar</a>
+                        <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">
+                            <i class="bi bi-save me-2"></i> Salvar Nível
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<style>
+    .form-control:focus {
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+    }
+    .card {
+        transition: all 0.2s ease-in-out;
+    }
+    .card:hover {
+        box-shadow: 0 0.5rem 2rem rgba(0,0,0,0.08) !important;
+    }
+    .input-group-text {
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+</style>
+
+<script>
+    // Validation
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+</script>
 {% endblock %}
