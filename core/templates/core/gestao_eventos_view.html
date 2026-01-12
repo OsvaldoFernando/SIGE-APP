@@ -1,16 +1,131 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Gestão de Eventos - SIGE{% endblock %}
+{% block title %}Gestão de Eventos Académicos - SIGE{% endblock %}
 
 {% block content %}
 <div class="container my-5">
-    <a href="{% url 'gestao_administrativa' %}" style="text-decoration: none; color: #666; margin-bottom: 15px; display: inline-block;">← Voltar</a>
-    <h2>Gestão de Eventos</h2>
-    <hr>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'painel_principal' %}" class="text-decoration-none">Painel</a></li>
+                    <li class="breadcrumb-item active">Gestão de Eventos</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold"><i class="bi bi-calendar-check me-2"></i>Gestão de Eventos</h2>
+        </div>
+        <button type="button" class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#novoEventoModal">
+            <i class="bi bi-plus-lg me-2"></i>Novo Evento
+        </button>
+    </div>
 
-    <div class="card">
-        <div class="card-body">
-            <p class="text-muted">Planejar, organizar e gerenciar eventos da instituição.</p>
+    <div class="card border-0 shadow-sm" style="border-radius: 15px;">
+        <div class="card-body p-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="bg-light">
+                        <tr>
+                            <th>Evento</th>
+                            <th>Ano Lectivo</th>
+                            <th>Período</th>
+                            <th>Estado</th>
+                            <th class="text-end">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for evento in eventos %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-opacity-10 p-2 me-3 {% if evento.tipo_evento == 'INSCRICAO' %}bg-info text-info{% elif evento.tipo_evento == 'MATRICULA' %}bg-success text-success{% elif evento.tipo_evento == 'TESTE' %}bg-warning text-warning{% else %}bg-secondary text-secondary{% endif %}">
+                                        <i class="bi bi-calendar-event"></i>
+                                    </div>
+                                    <div>
+                                        <span class="d-block fw-bold">{{ evento.descricao }}</span>
+                                        <small class="text-muted">{{ evento.get_tipo_evento_display }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ evento.ano_lectivo.codigo }}</td>
+                            <td>{{ evento.data_inicio|date:"d/m/Y" }} - {{ evento.data_fim|date:"d/m/Y" }}</td>
+                            <td>
+                                {% if evento.esta_ocorrendo %}
+                                <span class="badge bg-success rounded-pill">Ativo</span>
+                                {% else %}
+                                <span class="badge bg-secondary rounded-pill">Inativo</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <form method="POST" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="deletar_evento">
+                                    <input type="hidden" name="evento_id" value="{{ evento.id }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger border-0" onclick="return confirm('Tem certeza que deseja remover este evento?')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">Nenhum evento registrado no sistema.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Novo Evento -->
+<div class="modal fade" id="novoEventoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow" style="border-radius: 15px;">
+            <div class="modal-header border-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold">Novo Evento de Calendário</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="criar_evento">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Ano Lectivo</label>
+                        <select name="ano_lectivo" class="form-select" required>
+                            {% for ano in anos %}
+                            <option value="{{ ano.id }}">{{ ano.codigo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Tipo de Evento</label>
+                        <select name="tipo_evento" class="form-select" required>
+                            {% for code, label in tipos_evento %}
+                            <option value="{{ code }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Descrição</label>
+                        <input type="text" name="descricao" class="form-control" placeholder="Ex: Inscrições para Novos Alunos" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold text-muted">Data de Início</label>
+                            <input type="date" name="data_inicio" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label small fw-bold text-muted">Data de Fim</label>
+                            <input type="date" name="data_fim" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pb-4 px-4">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary px-4">Salvar Evento</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

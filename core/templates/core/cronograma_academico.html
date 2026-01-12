@@ -1,18 +1,95 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Cronograma Acadêmico - SIGE{% endblock %}
+{% block title %}Calendário Acadêmico - SIGE{% endblock %}
 
 {% block content %}
 <div class="container my-5">
-    <a href="{% url 'painel_principal' %}" style="text-decoration: none; color: #666; margin-bottom: 15px; display: inline-block;">← Voltar ao Painel</a>
-    <h2>Cronograma Acadêmico</h2>
-    <hr>
-
-    <div class="card">
-        <div class="card-body">
-            <p class="text-muted">Cronograma com datas importantes do ano acadêmico.</p>
-            <p class="text-muted">Eventos: Início de aulas, provas, férias, formatura, etc.</p>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'painel_principal' %}" class="text-decoration-none">Painel</a></li>
+                    <li class="breadcrumb-item active">Calendário Acadêmico</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold"><i class="bi bi-calendar3 me-2"></i>Calendário Acadêmico</h2>
         </div>
+    </div>
+
+    <div class="row g-4">
+        {% for ano in anos %}
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px;">
+                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="fw-bold mb-0 text-primary">{{ ano.codigo }}</h5>
+                        {% if ano.inscricoes_abertas %}
+                        <span class="badge bg-success bg-opacity-10 text-success border border-success mt-1" style="font-size: 0.6rem;">
+                            <i class="bi bi-unlock-fill me-1"></i>SISTEMA ABERTO PARA INSCRIÇÕES
+                        </span>
+                        {% else %}
+                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger mt-1" style="font-size: 0.6rem;">
+                            <i class="bi bi-lock-fill me-1"></i>SISTEMA FECHADO PARA INSCRIÇÕES
+                        </span>
+                        {% endif %}
+                    </div>
+                    {% if ano.ano_atual %}
+                    <span class="badge bg-primary rounded-pill">Ano Atual</span>
+                    {% endif %}
+                </div>
+                <div class="card-body px-4 pb-4">
+                    <div class="mb-4">
+                        <h6 class="text-muted small fw-bold text-uppercase mb-3"><i class="bi bi-calendar-event-fill me-2"></i>Marcos do Calendário</h6>
+                        <div class="list-group list-group-flush border rounded-3 overflow-hidden">
+                            {% for evento in ano.eventos.all %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center p-3 {% if evento.esta_ocorrendo %}bg-primary bg-opacity-10{% endif %}">
+                                <div>
+                                    <span class="badge {% if evento.tipo_evento == 'INSCRICAO' %}bg-info{% elif evento.tipo_evento == 'MATRICULA' %}bg-success{% elif evento.tipo_evento == 'TESTE' %}bg-warning{% else %}bg-secondary{% endif %} rounded-pill mb-1" style="font-size: 0.6rem;">
+                                        {{ evento.get_tipo_evento_display }}
+                                    </span>
+                                    <span class="d-block fw-bold" style="font-size: 0.85rem;">{{ evento.descricao }}</span>
+                                    <small class="text-muted">{{ evento.data_inicio|date:"d/m" }} até {{ evento.data_fim|date:"d/m" }}</small>
+                                </div>
+                                {% if evento.esta_ocorrendo %}
+                                <span class="badge bg-primary rounded-pill"><i class="bi bi-play-fill me-1"></i>EM CURSO</span>
+                                {% elif evento.estado == 'ENCERRADO' %}
+                                <span class="badge bg-light text-muted rounded-pill">ENCERRADO</span>
+                                {% endif %}
+                            </div>
+                            {% empty %}
+                            <div class="p-3 text-center text-muted small">Nenhum evento registrado.</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-0">
+                        <h6 class="text-muted small fw-bold text-uppercase mb-3"><i class="bi bi-calendar-range me-2"></i>Período Lectivo Base</h6>
+                        <div class="d-flex justify-content-between align-items-center p-3 border rounded-3">
+                            <div>
+                                <span class="d-block text-muted small">Início</span>
+                                <span class="fw-bold">{{ ano.data_inicio|date:"d/m/Y" }}</span>
+                            </div>
+                            <i class="bi bi-arrow-right text-muted"></i>
+                            <div class="text-end">
+                                <span class="d-block text-muted small">Fim</span>
+                                <span class="fw-bold">{{ ano.data_fim|date:"d/m/Y" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light border-0 px-4 py-3 text-end" style="border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;">
+                    <a href="/admin/core/anoacademico/{{ ano.id }}/change/" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-pencil me-1"></i>Editar Datas
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
+            <p class="mt-3 text-muted">Nenhum ano acadêmico configurado.</p>
+        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}

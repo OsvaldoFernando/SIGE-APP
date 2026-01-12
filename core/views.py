@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse, FileResponse
 from django.utils import timezone
-from .models import Curso, Inscricao, ConfiguracaoEscola, Escola, AnoAcademico, Notificacao, PerfilUsuario, Subscricao, PagamentoSubscricao, RecuperacaoSenha, Documento, Semestre, PeriodoLectivo
+from .models import Curso, Inscricao, ConfiguracaoEscola, Escola, AnoAcademico, Notificacao, PerfilUsuario, Subscricao, PagamentoSubscricao, RecuperacaoSenha, Documento, Semestre, PeriodoLectivo, GradeCurricular
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
@@ -94,6 +94,12 @@ def inscricao_create(request, curso_id):
             f'O curso "{curso.nome}" está indisponível para inscrições. '
             f'Por favor, entre em contato com a administração para mais informações.'
         )
+        return redirect('index')
+    
+    # Verificar calendário
+    ano_atual = AnoAcademico.objects.filter(ano_atual=True).first()
+    if not ano_atual or not ano_atual.inscricoes_abertas():
+        messages.error(request, "As inscrições não estão abertas no momento.")
         return redirect('index')
     
     context = {
@@ -1579,18 +1585,51 @@ def painel_principal(request):
     
     subscricao = Subscricao.objects.filter(estado__in=['ativo', 'teste']).first()
     
-    # Dados para o gráfico de inscrições e matrículas por curso
-    estatisticas_cursos = Curso.objects.filter(ativo=True).annotate(
-        total_inscritos=Count('inscricoes'),
-        total_matriculados=Count('inscricoes', filter=Q(inscricoes__aprovado=True))
-    )
+    # Estatísticas de inscrições por curso
+    estatisticas_cursos_data = []
+    for curso in Curso.objects.filter(ativo=True):
+        total_inscritos = curso.inscricoes.count()
+        aprovados = curso.inscricoes.filter(aprovado=True).count()
+        estatisticas_cursos_data.append({
+            'curso': curso,
+            'total': total_inscritos,
+            'aprovados': aprovados,
+            'reprovados': curso.inscricoes.filter(aprovado=False, nota_teste__isnull=False).count(),
+            'vagas_restantes': curso.vagas_disponiveis()
+        })
+    
     dados_grafico = {
-        'labels': [c.nome for c in estatisticas_cursos],
-        'valores': [c.total_inscritos for c in estatisticas_cursos]
+        'labels': [c['curso'].nome for c in estatisticas_cursos_data],
+        'valores': [c['total'] for c in estatisticas_cursos_data]
     }
     dados_grafico_matriculas = {
-        'labels': [c.nome for c in estatisticas_cursos],
-        'valores': [c.total_matriculados for c in estatisticas_cursos]
+        'labels': [c['curso'].nome for c in estatisticas_cursos_data],
+        'valores': [c['aprovados'] for c in estatisticas_cursos_data]
+    }
+    
+    # Dados para gráfico de pizza (Distribuição por Sexo)
+    distribuicao_sexo = {
+        'labels': ['Masculino', 'Feminino'],
+        'valores': [
+            Inscricao.objects.filter(sexo='M').count(),
+            Inscricao.objects.filter(sexo='F').count()
+        ]
+    }
+
+    # Dados para gráfico de linha (Inscrições por dia - últimos 7 dias)
+    from datetime import timedelta
+    hoje_dt = timezone.now()
+    dias = []
+    inscricoes_por_dia = []
+    for i in range(6, -1, -1):
+        dia = (hoje_dt - timedelta(days=i)).date()
+        dias.append(dia.strftime('%d/%m'))
+        count = Inscricao.objects.filter(data_inscricao__date=dia).count()
+        inscricoes_por_dia.append(count)
+    
+    dados_evolucao = {
+        'labels': dias,
+        'valores': inscricoes_por_dia
     }
 
     context = {
@@ -1605,7 +1644,10 @@ def painel_principal(request):
         'subscricao': subscricao,
         'now': date.today(),
         'dados_grafico': json.dumps(dados_grafico),
-        'dados_grafico_matriculas': json.dumps(dados_grafico_matriculas)
+        'dados_grafico_matriculas': json.dumps(dados_grafico_matriculas),
+        'dados_sexo': json.dumps(distribuicao_sexo),
+        'dados_evolucao': json.dumps(dados_evolucao),
+        'estatisticas_cursos': estatisticas_cursos_data
     }
     return render(request, 'core/painel_principal.html', context)
 
@@ -1843,32 +1885,121 @@ def cursos_disciplinas(request):
 
 @login_required
 def grelha_curricular(request):
-    """View para exibir grelha curricular estruturada por anos e semestres"""
+    """View para gerenciar e exibir grelha curricular estruturada"""
+    if request.method == 'POST':
+        if 'add_disciplina' in request.POST:
+            grade_id = request.POST.get('grade_id')
+            grade = get_object_or_404(GradeCurricular, id=grade_id)
+            from .models import Disciplina
+            disciplina = Disciplina.objects.create(
+                curso=grade.curso,
+                grade_curricular=grade,
+                nome=request.POST.get('nome'),
+                area_conhecimento=request.POST.get('area_conhecimento', 'nuclear'),
+                ano_curricular=request.POST.get('ano'),
+                semestre_curricular=request.POST.get('periodo'),
+                tipo=request.POST.get('tipo'),
+                carga_horaria=request.POST.get('carga_horaria') or 40,
+                creditos=request.POST.get('creditos') or 0,
+                codigo=request.POST.get('codigo', ''),
+                requer_duas_positivas_para_dispensa=request.POST.get('requer_parcelares') == 'on',
+                lei_7_aplicavel=request.POST.get('lei_7') == 'on'
+            )
+            
+            prereq_ids = request.POST.getlist('prerequisitos')
+            if prereq_ids:
+                disciplina.prerequisitos.set(prereq_ids)
+                
+            messages.success(request, 'Disciplina adicionada à grelha!')
+            return redirect(f"{request.path}?curso={grade.curso.id}")
+
+        if 'delete_disciplina' in request.POST:
+            disc_id = request.POST.get('disciplina_id')
+            disciplina = get_object_or_404(Disciplina, id=disc_id)
+            curso_id = disciplina.curso.id
+            disciplina.delete()
+            messages.success(request, 'Disciplina removida com sucesso!')
+            return redirect(f"{request.path}?curso={curso_id}")
+
+        curso_id = request.POST.get('curso_id')
+        versao = request.POST.get('versao')
+        duracao = request.POST.get('duracao')
+        tipo_periodo = request.POST.get('tipo_periodo')
+        estado = request.POST.get('estado')
+        
+        if curso_id and versao:
+            curso = get_object_or_404(Curso, id=curso_id)
+            GradeCurricular.objects.create(
+                curso=curso,
+                versao=versao,
+                duracao_anos=int(duracao) if duracao else 4,
+                tipo_periodo=tipo_periodo or 'semestre',
+                estado=estado or 'rascunho'
+            )
+            messages.success(request, 'Grade curricular iniciada com sucesso!')
+            return redirect('grelha_curricular')
+
     cursos = Curso.objects.filter(ativo=True)
-    curso_id = request.GET.get('curso')
+    curso_selecionado_id = request.GET.get('curso')
+    grades = GradeCurricular.objects.all()
+    
     disciplinas = []
     anos_range = []
-    semestres_range = [1, 2]
+    periodos_range = []
+    grade_ativa = None
+    stats = {'total_creditos': 0, 'total_horas': 0, 'total_disciplinas': 0, 'nuclear_count': 0}
     
-    if curso_id:
-        curso = get_object_or_404(Curso, id=curso_id)
-        disciplinas = curso.disciplinas.all()
-        # Calcula anos baseado na duração do curso (assume 12 meses por ano)
-        anos = (curso.duracao_meses // 12) if curso.duracao_meses >= 12 else 1
+    if curso_selecionado_id:
+        curso = get_object_or_404(Curso, id=curso_selecionado_id)
+        grade_ativa = GradeCurricular.objects.filter(curso=curso, estado='ativo').first()
+        if not grade_ativa:
+            grade_ativa = GradeCurricular.objects.filter(curso=curso).first()
+            
+        disciplinas = grade_ativa.disciplinas.all() if grade_ativa else []
+        
+        # Estatísticas
+        for d in disciplinas:
+            stats['total_creditos'] += d.creditos
+            stats['total_horas'] += d.carga_horaria
+            stats['total_disciplinas'] += 1
+            if d.area_conhecimento == 'nuclear':
+                stats['nuclear_count'] += 1
+
+        # Calcula anos baseado na grade ou no curso
+        anos = grade_ativa.duracao_anos if grade_ativa else (curso.duracao_meses // 12 if curso.duracao_meses >= 12 else 1)
         anos_range = range(1, anos + 1)
+        
+        # Define os períodos (semestres ou trimestres)
+        if grade_ativa and grade_ativa.tipo_periodo == 'trimestre':
+            periodos_range = [1, 2, 3]
+            tipo_periodo_label = "Trimestre"
+        else:
+            periodos_range = [1, 2]
+            tipo_periodo_label = "Semestre"
 
     return render(request, 'core/grelha_curricular.html', {
         'cursos': cursos,
+        'grades': grades,
+        'grade_ativa': grade_ativa,
         'disciplinas': disciplinas,
         'anos_range': anos_range,
-        'semestres_range': semestres_range,
+        'periodos_range': periodos_range,
+        'tipo_periodo_label': tipo_periodo_label if curso_selecionado_id else "Semestre",
+        'stats': stats,
         'active': 'grelha'
     })
 
 @login_required
 def cronograma_academico(request):
     """View para exibir cronograma acadêmico"""
-    context = {'active': 'cronograma'}
+    from .models import AnoAcademico, EventoCalendario
+    anos = AnoAcademico.objects.all().order_by('-data_inicio')
+    eventos_recentes = EventoCalendario.objects.filter(estado='ATIVO').order_by('data_inicio')[:5]
+    context = {
+        'active': 'cronograma',
+        'anos': anos,
+        'eventos_recentes': eventos_recentes
+    }
     return render(request, 'core/cronograma_academico.html', context)
 
 @login_required
@@ -1903,8 +2034,15 @@ def syllabus(request):
 
 @login_required
 def admissao(request):
-    """View para admissão de estudantes"""
-    context = {}
+    """View para admissão de estudantes - Controlada pelo Calendário"""
+    from .models import AnoAcademico
+    ano_atual = AnoAcademico.objects.filter(ano_atual=True).first()
+    
+    if not ano_atual or not ano_atual.inscricoes_abertas():
+        messages.error(request, "O sistema de inscrições está fechado no momento conforme o calendário acadêmico.")
+        return redirect('painel_principal')
+        
+    context = {'ano_atual': ano_atual}
     return render(request, 'core/admissao_view.html', context)
 
 @login_required
@@ -2111,8 +2249,42 @@ def gestao_tarefas(request):
 
 @login_required
 def gestao_eventos(request):
-    """View para gestão de eventos"""
-    context = {}
+    """View para gestão de eventos e marcos do calendário"""
+    from .models import EventoCalendario, AnoAcademico
+    eventos = EventoCalendario.objects.all().order_by('-data_inicio')
+    anos = AnoAcademico.objects.filter(estado='ATIVO')
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'criar_evento':
+            try:
+                ano_id = request.POST.get('ano_lectivo')
+                ano = AnoAcademico.objects.get(id=ano_id)
+                EventoCalendario.objects.create(
+                    ano_lectivo=ano,
+                    tipo_evento=request.POST.get('tipo_evento'),
+                    descricao=request.POST.get('descricao'),
+                    data_inicio=request.POST.get('data_inicio'),
+                    data_fim=request.POST.get('data_fim'),
+                    estado='ATIVO'
+                )
+                messages.success(request, "Evento criado com sucesso!")
+            except Exception as e:
+                messages.error(request, f"Erro ao criar evento: {str(e)}")
+        
+        elif action == 'deletar_evento':
+            evento_id = request.POST.get('evento_id')
+            EventoCalendario.objects.filter(id=evento_id).delete()
+            messages.success(request, "Evento removido.")
+            
+        return redirect('gestao_eventos')
+
+    context = {
+        'eventos': eventos,
+        'anos': anos,
+        'tipos_evento': EventoCalendario.TIPO_EVENTO_CHOICES,
+        'active': 'eventos'
+    }
     return render(request, 'core/gestao_eventos_view.html', context)
 
 @login_required

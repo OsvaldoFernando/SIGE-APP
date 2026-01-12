@@ -5,35 +5,67 @@
 {% block content %}
 <div class="container-fluid px-4 py-5">
     <!-- Gráficos de Visão Geral -->
-    <div class="row g-4 mb-5">
+    <div class="row g-4 mb-4">
         <!-- Estudantes Inscritos -->
-        <div class="col-lg-6">
+        <div class="col-lg-3 col-md-6">
             <div class="card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-4">
                         <div class="bg-success bg-opacity-10 p-2 rounded-3 me-3">
-                            <i class="bi bi-person-plus text-success fs-4"></i>
+                            <i class="bi bi-person-plus text-success fs-5"></i>
                         </div>
-                        <h5 class="mb-0 fw-bold text-dark">Estudantes Inscritos por Curso</h5>
+                        <h6 class="mb-0 fw-bold text-dark">Inscritos por Curso</h6>
                     </div>
-                    <div style="height: 300px;">
+                    <div style="height: 200px;">
                         <canvas id="inscricoesChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
         <!-- Estudantes Matriculados -->
-        <div class="col-lg-6">
+        <div class="col-lg-3 col-md-6">
             <div class="card border-0 shadow-sm rounded-4 h-100">
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center mb-4">
                         <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
-                            <i class="bi bi-person-check text-primary fs-4"></i>
+                            <i class="bi bi-person-check text-primary fs-5"></i>
                         </div>
-                        <h5 class="mb-0 fw-bold text-dark">Estudantes Matriculados por Curso</h5>
+                        <h6 class="mb-0 fw-bold text-dark">Matriculados</h6>
                     </div>
-                    <div style="height: 300px;">
+                    <div style="height: 200px;">
                         <canvas id="matriculasChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Distribuição por Sexo -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-info bg-opacity-10 p-2 rounded-3 me-3">
+                            <i class="bi bi-gender-ambiguous text-info fs-5"></i>
+                        </div>
+                        <h6 class="mb-0 fw-bold text-dark">Gênero</h6>
+                    </div>
+                    <div style="height: 200px;">
+                        <canvas id="sexoChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Evolução de Inscrições -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="bg-warning bg-opacity-10 p-2 rounded-3 me-3">
+                            <i class="bi bi-graph-up text-warning fs-5"></i>
+                        </div>
+                        <h6 class="mb-0 fw-bold text-dark">Evolução (7d)</h6>
+                    </div>
+                    <div style="height: 200px;">
+                        <canvas id="evolucaoChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -333,14 +365,14 @@
                     </a>
                 </div>
                 <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
-                    <a href="#" class="text-decoration-none h-100 d-block">
+                    <a href="{% url 'gestao_eventos' %}" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
                                 <div class="icon-wrapper">
-                                    <i class="bi bi-file-earmark-check fs-2 text-primary"></i>
+                                    <i class="bi bi-calendar-check fs-2 text-primary"></i>
                                 </div>
-                                <h6 class="card-title">Provas</h6>
-                                <p class="card-text mb-0">Gestão e agendamento de avaliações e exames.</p>
+                                <h6 class="card-title">Eventos</h6>
+                                <p class="card-text mb-0">Gerencie marcos e datas importantes do calendário.</p>
                             </div>
                         </div>
                     </a>
@@ -411,7 +443,7 @@
                     </a>
                 </div>
                 <div class="col-xl-3 col-lg-4 col-md-6 menu-item">
-                    <a href="#" class="text-decoration-none h-100 d-block">
+                    <a href="{% url 'cronograma_academico' %}" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
                                 <div class="icon-wrapper">
@@ -459,38 +491,86 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Inicialização dos Gráficos (Exemplo)
-    const setupChart = (id, label, color) => {
-        const ctx = document.getElementById(id);
-        if (!ctx) return;
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Engenharia', 'Direito', 'Medicina', 'Gestão', 'TI'],
-                datasets: [{
-                    label: label,
-                    data: [65, 59, 80, 81, 56],
-                    backgroundColor: color,
-                    borderRadius: 10,
-                    borderSkipped: false,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: { beginAtZero: true, grid: { display: false } },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
-    };
+    // Gráfico de Inscrições
+    const dadosInscricoes = JSON.parse('{{ dados_grafico|safe }}');
+    new Chart(document.getElementById('inscricoesChart'), {
+        type: 'bar',
+        data: {
+            labels: dadosInscricoes.labels,
+            datasets: [{
+                label: 'Inscritos',
+                data: dadosInscricoes.valores,
+                backgroundColor: 'rgba(5, 150, 105, 0.6)',
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } }
+        }
+    });
 
-    setupChart('inscricoesChart', 'Inscritos', '#10b981');
-    setupChart('matriculasChart', 'Matriculados', '#3b82f6');
+    // Gráfico de Matrículas
+    const dadosMatriculas = JSON.parse('{{ dados_grafico_matriculas|safe }}');
+    new Chart(document.getElementById('matriculasChart'), {
+        type: 'bar',
+        data: {
+            labels: dadosMatriculas.labels,
+            datasets: [{
+                label: 'Matriculados',
+                data: dadosMatriculas.valores,
+                backgroundColor: 'rgba(30, 58, 138, 0.6)',
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // Gráfico de Sexo
+    const dadosSexo = JSON.parse('{{ dados_sexo|safe }}');
+    new Chart(document.getElementById('sexoChart'), {
+        type: 'doughnut',
+        data: {
+            labels: dadosSexo.labels,
+            datasets: [{
+                data: dadosSexo.valores,
+                backgroundColor: ['#3b82f6', '#ec4899'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: true, position: 'bottom' } }
+        }
+    });
+
+    // Gráfico de Evolução
+    const dadosEvolucao = JSON.parse('{{ dados_evolucao|safe }}');
+    new Chart(document.getElementById('evolucaoChart'), {
+        type: 'line',
+        data: {
+            labels: dadosEvolucao.labels,
+            datasets: [{
+                label: 'Novas Inscrições',
+                data: dadosEvolucao.valores,
+                borderColor: '#f59e0b',
+                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } }
+        }
+    });
 
     // Lógica de Pesquisa
     const searchInput = document.getElementById('searchMenu');

@@ -26,6 +26,16 @@
             </div>
             
             <div class="card-body p-4 p-md-5 bg-white">
+                <div class="alert alert-info border-0 small rounded-3 mb-4 d-flex align-items-center gap-3">
+                    <div class="bg-info bg-opacity-10 p-2 rounded-circle">
+                        <i class="bi bi-briefcase-fill text-info fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1 fw-bold text-dark">Informação Profissional</h6>
+                        <p class="mb-0 text-muted small">Nesta secção poderá gerir a sua trajetória académica e profissional dentro da instituição.</p>
+                    </div>
+                </div>
+
                 {% if messages %}
                     {% for message in messages %}
                         <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} border-0 small rounded-3 mb-4 d-flex align-items-center gap-2">

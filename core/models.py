@@ -27,6 +27,18 @@ class AnoAcademico(models.Model):
     def __str__(self):
         return self.codigo
     
+    def inscricoes_abertas(self):
+        """Verifica se as inscrições estão abertas com base no novo modelo de Eventos"""
+        evento = EventoCalendario.objects.filter(
+            ano_lectivo=self,
+            tipo_evento='INSCRICAO',
+            estado='ATIVO'
+        ).first()
+        
+        if not evento:
+            return False
+        return evento.esta_ocorrendo()
+
     def save(self, *args, **kwargs):
         if self.pk:
             try:
@@ -44,6 +56,40 @@ class AnoAcademico(models.Model):
             AnoAcademico.objects.exclude(pk=self.pk).update(ano_atual=False)
             
         super().save(*args, **kwargs)
+
+class EventoCalendario(models.Model):
+    TIPO_EVENTO_CHOICES = [
+        ('INSCRICAO', 'Inscrição'),
+        ('MATRICULA', 'Matrícula'),
+        ('TESTE', 'Teste / Avaliação'),
+        ('EXAMES', 'Exames'),
+        ('FERIAS', 'Férias'),
+        ('OUTRO', 'Outro'),
+    ]
+    
+    ESTADO_CHOICES = [
+        ('ATIVO', 'Ativo'),
+        ('ENCERRADO', 'Encerrado'),
+    ]
+    
+    ano_lectivo = models.ForeignKey(AnoAcademico, on_delete=models.CASCADE, related_name='eventos', verbose_name="Ano Lectivo")
+    tipo_evento = models.CharField(max_length=20, choices=TIPO_EVENTO_CHOICES, verbose_name="Tipo de Evento")
+    descricao = models.CharField(max_length=255, verbose_name="Descrição")
+    data_inicio = models.DateField(verbose_name="Data de Início")
+    data_fim = models.DateField(verbose_name="Data de Fim")
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='ATIVO', verbose_name="Estado")
+
+    class Meta:
+        verbose_name = "Evento de Calendário"
+        verbose_name_plural = "Eventos de Calendário"
+        ordering = ['data_inicio']
+
+    def __str__(self):
+        return f"{self.get_tipo_evento_display()} - {self.ano_lectivo}"
+
+    def esta_ocorrendo(self):
+        hoje = timezone.now().date()
+        return self.estado == 'ATIVO' and self.data_inicio <= hoje <= self.data_fim
 
 class PeriodoLectivo(models.Model):
     ESTADO_CHOICES = [
@@ -353,18 +399,66 @@ class Curso(models.Model):
     def get_duracao_display_full(self):
         return f"{self.get_duracao_meses_display()}"
 
+class GradeCurricular(models.Model):
+    ESTADO_CHOICES = [
+        ('rascunho', 'Rascunho'),
+        ('ativo', 'Ativo'),
+        ('obsoleto', 'Obsoleto'),
+    ]
+    
+    TIPO_PERIODO_CHOICES = [
+        ('semestre', 'Semestral'),
+        ('trimestre', 'Trimestral'),
+    ]
+    
+    curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='grades_curriculares', verbose_name="Curso")
+    versao = models.CharField(max_length=50, verbose_name="Versão (Ano ou Código)")
+    duracao_anos = models.PositiveIntegerField(default=4, verbose_name="Duração (Anos)")
+    tipo_periodo = models.CharField(max_length=20, choices=TIPO_PERIODO_CHOICES, default='semestre', verbose_name="Tipo de Período")
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='rascunho', verbose_name="Estado")
+    descricao = models.TextField(blank=True, verbose_name="Descrição")
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    data_atualizacao = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Grade Curricular"
+        verbose_name_plural = "Grades Curriculares"
+        unique_together = ['curso', 'versao']
+        ordering = ['curso', '-versao']
+
+    def __str__(self):
+        return f"{self.curso.nome} - {self.versao}"
+
 class Disciplina(models.Model):
+    TIPO_CHOICES = [
+        ('obrigatoria', 'Obrigatória'),
+        ('opcional', 'Opcional'),
+    ]
+
+    AREA_CHOICES = [
+        ('nuclear', 'Nuclear/Científica'),
+        ('complementar', 'Complementar'),
+        ('geral', 'Formação Geral'),
+        ('projeto', 'Projeto/Estágio'),
+    ]
+    
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='disciplinas', verbose_name="Curso")
+    grade_curricular = models.ForeignKey(GradeCurricular, on_delete=models.SET_NULL, null=True, blank=True, related_name='disciplinas', verbose_name="Grade Curricular")
     nome = models.CharField(max_length=200, verbose_name="Nome da Disciplina")
+    area_conhecimento = models.CharField(max_length=30, choices=AREA_CHOICES, default='nuclear', verbose_name="Área de Conhecimento")
     carga_horaria = models.PositiveIntegerField(verbose_name="Carga Horária (horas)", default=40)
+    creditos = models.PositiveIntegerField(default=0, verbose_name="Créditos")
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='obrigatoria', verbose_name="Tipo")
     descricao = models.TextField(blank=True, verbose_name="Descrição")
     codigo = models.CharField(max_length=50, blank=True, verbose_name="Código da Disciplina")
     ano_curricular = models.PositiveIntegerField(default=1, verbose_name="Ano Curricular")
     semestre_curricular = models.PositiveIntegerField(
-        choices=[(1, '1º Semestre'), (2, '2º Semestre')], 
         default=1, 
-        verbose_name="Semestre Curricular"
+        verbose_name="Período Curricular"
     )
+    prerequisitos = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='sucessoras', verbose_name="Pré-requisitos")
+    requer_duas_positivas_para_dispensa = models.BooleanField(default=False, verbose_name="Requer Positiva nas Provas Parcelares para Dispensa")
+    lei_7_aplicavel = models.BooleanField(default=False, verbose_name="Aplicar Lei 7 (Reprovação Direta se Média < 7)")
     
     class Meta:
         verbose_name = "Disciplina"
