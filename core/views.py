@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse, FileResponse
 from django.utils import timezone
-from .models import Curso, Inscricao, ConfiguracaoEscola, Escola, AnoAcademico, Notificacao, PerfilUsuario, Subscricao, PagamentoSubscricao, RecuperacaoSenha, Documento, Semestre, PeriodoLectivo, GradeCurricular
+from .models import Curso, Inscricao, ConfiguracaoEscola, Escola, AnoAcademico, Notificacao, PerfilUsuario, Subscricao, PagamentoSubscricao, RecuperacaoSenha, Documento, Semestre, PeriodoLectivo, GradeCurricular, NivelAcademico
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
@@ -66,9 +66,19 @@ def index(request):
     }
     stats_inscricoes['total'] = stats_inscricoes['submetidas'] + stats_inscricoes['aprovadas'] + stats_inscricoes['pendentes']
     
-    # Adicionar cálculo de receita diária (exemplo simplificado)
-    # Aqui você pode buscar do modelo de Pagamentos se existir
-    receita_hoje = 0.00
+    # Estatísticas por Estado (Candidatos, Admitidos, Registrados, Ativos)
+    # Candidatos = Todas as inscrições submetidas/pendentes
+    # Admitidos = Inscrições aprovadas
+    # Registro = Inscrições aprovadas que geraram matrícula (aqui simplificaremos usando status ou flags)
+    # Ativos = Estudantes matriculados ativos
+    
+    # Como o modelo de Estudante/Matrícula pode variar, vamos usar Inscricao como base por enquanto
+    stats_estudantes = {
+        'candidatos': Inscricao.objects.filter(status_inscricao__in=['submetida', 'pendente']).count(),
+        'admitidos': Inscricao.objects.filter(aprovado=True).count(),
+        'registrados': Inscricao.objects.filter(status_inscricao='matriculado').count(), # Supondo que existe este status
+        'ativos': Inscricao.objects.filter(status_inscricao='ativo').count(), # Supondo que existe este status
+    }
     
     return render(request, 'core/index.html', {
         'cursos': cursos,
@@ -77,7 +87,8 @@ def index(request):
         'ano_atual': ano_atual,
         'semestre_atual': semestre_atual,
         'receita_hoje': receita_hoje,
-        'stats_inscricoes': stats_inscricoes
+        'stats_inscricoes': stats_inscricoes,
+        'stats_estudantes': stats_estudantes,
     })
 
 def inscricao_create(request, curso_id):
@@ -2927,3 +2938,38 @@ def ativar_utilizador(request, user_id):
     messages.success(request, f'Utilizador {status} com sucesso!')
     return redirect('listar_utilizadores')
 
+
+@login_required
+def nivel_academico_lista(request):
+    niveis = NivelAcademico.objects.all()
+    return render(request, 'core/nivel_academico_lista.html', {'niveis': niveis})
+
+@login_required
+def nivel_academico_create(request):
+    if request.method == 'POST':
+        nome = request.POST.get('nome')
+        descricao = request.POST.get('descricao', '')
+        NivelAcademico.objects.create(nome=nome, descricao=descricao)
+        messages.success(request, 'Nível académico criado com sucesso!')
+        return redirect('nivel_academico_lista')
+    return render(request, 'core/nivel_academico_form.html')
+
+@login_required
+def nivel_academico_edit(request, pk):
+    nivel = get_object_or_404(NivelAcademico, pk=pk)
+    if request.method == 'POST':
+        nivel.nome = request.POST.get('nome')
+        nivel.descricao = request.POST.get('descricao', '')
+        nivel.save()
+        messages.success(request, 'Nível académico atualizado com sucesso!')
+        return redirect('nivel_academico_lista')
+    return render(request, 'core/nivel_academico_form.html', {'nivel': nivel})
+
+@login_required
+def nivel_academico_delete(request, pk):
+    nivel = get_object_or_404(NivelAcademico, pk=pk)
+    if request.method == 'POST':
+        nivel.delete()
+        messages.success(request, 'Nível académico removido com sucesso!')
+        return redirect('nivel_academico_lista')
+    return render(request, 'core/confirm_delete.html', {'object': nivel, 'type': 'Nível Académico'})

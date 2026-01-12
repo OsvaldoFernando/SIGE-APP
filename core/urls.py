@@ -66,4 +66,10 @@ urlpatterns = [
     path('recursos-humanos/', views.recursos_humanos, name='recursos_humanos'),
     path('relatorios-financeiros/', views.relatorios_financeiros, name='relatorios_financeiros'),
     path('api/verificar-existente/', views.verificar_existente, name='verificar_existente'),
+    
+    # URLs para Nível Académico
+    path('niveis-academicos/', views.nivel_academico_lista, name='nivel_academico_lista'),
+    path('niveis-academicos/novo/', views.nivel_academico_create, name='nivel_academico_create'),
+    path('niveis-academicos/<int:pk>/editar/', views.nivel_academico_edit, name='nivel_academico_edit'),
+    path('niveis-academicos/<int:pk>/deletar/', views.nivel_academico_delete, name='nivel_academico_delete'),
 ]

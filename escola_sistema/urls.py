@@ -90,6 +90,13 @@ urlpatterns = [
     path('anos-academicos/<int:ano_id>/semestres/', views.semestre_lista, name='semestre_lista'),
     path('anos-academicos/<int:ano_id>/semestres/novo/', views.semestre_create, name='semestre_create'),
     path('semestres/<int:pk>/editar/', views.semestre_edit, name='semestre_edit'),
+    
+    # Nível Académico
+    path('niveis-academicos/', views.nivel_academico_lista, name='nivel_academico_lista'),
+    path('niveis-academicos/novo/', views.nivel_academico_create, name='nivel_academico_create'),
+    path('niveis-academicos/<int:pk>/editar/', views.nivel_academico_edit, name='nivel_academico_edit'),
+    path('niveis-academicos/<int:pk>/deletar/', views.nivel_academico_delete, name='nivel_academico_delete'),
+    
     path('login/', views.login_view, name='login'),
     path('registro/', views.registro_view, name='registro'),
     path('logout/', views.logout_view, name='logout'),

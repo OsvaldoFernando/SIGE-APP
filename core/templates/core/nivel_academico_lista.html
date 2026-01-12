@@ -1,0 +1,39 @@
+{% extends 'core/base.html' %}
+{% block title %}Níveis Académicos{% endblock %}
+{% block content %}
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Níveis Académicos</h2>
+        <a href="{% url 'nivel_academico_create' %}" class="btn btn-primary">Novo Nível</a>
+    </div>
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="table-responsive p-4">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Descrição</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for nivel in niveis %}
+                    <tr>
+                        <td class="fw-bold">{{ nivel.nome }}</td>
+                        <td>{{ nivel.descricao|default:"---" }}</td>
+                        <td class="text-end">
+                            <a href="{% url 'nivel_academico_edit' nivel.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'nivel_academico_delete' nivel.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted py-4">Nenhum nível académico registrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
