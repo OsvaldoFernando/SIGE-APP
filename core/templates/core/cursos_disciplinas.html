@@ -6,8 +6,43 @@
     .table-modern thead th { background-color: #f8f9fa; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; color: #6c757d; border-bottom: 2px solid #dee2e6; padding: 15px; }
     .table-modern tbody td { padding: 15px; vertical-align: middle; }
     .status-badge { padding: 6px 12px; border-radius: 20px; font-weight: 500; font-size: 0.85rem; }
-    .btn-action { width: 35px; height: 35px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; margin: 0 2px; transition: all 0.2s; }
-    .page-header { background: white; padding: 2rem 0; margin-bottom: 2rem; border-bottom: 1px solid #edf2f7; }
+    .btn-action { 
+        width: 38px; 
+        height: 38px; 
+        border-radius: 10px; 
+        display: inline-flex; 
+        align-items: center; 
+        justify-content: center; 
+        margin: 0 4px; 
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid #e2e8f0;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .btn-action i { font-size: 1.1rem; }
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .btn-action-edit { color: #3b82f6; border-color: #dbeafe; }
+    .btn-action-edit:hover { background: #3b82f6; color: white; border-color: #3b82f6; }
+    
+    .btn-action-status { color: #f59e0b; border-color: #fef3c7; }
+    .btn-action-status:hover { background: #f59e0b; color: white; border-color: #f59e0b; }
+    
+    .btn-action-delete { color: #ef4444; border-color: #fee2e2; }
+    .btn-action-delete:hover { background: #ef4444; color: white; border-color: #ef4444; }
+    
+    .status-pill {
+        padding: 5px 12px;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .status-active { background: #dcfce7; color: #166534; }
+    .status-inactive { background: #fee2e2; color: #991b1b; }
     .nav-tabs-modern { 
         border: none; 
         background: #f1f5f9; 
@@ -84,17 +119,17 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb mb-2">
                         <li class="breadcrumb-item"><a href="{% url 'painel_principal' %}"><i class="bi bi-house-door me-1"></i>Painel</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Disciplinas</li>
+                        <li class="breadcrumb-item active" aria-current="page">Gestão de Cursos</li>
                     </ol>
                 </nav>
-                <h2 class="fw-bold mb-1" style="color: #1e3a8a;">Disciplinas</h2>
-                <p class="text-muted mb-0">Gerencie a estrutura das disciplinas acadêmicas</p>
+                <h2 class="fw-bold mb-1" style="color: #1e3a8a;">Gestão de Cursos</h2>
+                <p class="text-muted mb-0">Gerencie a oferta formativa e estrutura dos cursos acadêmicos</p>
             </div>
             <div class="d-flex gap-3">
                 <a href="{% url 'painel_principal' %}" class="btn-header btn-header-light text-decoration-none">
                     <i class="bi bi-arrow-left"></i> Voltar
                 </a>
-                <button type="button" id="btnNovoHeader" class="btn-header btn-header-primary" data-bs-toggle="modal" data-bs-target="#modalNovoCurso">
+                <button type="button" class="btn-header btn-header-primary" data-bs-toggle="modal" data-bs-target="#modalNovoCurso">
                     <i class="bi bi-plus-lg"></i> Novo Curso
                 </button>
             </div>
@@ -111,31 +146,54 @@
                     <table class="table table-modern mb-0">
                         <thead>
                             <tr>
-                                <th>Disciplina</th>
-                                <th>Curso</th>
-                                <th>Carga Horária</th>
+                                <th>Código</th>
+                                <th>Nome do Curso</th>
+                                <th>Grau Académico</th>
+                                <th>Duração</th>
+                                <th>Vagas</th>
+                                <th>Status</th>
                                 <th class="text-end pe-4">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for disciplina in disciplinas %}
+                            {% for curso in cursos %}
                             <tr>
+                                <td><span class="badge bg-light text-dark border px-2 py-2">{{ curso.codigo }}</span></td>
+                                <td class="fw-bold text-dark">{{ curso.nome }}</td>
                                 <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
-                                            <i class="bi bi-book text-primary"></i>
-                                        </div>
-                                        <span class="fw-bold text-dark">{{ disciplina.nome }}</span>
-                                    </div>
+                                    <div class="small fw-semibold text-primary text-uppercase">{{ curso.get_grau_display }}</div>
+                                    <div class="small text-muted">{{ curso.get_regime_display }} | {{ curso.get_modalidade_display }}</div>
                                 </td>
+                                <td><span class="badge bg-secondary bg-opacity-10 text-secondary border-0 px-3 py-2">{{ curso.get_duracao_meses_display }}</span></td>
+                                <td><span class="badge bg-primary bg-opacity-10 text-primary border-0 px-3 py-2">{{ curso.vagas }}</span></td>
                                 <td>
-                                    <span class="badge bg-light text-dark border">{{ disciplina.curso.codigo }}</span>
-                                    <small class="ms-1">{{ disciplina.curso.nome }}</small>
+                                    {% if curso.ativo %}
+                                    <span class="status-pill status-active">Ativo</span>
+                                    {% else %}
+                                    <span class="status-pill status-inactive">Inativo</span>
+                                    {% endif %}
                                 </td>
-                                <td>{{ disciplina.carga_horaria }}h</td>
                                 <td class="text-end pe-4">
-                                    <button class="btn-action btn btn-outline-info"><i class="bi bi-pencil-square"></i></button>
-                                    <button class="btn-action btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                    <button class="btn-action btn-action-edit btn-editar-curso" 
+                                            title="Editar Curso"
+                                            data-curso-id="{{ curso.id }}"
+                                            data-curso-codigo="{{ curso.codigo }}"
+                                            data-curso-nome="{{ curso.nome }}"
+                                            data-curso-vagas="{{ curso.vagas }}"
+                                            data-curso-duracao="{{ curso.duracao_meses }}"
+                                            data-curso-nota="{{ curso.nota_minima }}"
+                                            data-curso-grau="{{ curso.grau }}"
+                                            data-curso-regime="{{ curso.regime }}"
+                                            data-curso-modalidade="{{ curso.modalidade }}"
+                                            data-curso-requer="{{ curso.requer_prerequisitos }}">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button class="btn-action btn-action-status btn-toggle-curso" title="Alterar Status" data-curso-id="{{ curso.id }}">
+                                        <i class="bi bi-power"></i>
+                                    </button>
+                                    <button class="btn-action btn-action-delete btn-deletar-curso" title="Eliminar Curso" data-curso-id="{{ curso.id }}" data-curso-nome="{{ curso.nome }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -174,6 +232,7 @@
                                 <option value="mestrado">Mestrado</option>
                                 <option value="doutoramento">Doutoramento</option>
                                 <option value="especialidade">Especialidade</option>
+                                <option value="ensino_medio">Ensino Médio</option>
                             </select>
                         </div>
                     </div>
@@ -254,6 +313,7 @@
                                 <option value="mestrado">Mestrado</option>
                                 <option value="doutoramento">Doutoramento</option>
                                 <option value="especialidade">Especialidade</option>
+                                <option value="ensino_medio">Ensino Médio</option>
                             </select>
                         </div>
                     </div>
@@ -346,19 +406,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const btnNovoHeader = document.getElementById('btnNovoHeader');
-        
-        // Tab switch handling for the header button
-        document.getElementById('managementTabs').addEventListener('shown.bs.tab', function (e) {
-            if (e.target.id === 'disciplinas-tab') {
-                btnNovoHeader.innerHTML = '<i class="bi bi-plus-lg me-2"></i>Nova Disciplina';
-                btnNovoHeader.setAttribute('data-bs-target', '#modalNovaDisciplina');
-            } else {
-                btnNovoHeader.innerHTML = '<i class="bi bi-plus-lg me-2"></i>Novo Curso';
-                btnNovoHeader.setAttribute('data-bs-target', '#modalNovoCurso');
-            }
-        });
-
         // Toggle Curso Status
         document.querySelectorAll('.btn-toggle-curso').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -387,32 +434,34 @@
         });
 
         // Form Submissions
-        function handleForm(id, url) {
+        function handleForm(id, acao, url) {
             document.getElementById(id).addEventListener('submit', function(e) {
                 e.preventDefault();
+                const formData = new FormData(this);
+                formData.append('acao', acao);
                 fetch(url, {
                     method: 'POST',
-                    body: new FormData(this),
+                    body: formData,
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 }).then(r => r.json()).then(data => { if(data.success) location.reload(); });
             });
         }
 
-        handleForm('formNovoCurso', '/cursos/novo/');
-        handleForm('formEditarCurso', '/cursos/' + (document.getElementById('editarCurso_id').value || '0') + '/editar/');
+        handleForm('formNovoCurso', 'criar_curso', '/cursos-disciplinas/');
         
         // Fixed edit form URL handling
         document.getElementById('formEditarCurso').onsubmit = function(e) {
             e.preventDefault();
-            const id = document.getElementById('editarCurso_id').value;
-            fetch(`/cursos/${id}/editar/`, {
+            const formData = new FormData(this);
+            formData.append('acao', 'editar_curso');
+            fetch(`/cursos-disciplinas/`, {
                 method: 'POST',
-                body: new FormData(this),
+                body: formData,
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             }).then(r => r.json()).then(data => { if(data.success) location.reload(); });
         };
 
-        handleForm('formNovaDisciplina', '/disciplinas/nova/');
+        handleForm('formNovaDisciplina', 'criar_disciplina', '/cursos-disciplinas/');
 
         // Delete Course
         document.querySelectorAll('.btn-deletar-curso').forEach(btn => {
@@ -420,11 +469,30 @@
                 const id = this.dataset.cursoId;
                 const nome = this.dataset.cursoNome;
                 if (confirm(`ATENÇÃO: Você está prestes a eliminar o curso "${nome}".\n\nEsta ação é irreversível.\n\nDeseja continuar?`)) {
-                    fetch(`/cursos/${id}/deletar/`, {
+                    const formData = new FormData();
+                    formData.append('acao', 'deletar_curso');
+                    formData.append('curso_id', id);
+                    fetch(`/cursos-disciplinas/`, {
                         method: 'POST',
-                        headers: { 'X-CSRFToken': '{{ csrf_token }}', 'X-Requested-With': 'XMLHttpRequest' }
+                        body: formData,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
                     }).then(r => r.json()).then(data => { if(data.success) location.reload(); });
                 }
+            });
+        });
+
+        // Toggle Status
+        document.querySelectorAll('.btn-toggle-curso').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const id = this.dataset.cursoId;
+                const formData = new FormData();
+                formData.append('acao', 'toggle_curso');
+                formData.append('curso_id', id);
+                fetch(`/cursos-disciplinas/`, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                }).then(r => r.json()).then(data => { if(data.success) location.reload(); });
             });
         });
     });

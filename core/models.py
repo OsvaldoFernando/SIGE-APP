@@ -343,14 +343,20 @@ class ConfiguracaoEscola(models.Model):
             raise ValueError('Só pode existir uma configuração de escola')
         return super().save(*args, **kwargs)
 
+class NivelAcademico(models.Model):
+    nome = models.CharField(max_length=100, unique=True, verbose_name="Nome do Nível")
+    descricao = models.TextField(blank=True, verbose_name="Descrição")
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Nível Académico"
+        verbose_name_plural = "Níveis Académicos"
+        ordering = ['nome']
+
+    def __str__(self):
+        return self.nome
+
 class Curso(models.Model):
-    GRAU_CHOICES = [
-        ('licenciatura', 'Licenciatura'),
-        ('mestrado', 'Mestrado'),
-        ('doutoramento', 'Doutoramento'),
-        ('especialidade', 'Especialidade'),
-    ]
-    
     REGIME_CHOICES = [
         ('diurno', 'Diurno'),
         ('pos-laboral', 'Pós-Laboral'),
@@ -374,7 +380,7 @@ class Curso(models.Model):
     
     codigo = models.CharField(max_length=50, unique=True, default="CURSO", verbose_name="Código do Curso")
     nome = models.CharField(max_length=200, verbose_name="Nome do Curso")
-    grau = models.CharField(max_length=20, choices=GRAU_CHOICES, default='licenciatura', verbose_name="Grau")
+    grau = models.ForeignKey(NivelAcademico, on_delete=models.PROTECT, related_name='cursos', verbose_name="Grau Académico")
     regime = models.CharField(max_length=20, choices=REGIME_CHOICES, default='diurno', verbose_name="Regime")
     modalidade = models.CharField(max_length=20, choices=MODALIDADE_CHOICES, default='presencial', verbose_name="Modalidade")
     descricao = models.TextField(blank=True, verbose_name="Descrição")

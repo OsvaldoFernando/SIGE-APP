@@ -1794,6 +1794,10 @@ def cursos_disciplinas(request):
                     vagas = int(request.POST.get('vagas', 30))
                     duracao = int(request.POST.get('duracao_meses', 12))
                     nota_minima = request.POST.get('nota_minima', '10.00')
+                    grau = request.POST.get('grau', 'licenciatura')
+                    regime = request.POST.get('regime', 'diurno')
+                    modalidade = request.POST.get('modalidade', 'presencial')
+                    requer_prerequisitos = request.POST.get('requer_prerequisitos') == 'on'
                     
                     if Curso.objects.filter(codigo=codigo).exists():
                         return JsonResponse({'success': False, 'message': 'Código de curso já existe!'})
@@ -1803,7 +1807,11 @@ def cursos_disciplinas(request):
                         nome=nome,
                         vagas=vagas,
                         duracao_meses=duracao,
-                        nota_minima=nota_minima
+                        nota_minima=nota_minima,
+                        grau=grau,
+                        regime=regime,
+                        modalidade=modalidade,
+                        requer_prerequisitos=requer_prerequisitos
                     )
                     return JsonResponse({
                         'success': True,
@@ -1829,6 +1837,10 @@ def cursos_disciplinas(request):
                     curso.vagas = int(request.POST.get('vagas', curso.vagas))
                     curso.duracao_meses = int(request.POST.get('duracao_meses', curso.duracao_meses))
                     curso.nota_minima = request.POST.get('nota_minima', curso.nota_minima)
+                    curso.grau = request.POST.get('grau', curso.grau)
+                    curso.regime = request.POST.get('regime', curso.regime)
+                    curso.modalidade = request.POST.get('modalidade', curso.modalidade)
+                    curso.requer_prerequisitos = request.POST.get('requer_prerequisitos') == 'on'
                     curso.save()
                     return JsonResponse({'success': True, 'message': 'Curso atualizado com sucesso!'})
                 except Exception as e:
@@ -1929,15 +1941,23 @@ def grelha_curricular(request):
         
         if curso_id and versao:
             curso = get_object_or_404(Curso, id=curso_id)
+            # Verifica se já existe uma grade com este curso e versão
+            if GradeCurricular.objects.filter(curso=curso, versao=versao).exists():
+                messages.error(request, f'Já existe uma grade curricular para o curso {curso.nome} com a versão {versao}. Por favor, use um nome de versão diferente.')
+                return redirect('grelha_curricular')
+
+            # Desativa grades anteriores para este curso se a nova for ativa
+            GradeCurricular.objects.filter(curso=curso).update(estado='obsoleto')
+
             GradeCurricular.objects.create(
                 curso=curso,
                 versao=versao,
                 duracao_anos=int(duracao) if duracao else 4,
                 tipo_periodo=tipo_periodo or 'semestre',
-                estado=estado or 'rascunho'
+                estado='ativo'
             )
-            messages.success(request, 'Grade curricular iniciada com sucesso!')
-            return redirect('grelha_curricular')
+            messages.success(request, 'Grade curricular iniciada e ativada com sucesso!')
+            return redirect(f"{request.path}?curso={curso.id}")
 
     cursos = Curso.objects.filter(ativo=True)
     curso_selecionado_id = request.GET.get('curso')
@@ -2576,14 +2596,21 @@ def gerar_pdf_documento(request, documento_id, inscricao_id=None):
 
 @login_required
 def listar_cursos(request):
-    """Lista todos os cursos cadastrados"""
+    """Lista todos os cursos cadastrados usando o template moderno"""
     perfil = getattr(request.user, 'perfil', None)
     if not request.user.is_staff and not (perfil and perfil.nivel_acesso in ['admin', 'super_admin']):
         messages.error(request, 'Acesso negado.')
         return redirect('painel_principal')
+    
     cursos = Curso.objects.all()
-    return render(request, 'core/cursos/listar_cursos.html', {
+    # Adicionamos disciplinas para compatibilidade se o template esperar
+    from .models import Disciplina
+    disciplinas = Disciplina.objects.all()
+    
+    return render(request, 'core/cursos_disciplinas.html', {
         'cursos': cursos,
+        'disciplinas': disciplinas,
+        'duracao_choices': Curso.DURACAO_CHOICES,
         'total_cursos': cursos.count(),
     })
 
