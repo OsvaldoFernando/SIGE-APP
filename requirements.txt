@@ -5,3 +5,17 @@ sqlparse==0.5.5
 django
 gunicorn
 qrcode
+django
+gunicorn
+qrcode
+reportlab
+django
+gunicorn
+pillow
+qrcode
+reportlab
+django
+gunicorn
+pillow
+qrcode
+reportlab
