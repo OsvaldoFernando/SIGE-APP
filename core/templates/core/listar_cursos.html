@@ -171,8 +171,8 @@
                                             data-bs-toggle="modal" data-bs-target="#modalEditarCurso">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
-                                    <button class="btn-action btn btn-outline-danger btn-deletar-curso" 
-                                            data-curso-id="{{ curso.id }}" data-curso-nome="{{ curso.nome }}">
+                                    <button type="button" class="btn-action btn btn-outline-danger" 
+                                            onclick="openDeleteModal('{{ curso.id }}', '{{ curso.nome }}')">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </td>
@@ -181,6 +181,34 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmar Deleção -->
+<div class="modal fade" id="modalConfirmarDeletar" tabindex="-1" aria-labelledby="modalConfirmarDeletarLabel" aria-hidden="true" style="z-index: 2000;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="modalConfirmarDeletarLabel" style="color: #1e3a8a;">Confirmar Eliminação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-danger bg-opacity-10 p-3 rounded-circle text-danger">
+                        <i class="bi bi-exclamation-triangle fs-3"></i>
+                    </div>
+                    <div>
+                        <p class="mb-0 fw-medium">ATENÇÃO: Você está prestes a eliminar o curso <span id="deletarCursoNome" class="fw-bold"></span>.</p>
+                        <p class="text-muted small mb-0">Esta ação é irreversível.</p>
+                        <p class="fw-bold mt-2">Deseja continuar?</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger rounded-3 px-4" id="btnConfirmarDeletar">OK</button>
             </div>
         </div>
     </div>
@@ -197,73 +225,78 @@
             <form id="formNovoCurso">
                 {% csrf_token %}
                 <div class="modal-body px-4">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Código</label>
-                        <input type="text" class="form-control" name="codigo" required style="border-radius: 10px;">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" style="color: #1e3a8a;">Grau Académico</label>
+                        <select name="grau" id="id_grau_novo" class="form-select form-select-lg shadow-sm" required style="border-radius: 12px; border: 2px solid #e2e8f0;" onchange="updateCourseFields(this, 'novo')">
+                            <option value="">Selecionar Grau...</option>
+                            {% for nivel in niveis %}
+                            <option value="{{ nivel.id }}" 
+                                    data-duracao="{{ nivel.duracao_padrao|default:12 }}"
+                                    data-nota="{{ nivel.nota_minima_aprovacao|default:10 }}"
+                                    data-regime="{% if nivel.regime_regular %}diurno{% elif nivel.regime_pos_laboral %}pos-laboral{% else %}diurno{% endif %}">
+                                {{ nivel.nome }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text mt-2">Selecione o grau para carregar as configurações do curso.</div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Nome do Curso</label>
-                            <input type="text" class="form-control" name="nome" required style="border-radius: 10px;">
+
+                    <div id="campos_dinamicos_novo" style="display: none;">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Código</label>
+                            <input type="text" class="form-control" name="codigo" id="id_codigo_novo" required style="border-radius: 10px;">
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Grau Académico</label>
-                            <select name="grau" id="id_grau_novo" class="form-select" required style="border-radius: 10px;" onchange="updateCourseFields(this, 'novo')">
-                                <option value="">Selecionar Grau...</option>
-                                {% for nivel in niveis %}
-                                <option value="{{ nivel.id }}" 
-                                        data-duracao="{{ nivel.duracao_padrao|default:12 }}"
-                                        data-nota="{{ nivel.nota_minima_aprovacao|default:10 }}"
-                                        data-regime="{% if nivel.regime_regular %}diurno{% elif nivel.regime_pos_laboral %}pos-laboral{% else %}diurno{% endif %}">
-                                    {{ nivel.nome }}
-                                </option>
-                                {% endfor %}
-                            </select>
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label fw-semibold">Nome do Curso</label>
+                                <input type="text" class="form-control" name="nome" id="id_nome_novo" required style="border-radius: 10px;">
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-semibold">Vagas</label>
-                            <input type="number" class="form-control" name="vagas" value="30" style="border-radius: 10px;">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-semibold">Vagas</label>
+                                <input type="number" class="form-control border-primary" name="vagas" id="id_vagas_novo" placeholder="Ex: 30" style="border-radius: 10px; border-width: 2px;">
+                                <div class="form-text text-primary fw-medium small">Campo obrigatório.</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-semibold">Duração</label>
+                                <select class="form-select" name="duracao_meses" id="id_duracao_novo" required style="border-radius: 10px;">
+                                    {% for val, label in duracao_choices %}
+                                    <option value="{{ val }}">{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-semibold">Regime</label>
+                                <select name="regime" id="id_regime_novo" class="form-select" required style="border-radius: 10px;">
+                                    <option value="diurno">Diurno</option>
+                                    <option value="pos-laboral">Pós-Laboral</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-semibold">Duração</label>
-                            <select class="form-select" name="duracao_meses" id="id_duracao_novo" required style="border-radius: 10px;">
-                                {% for val, label in duracao_choices %}
-                                <option value="{{ val }}" {% if val == 12 %}selected{% endif %}>{{ label }}</option>
-                                {% endfor %}
-                            </select>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Modalidade</label>
+                                <select name="modalidade" class="form-select" required style="border-radius: 10px;">
+                                    <option value="presencial">Presencial</option>
+                                    <option value="semipresencial">Semipresencial</option>
+                                    <option value="ead">EAD</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Nota Mínima</label>
+                                <input type="number" step="0.01" class="form-control" name="nota_minima" id="id_nota_novo" style="border-radius: 10px;">
+                            </div>
                         </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-semibold">Regime</label>
-                            <select name="regime" id="id_regime_novo" class="form-select" required style="border-radius: 10px;">
-                                <option value="diurno">Diurno</option>
-                                <option value="pos-laboral">Pós-Laboral</option>
-                            </select>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" name="requer_prerequisitos" id="novoRequer">
+                            <label class="form-check-label" for="novoRequer">Requer Pré-requisitos</label>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Modalidade</label>
-                            <select name="modalidade" class="form-select" required style="border-radius: 10px;">
-                                <option value="presencial">Presencial</option>
-                                <option value="semipresencial">Semipresencial</option>
-                                <option value="ead">EAD</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Nota Mínima</label>
-                            <input type="number" step="0.01" class="form-control" name="nota_minima" id="id_nota_novo" value="10" style="border-radius: 10px;">
-                        </div>
-                    </div>
-                    <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" name="requer_prerequisitos" id="novoRequer">
-                        <label class="form-check-label" for="novoRequer">Requer Pré-requisitos</label>
                     </div>
                 </div>
                 <div class="modal-footer border-0 pb-4 px-4">
                     <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal" style="border-radius: 10px;">Cancelar</button>
-                    <button type="submit" class="btn btn-primary px-4" style="border-radius: 10px;">Criar Curso</button>
+                    <button type="submit" id="btnSubmitNovo" class="btn btn-primary px-4 shadow-sm" style="border-radius: 10px; display: none;">Criar Curso</button>
                 </div>
             </form>
         </div>
@@ -396,26 +429,120 @@
 <script>
     function updateCourseFields(select, prefix) {
         const option = select.options[select.selectedIndex];
+        
+        if (prefix === 'novo') {
+            const container = document.getElementById('campos_dinamicos_novo');
+            const btnSubmit = document.getElementById('btnSubmitNovo');
+            
+            if (!option.value) {
+                if (container) container.style.display = 'none';
+                if (btnSubmit) btnSubmit.style.display = 'none';
+                return;
+            }
+            
+            if (container) container.style.display = 'block';
+            if (btnSubmit) btnSubmit.style.display = 'block';
+        }
+
         if (!option.value) return;
 
         const duracao = option.dataset.duracao;
         const nota = option.dataset.nota;
         const regime = option.dataset.regime;
+        const nomeGrau = option.text.trim();
+        
+        const sugestaoCodigo = nomeGrau.substring(0, 3).toUpperCase() + Math.floor(10 + Math.random() * 90);
 
         if (prefix === 'novo') {
-            document.getElementById('id_duracao_novo').value = duracao;
-            document.getElementById('id_nota_novo').value = nota;
-            document.getElementById('id_regime_novo').value = regime;
+            const codigoField = document.getElementById('id_codigo_novo');
+            const nomeField = document.getElementById('id_nome_novo');
+            const vagasField = document.getElementById('id_vagas_novo');
+            const duracaoField = document.getElementById('id_duracao_novo');
+            const notaField = document.getElementById('id_nota_novo');
+            const regimeField = document.getElementById('id_regime_novo');
+
+            if (codigoField) codigoField.value = sugestaoCodigo;
+            if (nomeField) nomeField.value = nomeGrau + " em ";
+            if (vagasField) vagasField.value = ""; // Vazio como solicitado
+            if (duracaoField) duracaoField.value = duracao;
+            if (notaField) notaField.value = nota;
+            
+            // Garantir que o regime seja o mesmo definido no Nível Académico
+            if (regimeField) {
+                regimeField.value = regime;
+                // Opcional: Desabilitar ou alertar se quiser que seja estritamente o do nível
+                console.log("Regime definido pelo Nível:", regime);
+            }
         } else {
-            document.getElementById('editarCurso_duracao').value = duracao;
-            document.getElementById('editarCurso_nota').value = nota;
-            document.getElementById('editarCurso_regime').value = regime;
+            const duracaoField = document.getElementById('editarCurso_duracao');
+            const notaField = document.getElementById('editarCurso_nota');
+            const regimeField = document.getElementById('editarCurso_regime');
+
+            if (duracaoField) duracaoField.value = duracao;
+            if (notaField) notaField.value = nota;
+            if (regimeField) regimeField.value = regime;
         }
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        const btnNovoHeader = document.getElementById('btnNovoHeader');
-        
+        // Confirmar Deleção (Modal)
+        let cursoIdParaDeletar = null;
+        let modalDeletarInstancia = null;
+
+        window.openDeleteModal = function(id, nome) {
+            console.log("Chamando openDeleteModal para:", id, nome);
+            cursoIdParaDeletar = id;
+            const nomeSpan = document.getElementById('deletarCursoNome');
+            if (nomeSpan) nomeSpan.textContent = nome;
+            
+            const modalElement = document.getElementById('modalConfirmarDeletar');
+            if (modalElement) {
+                if (!modalDeletarInstancia) {
+                    modalDeletarInstancia = new bootstrap.Modal(modalElement);
+                }
+                modalDeletarInstancia.show();
+            } else {
+                console.error("Elemento modalConfirmarDeletar não encontrado!");
+            }
+        };
+
+        const btnConfirmar = document.getElementById('btnConfirmarDeletar');
+        if (btnConfirmar) {
+            btnConfirmar.addEventListener('click', function() {
+                if (cursoIdParaDeletar) {
+                    console.log("Confirmando exclusão do curso:", cursoIdParaDeletar);
+                    fetch(`/cursos/${cursoIdParaDeletar}/deletar/`, {
+                        method: 'POST',
+                        headers: { 
+                            'X-CSRFToken': '{{ csrf_token }}', 
+                            'X-Requested-With': 'XMLHttpRequest' 
+                        }
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            location.reload();
+                        } else {
+                            if (typeof showToast === 'function') {
+                                showToast(data.error || 'Erro ao eliminar curso', 'error');
+                            } else {
+                                alert(data.error || 'Erro ao eliminar curso');
+                            }
+                            if (modalDeletarInstancia) {
+                                modalDeletarInstancia.hide();
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Erro na requisição de exclusão:", err);
+                        if (modalDeletarInstancia) {
+                            modalDeletarInstancia.hide();
+                        }
+                    });
+                }
+            });
+        }
+
         // Tab switch handling for the header button
         document.getElementById('managementTabs').addEventListener('shown.bs.tab', function (e) {
             if (e.target.id === 'disciplinas-tab') {

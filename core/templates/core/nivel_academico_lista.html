@@ -8,10 +8,12 @@
             <h2 class="display-6 fw-bold text-dark mb-1">Níveis Académicos</h2>
             <p class="text-muted mb-0">Gestão de graus académicos e parâmetros de ensino.</p>
         </div>
+        {% if niveis %}
         <a href="{% url 'nivel_academico_create' %}" class="btn btn-primary btn-lg rounded-pill px-4 shadow-sm d-flex align-items-center gap-2">
             <i class="bi bi-plus-lg"></i>
             <span>Novo Nível</span>
         </a>
+        {% endif %}
     </div>
 
     <!-- Stats Overview -->

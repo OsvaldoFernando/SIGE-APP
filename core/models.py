@@ -354,9 +354,9 @@ class NivelAcademico(models.Model):
     creditos_minimos = models.PositiveIntegerField(default=0, verbose_name="Total Mínimo de Créditos")
     
     # Regras Académicas
-    nota_minima_aprovacao = models.DecimalField(max_digits=4, decimal_places=2, default=10.00, verbose_name="Nota Mínima de Aprovação")
+    nota_minima_aprovacao = models.DecimalField(max_digits=4, decimal_places=2, default=10.00, validators=[MinValueValidator(0.0), MaxValueValidator(10.0)], verbose_name="Nota Mínima de Aprovação")
     escala_notas_min = models.IntegerField(default=0, verbose_name="Escala Mínima")
-    escala_notas_max = models.IntegerField(default=20, verbose_name="Escala Máxima")
+    escala_notas_max = models.IntegerField(default=20, validators=[MinValueValidator(0), MaxValueValidator(20)], verbose_name="Escala Máxima")
     media_minima_progressao = models.DecimalField(max_digits=4, decimal_places=2, default=10.00, verbose_name="Média Mínima para Progressão")
     limite_reprovacoes = models.PositiveIntegerField(null=True, blank=True, verbose_name="Limite de Reprovações")
     

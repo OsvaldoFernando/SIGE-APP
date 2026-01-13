@@ -68,6 +68,7 @@
                             <div class="col-md-4">
                                 <label for="creditos_minimos" class="form-label fw-semibold">Créditos mínimos</label>
                                 <input type="number" class="form-control shadow-none border-2" id="creditos_minimos" name="creditos_minimos" value="{{ nivel.creditos_minimos|default:0 }}" min="0">
+                                <div class="form-text">Opcional</div>
                             </div>
                         </div>
                     </div>
@@ -84,11 +85,13 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label for="nota_minima_aprovacao" class="form-label fw-semibold">Nota mínima de aprovação</label>
-                                <input type="number" step="0.1" class="form-control shadow-none border-2" id="nota_minima_aprovacao" name="nota_minima_aprovacao" value="{{ nivel.nota_minima_aprovacao|default:10.0 }}" required>
+                                <input type="number" step="0.1" class="form-control shadow-none border-2" id="nota_minima_aprovacao" name="nota_minima_aprovacao" value="{{ nivel.nota_minima_aprovacao|default:10.0 }}" min="0" max="10" required>
+                                <div class="form-text">Máximo 10</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="escala_notas_max" class="form-label fw-semibold">Escala de notas (Máximo)</label>
-                                <input type="number" class="form-control shadow-none border-2" id="escala_notas_max" name="escala_notas_max" value="{{ nivel.escala_notas_max|default:20 }}" required>
+                                <input type="number" class="form-control shadow-none border-2" id="escala_notas_max" name="escala_notas_max" value="{{ nivel.escala_notas_max|default:20 }}" min="0" max="20" required>
+                                <div class="form-text">Máximo 20</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="media_minima_progressao" class="form-label fw-semibold">Média mínima para progressão</label>
