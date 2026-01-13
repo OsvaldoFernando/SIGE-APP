@@ -61,9 +61,16 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
+                                <label for="tipo_periodo" class="form-label fw-semibold">Tipo de Período</label>
+                                <select class="form-select shadow-none border-2" id="tipo_periodo" name="tipo_periodo" required>
+                                    <option value="semestre" {% if nivel.tipo_periodo == 'semestre' %}selected{% endif %}>Semestres</option>
+                                    <option value="trimestre" {% if nivel.tipo_periodo == 'trimestre' %}selected{% endif %}>Trimestres</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
                                 <label for="periodos_por_ano" class="form-label fw-semibold">Períodos por ano</label>
                                 <input type="number" class="form-control shadow-none border-2" id="periodos_por_ano" name="periodos_por_ano" value="{{ nivel.periodos_por_ano|default:2 }}" min="1" required>
-                                <div class="form-text">Ex: 2 para Semestres</div>
+                                <div class="form-text" id="periodo_help">Ex: 2 para Semestres</div>
                             </div>
                             <div class="col-md-4">
                                 <label for="creditos_minimos" class="form-label fw-semibold">Créditos mínimos</label>
@@ -229,6 +236,23 @@
 </style>
 
 <script>
+    // Períodos handling
+    const tipoPeriodo = document.getElementById('tipo_periodo');
+    const periodosInput = document.getElementById('periodos_por_ano');
+    const periodoHelp = document.getElementById('periodo_help');
+
+    if (tipoPeriodo && periodosInput) {
+        tipoPeriodo.addEventListener('change', function() {
+            if (this.value === 'trimestre') {
+                periodosInput.value = 3;
+                periodoHelp.textContent = 'Geralmente 3 para Trimestres';
+            } else {
+                periodosInput.value = 2;
+                periodoHelp.textContent = 'Geralmente 2 para Semestres';
+            }
+        });
+    }
+
     // Validation
     (function () {
         'use strict'

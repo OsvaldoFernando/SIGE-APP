@@ -350,6 +350,12 @@ class NivelAcademico(models.Model):
     
     # Estrutura Académica
     duracao_padrao = models.PositiveIntegerField(default=4, verbose_name="Duração Padrão (Anos)")
+    tipo_periodo = models.CharField(
+        max_length=20, 
+        choices=[('semestre', 'Semestres'), ('trimestre', 'Trimestres')], 
+        default='semestre', 
+        verbose_name="Tipo de Período"
+    )
     periodos_por_ano = models.PositiveIntegerField(default=2, verbose_name="Número de Períodos por Ano")
     creditos_minimos = models.PositiveIntegerField(default=0, verbose_name="Total Mínimo de Créditos")
     
@@ -470,6 +476,15 @@ class GradeCurricular(models.Model):
     tipo_periodo = models.CharField(max_length=20, choices=TIPO_PERIODO_CHOICES, default='semestre', verbose_name="Tipo de Período")
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='rascunho', verbose_name="Estado")
     descricao = models.TextField(blank=True, verbose_name="Descrição")
+    
+    # Regras Académicas da Grelha
+    media_aprovacao_direta = models.DecimalField(max_digits=4, decimal_places=2, default=14.00, verbose_name="Média para Dispensa/Aprovação Direta")
+    media_minima_exame = models.DecimalField(max_digits=4, decimal_places=2, default=10.00, verbose_name="Média Mínima para Exame")
+    media_reprovacao_direta = models.DecimalField(max_digits=4, decimal_places=2, default=7.00, verbose_name="Média para Reprovação Direta")
+    max_disciplinas_atraso = models.PositiveIntegerField(default=2, verbose_name="Limite de Disciplinas em Atraso")
+    permite_exame_especial = models.BooleanField(default=True, verbose_name="Permite Exame Especial (Recurso)")
+    precedencia_automatica_romana = models.BooleanField(default=True, verbose_name="Ativar Precedência Automática (I, II, III, IV)")
+    
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True)
 

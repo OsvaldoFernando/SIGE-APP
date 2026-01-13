@@ -43,7 +43,7 @@
                                     <tr>
                                         <th><i class="fas fa-barcode"></i> Código</th>
                                         <th><i class="fas fa-book"></i> Nome</th>
-                                        <th><i class="fas fa-graduation-cap"></i> Grau</th>
+                                        <th><i class="fas fa-graduation-cap"></i> Grau Académico</th>
                                         <th><i class="fas fa-clock"></i> Duração</th>
                                         <th><i class="fas fa-users"></i> Vagas</th>
                                         <th><i class="fas fa-toggle-on"></i> Status</th>
@@ -54,15 +54,18 @@
                                     {% for curso in cursos %}
                                         <tr>
                                             <td>
-                                                <span class="badge bg-info">{{ curso.codigo }}</span>
+                                                <span class="badge bg-info">{{ curso.grau.codigo|default:curso.codigo }}</span>
                                             </td>
                                             <td class="fw-500">{{ curso.nome }}</td>
                                             <td>
-                                                <small class="d-block">{{ curso.get_grau_display }}</small>
-                                                <small class="text-muted">{{ curso.get_regime_display }} | {{ curso.get_modalidade_display }}</small>
+                                                <small class="d-block">{{ curso.grau.nome }}</small>
+                                                <small class="text-muted">
+                                                    {% if curso.grau.regime_regular %}Regular{% endif %}
+                                                    {% if curso.grau.regime_pos_laboral %}| Pós-laboral{% endif %}
+                                                </small>
                                             </td>
                                             <td>
-                                                <span class="badge bg-secondary">{{ curso.get_duracao_meses_display }}</span>
+                                                <span class="badge bg-secondary">{{ curso.grau.duracao_padrao }} Anos</span>
                                             </td>
                                             <td>
                                                 <span class="badge bg-primary">{{ curso.vagas }}</span>

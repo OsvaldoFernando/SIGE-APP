@@ -1980,7 +1980,9 @@ def cursos_disciplinas(request):
                 except Exception as e:
                     return JsonResponse({'success': False, 'message': str(e)})
     
-    cursos = Curso.objects.all()
+    # Forçar atualização de dados dos cursos baseados no nível académico se necessário
+    # Isso garante que a listagem mostre dados atualizados
+    cursos = Curso.objects.all().select_related('grau')
     from .models import Disciplina
     disciplinas = Disciplina.objects.all()
     
@@ -2039,6 +2041,21 @@ def grelha_curricular(request):
         
         if curso_id and versao:
             curso = get_object_or_404(Curso, id=curso_id)
+            
+            # Se for uma atualização de regras de uma grade existente
+            grade_id = request.POST.get('grade_id_update')
+            if grade_id:
+                grade = get_object_or_404(GradeCurricular, id=grade_id)
+                grade.media_aprovacao_direta = request.POST.get('media_aprovacao', 14)
+                grade.media_minima_exame = request.POST.get('media_exame', 10)
+                grade.media_reprovacao_direta = request.POST.get('media_reprovacao', 7)
+                grade.max_disciplinas_atraso = request.POST.get('max_atraso', 2)
+                grade.permite_exame_especial = request.POST.get('exame_especial') == 'on'
+                grade.precedencia_automatica_romana = request.POST.get('precedencia_automatica') == 'on'
+                grade.save()
+                messages.success(request, 'Regras da grelha atualizadas com sucesso!')
+                return redirect(f"{request.path}?curso={curso.id}")
+
             # Verifica se já existe uma grade com este curso e versão
             if GradeCurricular.objects.filter(curso=curso, versao=versao).exists():
                 messages.error(request, f'Já existe uma grade curricular para o curso {curso.nome} com a versão {versao}. Por favor, use um nome de versão diferente.')
@@ -2083,17 +2100,44 @@ def grelha_curricular(request):
             if d.area_conhecimento == 'nuclear':
                 stats['nuclear_count'] += 1
 
-        # Calcula anos baseado na grade ou no curso
-        anos = grade_ativa.duracao_anos if grade_ativa else (curso.duracao_meses // 12 if curso.duracao_meses >= 12 else 1)
+        # Calcula anos baseado na grade, no nível académico ou no curso
+        if grade_ativa:
+            if grade_ativa.curso.grau and grade_ativa.curso.grau.duracao_padrao:
+                anos = grade_ativa.curso.grau.duracao_padrao
+            else:
+                anos = grade_ativa.duracao_anos
+        else:
+            anos = curso.grau.duracao_padrao if curso.grau and curso.grau.duracao_padrao else (curso.duracao_meses // 12 if curso.duracao_meses >= 12 else 1)
+        
         anos_range = range(1, anos + 1)
         
         # Define os períodos (semestres ou trimestres)
-        if grade_ativa and grade_ativa.tipo_periodo == 'trimestre':
-            periodos_range = [1, 2, 3]
-            tipo_periodo_label = "Trimestre"
+        if grade_ativa:
+            # Prioriza configuração do Nível Académico se disponível
+            if grade_ativa.curso.grau:
+                tipo = grade_ativa.curso.grau.tipo_periodo
+                num_periodos = grade_ativa.curso.grau.periodos_por_ano
+                
+                periodos_range = range(1, num_periodos + 1)
+                tipo_periodo_label = "Trimestre" if tipo == 'trimestre' else "Semestre"
+                if num_periodos > 3 and tipo == 'semestre': # Fallback para rótulo genérico se muitos períodos
+                    tipo_periodo_label = "Período"
+            else:
+                # Fallback para configuração da grade
+                if grade_ativa.tipo_periodo == 'trimestre':
+                    periodos_range = [1, 2, 3]
+                    tipo_periodo_label = "Trimestre"
+                else:
+                    periodos_range = [1, 2]
+                    tipo_periodo_label = "Semestre"
         else:
-            periodos_range = [1, 2]
-            tipo_periodo_label = "Semestre"
+            # Fallback para curso sem grade ativa
+            if curso.grau:
+                periodos_range = range(1, curso.grau.periodos_por_ano + 1)
+                tipo_periodo_label = "Trimestre" if curso.grau.tipo_periodo == 'trimestre' else "Semestre"
+            else:
+                periodos_range = [1, 2]
+                tipo_periodo_label = "Semestre"
 
     return render(request, 'core/grelha_curricular.html', {
         'cursos': cursos,
@@ -2721,51 +2765,97 @@ def criar_curso(request):
     if not request.user.is_staff and not (perfil and perfil.nivel_acesso in ['admin', 'super_admin']):
         messages.error(request, 'Acesso negado.')
         return redirect('listar_cursos')
+@login_required
+def criar_curso(request):
+    return _salvar_curso(request)
+
+@login_required
+def editar_curso(request, curso_id):
+    curso = get_object_or_404(Curso, id=curso_id)
+    return _salvar_curso(request, curso=curso, edicao=True)
+
+def _salvar_curso(request, curso=None, edicao=False):
+    perfil = getattr(request.user, 'perfil', None)
+    if not request.user.is_staff and not (perfil and perfil.nivel_acesso in ['admin', 'super_admin']):
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'Acesso negado.'})
+        messages.error(request, 'Acesso negado.')
+        return redirect('listar_cursos')
+    
     if request.method == 'POST':
         try:
-            codigo = request.POST.get('codigo')
+            grau_id = request.POST.get('grau')
+            grau_obj = get_object_or_404(NivelAcademico, id=grau_id)
+            
             nome = request.POST.get('nome')
-            descricao = request.POST.get('descricao', '')
-            vagas = int(request.POST.get('vagas', 0))
-            duracao_meses = int(request.POST.get('duracao_meses', 12))
-            nota_minima = request.POST.get('nota_minima', '10.00')
-            grau = request.POST.get('grau')
-            regime = request.POST.get('regime')
-            modalidade = request.POST.get('modalidade')
+            vagas = int(request.POST.get('vagas', 30))
+            requer_prerequisitos = request.POST.get('requer_prerequisitos') == 'on'
             
-            if Curso.objects.filter(codigo=codigo).exists():
-                messages.error(request, 'Curso com este código já existe!')
-                return render(request, 'core/cursos/curso_form.html', {
-                    'duracao_choices': Curso.DURACAO_CHOICES,
-                    'grau_choices': Curso.GRAU_CHOICES,
-                    'regime_choices': Curso.REGIME_CHOICES,
-                    'modalidade_choices': Curso.MODALIDADE_CHOICES,
-                })
+            # Dados vindos do Nível Académico
+            codigo = grau_obj.codigo or f"CURSO-{grau_obj.id}"
+            duracao_meses = (grau_obj.duracao_padrao or 4) * 12
+            nota_minima = grau_obj.nota_minima_aprovacao or 10.00
+            regime = 'diurno' if grau_obj.regime_regular else 'pos-laboral'
+            modalidade = 'presencial'
             
-            curso = Curso.objects.create(
-                codigo=codigo,
-                nome=nome,
-                descricao=descricao,
-                vagas=vagas,
-                duracao_meses=duracao_meses,
-                nota_minima=nota_minima,
-                grau=grau,
-                regime=regime,
-                modalidade=modalidade,
-                ativo=True
-            )
+            if edicao:
+                curso.nome = nome
+                curso.vagas = vagas
+                curso.grau = grau_obj
+                curso.requer_prerequisitos = requer_prerequisitos
+                # Atualizar campos automáticos caso o grau tenha mudado
+                curso.codigo = codigo
+                curso.duracao_meses = duracao_meses
+                curso.nota_minima = nota_minima
+                curso.regime = regime
+                curso.save()
+                msg = f'Curso "{curso.nome}" atualizado com sucesso!'
+            else:
+                if Curso.objects.filter(codigo=codigo, nome=nome).exists():
+                     import random
+                     codigo = f"{codigo}-{random.randint(100, 999)}"
+
+                curso = Curso.objects.create(
+                    codigo=codigo,
+                    nome=nome,
+                    vagas=vagas,
+                    duracao_meses=duracao_meses,
+                    nota_minima=nota_minima,
+                    grau=grau_obj,
+                    regime=regime,
+                    modalidade=modalidade,
+                    requer_prerequisitos=requer_prerequisitos,
+                    ativo=True
+                )
+                msg = f'Curso "{curso.nome}" cadastrado com sucesso!'
             
-            messages.success(request, f'Curso "{curso.nome}" cadastrado com sucesso!')
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': True, 'message': msg})
+            
+            messages.success(request, msg)
             return redirect('listar_cursos')
         except Exception as e:
-            messages.error(request, f'Erro ao criar curso: {str(e)}')
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': str(e)})
+            messages.error(request, f'Erro ao processar curso: {str(e)}')
     
     return render(request, 'core/cursos/curso_form.html', {
-        'duracao_choices': Curso.DURACAO_CHOICES,
-        'grau_choices': Curso.GRAU_CHOICES,
-        'regime_choices': Curso.REGIME_CHOICES,
-        'modalidade_choices': Curso.MODALIDADE_CHOICES,
+        'curso': curso if edicao else None,
+        'niveis': NivelAcademico.objects.all(),
+        'edicao': edicao,
     })
+
+@login_required
+@require_http_methods(["POST"])
+def toggle_curso_status(request, curso_id):
+    perfil = getattr(request.user, 'perfil', None)
+    if not request.user.is_staff and not (perfil and perfil.nivel_acesso in ['admin', 'super_admin']):
+        return JsonResponse({'success': False, 'error': 'Acesso negado.'})
+    
+    curso = get_object_or_404(Curso, id=curso_id)
+    curso.ativo = not curso.ativo
+    curso.save()
+    return JsonResponse({'success': True, 'novo_status': curso.ativo})
 
 @login_required
 def detalhe_curso(request, curso_id):
@@ -2779,43 +2869,6 @@ def detalhe_curso(request, curso_id):
         'total_inscricoes': inscricoes.count(),
         'total_aprovados': inscricoes.filter(aprovado=True).count(),
         'vagas_disponiveis': curso.vagas_disponiveis(),
-    })
-
-@login_required
-def editar_curso(request, curso_id):
-    """Edita um curso existente"""
-    perfil = getattr(request.user, 'perfil', None)
-    if not request.user.is_staff and not (perfil and perfil.nivel_acesso in ['admin', 'super_admin']):
-        messages.error(request, 'Acesso negado.')
-        return redirect('listar_cursos')
-    curso = get_object_or_404(Curso, id=curso_id)
-    
-    if request.method == 'POST':
-        try:
-            curso.codigo = request.POST.get('codigo', curso.codigo)
-            curso.nome = request.POST.get('nome', curso.nome)
-            curso.descricao = request.POST.get('descricao', curso.descricao)
-            curso.vagas = int(request.POST.get('vagas', curso.vagas))
-            curso.duracao_meses = int(request.POST.get('duracao_meses', curso.duracao_meses))
-            curso.nota_minima = request.POST.get('nota_minima', curso.nota_minima)
-            curso.grau = request.POST.get('grau', curso.grau)
-            curso.regime = request.POST.get('regime', curso.regime)
-            curso.modalidade = request.POST.get('modalidade', curso.modalidade)
-            curso.ativo = request.POST.get('ativo') == 'on'
-            
-            curso.save()
-            messages.success(request, f'Curso "{curso.nome}" atualizado com sucesso!')
-            return redirect('detalhe_curso', curso_id=curso.id)
-        except Exception as e:
-            messages.error(request, f'Erro ao editar curso: {str(e)}')
-    
-    return render(request, 'core/cursos/curso_form.html', {
-        'curso': curso,
-        'duracao_choices': Curso.DURACAO_CHOICES,
-        'grau_choices': Curso.GRAU_CHOICES,
-        'regime_choices': Curso.REGIME_CHOICES,
-        'modalidade_choices': Curso.MODALIDADE_CHOICES,
-        'edicao': True,
     })
 
 @login_required
@@ -3040,6 +3093,7 @@ def nivel_academico_create(request):
         nome = request.POST.get('nome')
         descricao = request.POST.get('descricao', '')
         duracao_padrao = request.POST.get('duracao_padrao', 4)
+        tipo_periodo = request.POST.get('tipo_periodo', 'semestre')
         periodos_por_ano = request.POST.get('periodos_por_ano', 2)
         creditos_minimos = request.POST.get('creditos_minimos', 0)
         nota_minima_aprovacao = request.POST.get('nota_minima_aprovacao', 10)
@@ -3064,6 +3118,7 @@ def nivel_academico_create(request):
             nome=nome, 
             descricao=descricao,
             duracao_padrao=duracao_padrao,
+            tipo_periodo=tipo_periodo,
             periodos_por_ano=periodos_por_ano,
             creditos_minimos=creditos_minimos,
             nota_minima_aprovacao=nota_minima_aprovacao,
@@ -3094,6 +3149,7 @@ def nivel_academico_edit(request, pk):
         nivel.nome = request.POST.get('nome')
         nivel.descricao = request.POST.get('descricao', '')
         nivel.duracao_padrao = request.POST.get('duracao_padrao', 4)
+        nivel.tipo_periodo = request.POST.get('tipo_periodo', 'semestre')
         nivel.periodos_por_ano = request.POST.get('periodos_por_ano', 2)
         nivel.creditos_minimos = request.POST.get('creditos_minimos', 0)
         nivel.nota_minima_aprovacao = request.POST.get('nota_minima_aprovacao', 10)

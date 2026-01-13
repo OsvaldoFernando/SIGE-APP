@@ -28,11 +28,13 @@
 
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="codigo" class="form-label fw-bold">Código do Curso <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control form-control-lg" id="codigo" name="codigo" 
-                                       value="{% if curso %}{{ curso.codigo }}{% endif %}" required 
-                                       placeholder="Ex: PROG2024" maxlength="50">
-                                <small class="text-muted">Identificador único do curso</small>
+                                <label for="grau" class="form-label fw-bold">Grau Académico <span class="text-danger">*</span></label>
+                                <select class="form-select form-select-lg" id="grau" name="grau" required>
+                                    <option value="">Selecione...</option>
+                                    {% for g in niveis %}
+                                        <option value="{{ g.id }}" {% if curso and curso.grau_id == g.id %}selected{% endif %}>{{ g.nome }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="nome" class="form-label fw-bold">Nome do Curso <span class="text-danger">*</span></label>
@@ -43,71 +45,16 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="descricao" class="form-label fw-bold">Descrição</label>
-                            <textarea class="form-control form-control-lg" id="descricao" name="descricao" 
-                                      rows="4" placeholder="Descreva o conteúdo e objetivos do curso...">{% if curso %}{{ curso.descricao }}{% endif %}</textarea>
-                            <small class="text-muted">Informações adicionais sobre o curso</small>
-                        </div>
 
                         <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label for="grau" class="form-label fw-bold">Grau Académico <span class="text-danger">*</span></label>
-                                <select class="form-select form-select-lg" id="grau" name="grau" required>
-                                    <option value="">Selecione...</option>
-                                    {% for value, label in grau_choices %}
-                                        <option value="{{ value }}" {% if curso and curso.grau == value %}selected{% endif %}>{{ label }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="regime" class="form-label fw-bold">Regime <span class="text-danger">*</span></label>
-                                <select class="form-select form-select-lg" id="regime" name="regime" required>
-                                    <option value="">Selecione...</option>
-                                    {% for value, label in regime_choices %}
-                                        <option value="{{ value }}" {% if curso and curso.regime == value %}selected{% endif %}>{{ label }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="modalidade" class="form-label fw-bold">Modalidade <span class="text-danger">*</span></label>
-                                <select class="form-select form-select-lg" id="modalidade" name="modalidade" required>
-                                    <option value="">Selecione...</option>
-                                    {% for value, label in modalidade_choices %}
-                                        <option value="{{ value }}" {% if curso and curso.modalidade == value %}selected{% endif %}>{{ label }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-12 mb-3">
                                 <label for="vagas" class="form-label fw-bold">Número de Vagas <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control form-control-lg" id="vagas" name="vagas" 
                                        value="{% if curso %}{{ curso.vagas }}{% else %}30{% endif %}" required min="1">
                                 <small class="text-muted">Quantidade de vagas disponíveis</small>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="duracao_meses" class="form-label fw-bold">Duração <span class="text-danger">*</span></label>
-                                <select class="form-select form-select-lg" id="duracao_meses" name="duracao_meses" required>
-                                    <option value="">Selecione a duração...</option>
-                                    {% for value, label in duracao_choices %}
-                                        <option value="{{ value }}" {% if curso and curso.duracao_meses == value %}selected{% endif %}>
-                                            {{ label }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                                <small class="text-muted">Duração total do curso</small>
-                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="nota_minima" class="form-label fw-bold">Nota Mínima para Aprovação <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control form-control-lg" id="nota_minima" name="nota_minima" 
-                                   value="{% if curso %}{{ curso.nota_minima }}{% else %}10{% endif %}" required 
-                                   min="10" max="20" step="0.01">
-                            <small class="text-muted">Nota mínima entre 10 e 20</small>
-                        </div>
 
                         {% if edicao %}
                             <div class="mb-3">

@@ -23,6 +23,7 @@ urlpatterns = [
     path('cursos/<int:curso_id>/detalhe/', views.detalhe_curso, name='detalhe_curso'),
     path('cursos/<int:curso_id>/editar/', views.editar_curso, name='editar_curso'),
     path('cursos/<int:curso_id>/deletar/', views.deletar_curso, name='deletar_curso'),
+    path('cursos/<int:curso_id>/toggle/', views.toggle_curso_status, name='toggle_curso_status'),
     
     # URLs para Gestão de Utilizadores
     path('utilizadores/', views.listar_utilizadores, name='listar_utilizadores'),
