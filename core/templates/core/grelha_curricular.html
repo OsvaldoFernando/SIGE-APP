@@ -174,23 +174,56 @@
                     <div class="row g-4">
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-dark">APROVAÇÃO DIRETA (≥)</label>
-                            <input type="number" step="0.1" name="media_aprovacao" class="form-control form-control-lg border-2 shadow-sm" value="{{ grade_ativa.media_aprovacao_direta|stringformat:'.1f'|default:'14.0' }}" style="border-color: #cbd5e1;">
-                            <div class="form-text text-muted small">Nota para dispensa de exame</div>
+                            <input type="number" step="0.01" min="0" max="20" name="media_aprovacao" class="form-control form-control-lg border-2 shadow-sm" value="{{ grade_ativa.media_aprovacao_direta|stringformat:'.2f'|default:'14.00' }}" style="border-color: #2563eb;">
+                            <div class="form-text text-muted small">Nota para dispensa (0-20)</div>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-dark">MÍNIMO P/ EXAME (≥)</label>
-                            <input type="number" step="0.1" name="media_exame" class="form-control form-control-lg border-2 shadow-sm" value="{{ grade_ativa.media_minima_exame|stringformat:'.1f'|default:'10.0' }}" style="border-color: #cbd5e1;">
-                            <div class="form-text text-muted small">Mínimo para admissão ao exame</div>
+                            <input type="number" step="0.01" min="0" max="20" name="media_exame" class="form-control form-control-lg border-2 shadow-sm" value="{{ grade_ativa.media_minima_exame|stringformat:'.2f'|default:'10.00' }}" style="border-color: #2563eb;">
+                            <div class="form-text text-muted small">Mínimo p/ exame (0-20)</div>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-dark">REPROVAÇÃO DIRETA (<)</label>
-                            <input type="number" step="0.1" name="media_reprovacao" class="form-control form-control-lg border-2 shadow-sm" value="{{ grade_ativa.media_reprovacao_direta|stringformat:'.1f'|default:'7.0' }}" style="border-color: #cbd5e1;">
-                            <div class="form-text text-muted small">Nota que reprova direto</div>
+                            <input type="number" step="0.01" min="0" max="20" name="media_reprovacao" class="form-control form-control-lg border-2 shadow-sm" value="{{ grade_ativa.media_reprovacao_direta|stringformat:'.2f'|default:'7.00' }}" style="border-color: #2563eb;">
+                            <div class="form-text text-muted small">Reprova direto (0-20)</div>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label small fw-bold text-dark">LIMITE CADEIRAS ATRASO</label>
-                            <input type="number" name="max_atraso" class="form-control form-control-lg border-2 shadow-sm" value="{{ grade_ativa.max_disciplinas_atraso|default:2 }}" style="border-color: #cbd5e1;">
-                            <div class="form-text text-muted small">Máximo para transitar de ano</div>
+                            <input type="number" min="0" max="6" name="max_atraso" class="form-control form-control-lg border-2 shadow-sm" value="{{ grade_ativa.max_disciplinas_atraso|default:2 }}" style="border-color: #2563eb;">
+                            <div class="form-text text-muted small">Máximo 6 disciplinas</div>
+                        </div>
+                    </div>
+
+                    <!-- PAINEL DE REGRAS DINÂMICAS (ALERTA VISÍVEL) -->
+                    <div class="mt-4 p-4 rounded-4 shadow-sm" style="background-color: #eff6ff; border: 2px solid #3b82f6;">
+                        <h6 class="fw-bold mb-3 text-primary"><i class="bi bi-info-circle-fill me-2"></i>REGRAS DESTA GRELHA (VISUALIZAÇÃO EM TEMPO REAL)</h6>
+                        <div class="d-flex flex-wrap gap-3">
+                            <div class="badge bg-white text-primary border p-3 rounded-3 shadow-sm">
+                                <i class="bi bi-award-fill me-2"></i>Dispensa: <strong>{{ grade_ativa.media_aprovacao_direta|floatformat:0 }}</strong>
+                            </div>
+                            <div class="badge bg-white text-success border p-3 rounded-3 shadow-sm">
+                                <i class="bi bi-journal-check me-2"></i>Exame: <strong>{{ grade_ativa.media_minima_exame|floatformat:0 }}</strong>
+                            </div>
+                            <div class="badge bg-white text-danger border p-3 rounded-3 shadow-sm">
+                                <i class="bi bi-x-circle-fill me-2"></i>Reprovação: <strong>< {{ grade_ativa.media_reprovacao_direta|floatformat:0 }}</strong>
+                            </div>
+                            {% if grade_ativa.permite_exame_especial %}
+                            <div class="badge bg-success text-white p-3 rounded-3 shadow-sm">
+                                <i class="bi bi-check-lg me-2"></i>Exame Especial: <strong>ATIVO</strong>
+                            </div>
+                            {% else %}
+                            <div class="badge bg-danger text-white p-3 rounded-3 shadow-sm">
+                                <i class="bi bi-slash-circle me-2"></i>Exame Especial: <strong>BLOQUEADO</strong>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="mt-3 p-3 bg-white rounded-3 border border-primary border-opacity-25">
+                            <p class="mb-0 small fw-bold text-primary"><i class="bi bi-folder-fill me-2"></i>REGRAS PARA DISCIPLINAS DE PROJETO:</p>
+                            <div class="d-flex gap-2 mt-2">
+                                <span class="badge bg-primary bg-opacity-10 text-primary">Apenas P1</span>
+                                <span class="badge bg-primary bg-opacity-10 text-primary">Exame = Projeto</span>
+                                <span class="badge bg-primary bg-opacity-10 text-primary">Sem Lei 7</span>
+                            </div>
                         </div>
                     </div>
                     <hr class="my-4" style="border-top: 2px solid #e2e8f0;">
@@ -211,6 +244,14 @@
                     </div>
                 </div>
             </form>
+            <div class="card-footer bg-light p-3 border-0">
+                <form method="POST" onsubmit="return confirm('ATENÇÃO: Isso excluirá permanentemente TODA a grelha curricular (disciplinas e regras). Continuar?')">
+                    {% csrf_token %}
+                    <input type="hidden" name="delete_grade" value="1">
+                    <input type="hidden" name="grade_id_delete" value="{{ grade_ativa.id }}">
+                    <button type="submit" class="btn btn-link text-danger fw-bold small p-0"><i class="bi bi-trash-fill me-1"></i>REMOVER ESTA GRELHA E TODAS AS SUAS REGRAS</button>
+                </form>
+            </div>
         </div>
         {% else %}
         <div class="alert alert-warning border-0 shadow-sm p-4 rounded-4 mb-5">
@@ -279,10 +320,26 @@
                                             </div>
                                             {% endif %}
                                             
-                                            {% if d.lei_7_aplicavel %}
-                                            <div class="mt-1 d-flex align-items-center">
-                                                <span class="text-danger fw-bold" style="font-size: 0.65rem;"><i class="bi bi-exclamation-triangle-fill me-1"></i>RESTRITO: LEI 7 (MÉDIA < 7 = REPROVAÇÃO)</span>
+                                            {% if d.is_projeto %}
+                                            <div class="mt-1 d-flex flex-column gap-1">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="text-info fw-bold" style="font-size: 0.65rem;"><i class="bi bi-folder-fill me-1"></i>DISCIPLINA DE PROJETO</span>
+                                                    <span class="badge bg-primary rounded-pill" style="font-size: 0.55rem;">P1 + PROJETO</span>
+                                                </div>
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25" style="font-size: 0.6rem;">Apenas 1ª Prova (P1)</span>
+                                                    <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25" style="font-size: 0.6rem;">Sem 2ª Prova (P2)</span>
+                                                    <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-25" style="font-size: 0.6rem;">Exame = Projeto</span>
+                                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25" style="font-size: 0.6rem;">Sem Lei 7</span>
+                                                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25" style="font-size: 0.6rem;">Sem Exame Especial</span>
+                                                </div>
                                             </div>
+                                            {% else %}
+                                                {% if d.lei_7_aplicavel %}
+                                                <div class="mt-1 d-flex align-items-center">
+                                                    <span class="text-danger fw-bold" style="font-size: 0.65rem;"><i class="bi bi-exclamation-triangle-fill me-1"></i>RESTRITO: LEI 7 (MÉDIA < 7 = REPROVAÇÃO)</span>
+                                                </div>
+                                                {% endif %}
                                             {% endif %}
                                         </div>
                                         <div class="text-end ps-3">
@@ -425,6 +482,12 @@
                         <div class="col-md-4">
                             <label class="form-label fw-bold small">CARGA HORÁRIA (H)</label>
                             <input type="number" name="carga_horaria" class="form-control bg-light border-0" value="60">
+                        </div>
+                        <div class="col-md-5 d-flex align-items-end">
+                            <div class="form-check form-switch mb-2 p-3 bg-primary bg-opacity-10 rounded-3 border border-primary border-opacity-25 w-100">
+                                <input class="form-check-input ms-0" type="checkbox" name="is_projeto" id="swIsProjeto">
+                                <label class="form-check-label fw-bold small ms-2 text-primary" for="swIsProjeto">DISCIPLINA DE PROJETO?</label>
+                            </div>
                         </div>
                         <div class="col-md-8">
                             <label class="form-label fw-bold small">PRÉ-REQUISITOS (DEPENDÊNCIA)</label>

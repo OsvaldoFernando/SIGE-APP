@@ -2011,6 +2011,7 @@ def grelha_curricular(request):
                 ano_curricular=request.POST.get('ano'),
                 semestre_curricular=request.POST.get('periodo'),
                 tipo=request.POST.get('tipo'),
+                is_projeto=request.POST.get('is_projeto') == 'on',
                 carga_horaria=request.POST.get('carga_horaria') or 40,
                 creditos=request.POST.get('creditos') or 0,
                 codigo=request.POST.get('codigo', ''),
@@ -2055,6 +2056,14 @@ def grelha_curricular(request):
                 grade.save()
                 messages.success(request, 'Regras da grelha atualizadas com sucesso!')
                 return redirect(f"{request.path}?curso={curso.id}")
+
+            if 'delete_grade' in request.POST:
+                grade_id = request.POST.get('grade_id_delete')
+                grade = get_object_or_404(GradeCurricular, id=grade_id)
+                curso_id = grade.curso.id
+                grade.delete()
+                messages.success(request, 'Grelha curricular e suas regras foram removidas com sucesso!')
+                return redirect(f"{request.path}?curso={curso_id}")
 
             # Verifica se já existe uma grade com este curso e versão
             if GradeCurricular.objects.filter(curso=curso, versao=versao).exists():

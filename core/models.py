@@ -514,6 +514,7 @@ class Disciplina(models.Model):
     grade_curricular = models.ForeignKey(GradeCurricular, on_delete=models.SET_NULL, null=True, blank=True, related_name='disciplinas', verbose_name="Grade Curricular")
     nome = models.CharField(max_length=200, verbose_name="Nome da Disciplina")
     area_conhecimento = models.CharField(max_length=30, choices=AREA_CHOICES, default='nuclear', verbose_name="Área de Conhecimento")
+    is_projeto = models.BooleanField(default=False, verbose_name="É Disciplina de Projeto?")
     carga_horaria = models.PositiveIntegerField(verbose_name="Carga Horária (horas)", default=40)
     creditos = models.PositiveIntegerField(default=0, verbose_name="Créditos")
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='obrigatoria', verbose_name="Tipo")
@@ -527,6 +528,16 @@ class Disciplina(models.Model):
     prerequisitos = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='sucessoras', verbose_name="Pré-requisitos")
     requer_duas_positivas_para_dispensa = models.BooleanField(default=False, verbose_name="Requer Positiva nas Provas Parcelares para Dispensa")
     lei_7_aplicavel = models.BooleanField(default=False, verbose_name="Aplicar Lei 7 (Reprovação Direta se Média < 7)")
+    
+    def save(self, *args, **kwargs):
+        if self.is_projeto:
+            self.lei_7_aplicavel = False
+            self.requer_duas_positivas_para_dispensa = False
+        
+        # Arredondamento de notas se aplicável (exemplo: para o inteiro mais próximo ou 1 casa decimal)
+        # Se houver campos de nota específicos aqui, poderiam ser arredondados.
+        # No contexto de GradeCurricular e Disciplina, as regras de média são decimais.
+        super().save(*args, **kwargs)
     
     class Meta:
         verbose_name = "Disciplina"
