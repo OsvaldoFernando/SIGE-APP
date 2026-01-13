@@ -722,15 +722,26 @@ def admissao_inscricao(request):
 @login_required
 def cursos_lista(request):
     cursos = Curso.objects.all().order_by('-ativo', 'nome')
-    return render(request, 'core/cursos_lista.html', {'cursos': cursos})
+    niveis = NivelAcademico.objects.all()
+    # Debug: Verificar no console se os níveis estão sendo carregados
+    print(f"DEBUG: Níveis carregados na view cursos_lista: {[n.nome for n in niveis]}")
+    return render(request, 'core/listar_cursos.html', {'cursos': cursos, 'niveis': niveis})
 
 @login_required
 def curso_create(request):
+    niveis = NivelAcademico.objects.all()
     if request.method == 'POST':
+        grau_id = request.POST.get('grau')
+        try:
+            grau = NivelAcademico.objects.get(id=grau_id)
+        except (NivelAcademico.DoesNotExist, ValueError):
+            messages.error(request, "Grau académico inválido.")
+            return redirect('cursos_lista')
+            
         curso = Curso(
             nome=request.POST['nome'],
             codigo=request.POST.get('codigo', 'CURSO-' + request.POST['nome'][:3].upper()),
-            grau=request.POST['grau'],
+            grau=grau,
             regime=request.POST['regime'],
             modalidade=request.POST['modalidade'],
             vagas=request.POST['vagas'],
@@ -744,14 +755,17 @@ def curso_create(request):
             return JsonResponse({'success': True, 'message': 'Curso criado com sucesso!'})
         messages.success(request, f'Curso "{curso.nome}" cadastrado com sucesso!')
         return redirect('cursos_lista')
-    return render(request, 'core/curso_form.html')
+    return render(request, 'core/curso_form.html', {'niveis': niveis})
 
 @login_required
 def curso_edit(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
+    niveis = NivelAcademico.objects.all()
     if request.method == 'POST':
+        grau_id = request.POST.get('grau')
+        grau = get_object_or_404(NivelAcademico, id=grau_id)
         curso.nome = request.POST['nome']
-        curso.grau = request.POST['grau']
+        curso.grau = grau
         curso.regime = request.POST['regime']
         curso.modalidade = request.POST['modalidade']
         curso.vagas = request.POST['vagas']
@@ -764,7 +778,7 @@ def curso_edit(request, curso_id):
             return JsonResponse({'success': True, 'message': 'Curso atualizado com sucesso!'})
         messages.success(request, f'Curso "{curso.nome}" atualizado com sucesso!')
         return redirect('cursos_lista')
-    return render(request, 'core/curso_form.html', {'curso': curso})
+    return render(request, 'core/curso_form.html', {'curso': curso, 'niveis': niveis})
 
 @login_required
 def curso_toggle(request, curso_id):
@@ -1860,6 +1874,7 @@ def quadro_avisos(request):
 def cursos_disciplinas(request):
     """View para gerenciar cursos e disciplinas com suporte AJAX"""
     from .models import Disciplina
+    niveis = NivelAcademico.objects.all()
     
     if request.method == 'POST':
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -1872,7 +1887,8 @@ def cursos_disciplinas(request):
                     vagas = int(request.POST.get('vagas', 30))
                     duracao = int(request.POST.get('duracao_meses', 12))
                     nota_minima = request.POST.get('nota_minima', '10.00')
-                    grau = request.POST.get('grau', 'licenciatura')
+                    grau_id = request.POST.get('grau')
+                    grau = get_object_or_404(NivelAcademico, id=grau_id)
                     regime = request.POST.get('regime', 'diurno')
                     modalidade = request.POST.get('modalidade', 'presencial')
                     requer_prerequisitos = request.POST.get('requer_prerequisitos') == 'on'
@@ -1910,12 +1926,15 @@ def cursos_disciplinas(request):
                 try:
                     curso_id = int(request.POST.get('curso_id'))
                     curso = Curso.objects.get(id=curso_id)
+                    grau_id = request.POST.get('grau')
+                    grau = get_object_or_404(NivelAcademico, id=grau_id)
+                    
                     curso.codigo = request.POST.get('codigo', curso.codigo)
                     curso.nome = request.POST.get('nome', curso.nome)
                     curso.vagas = int(request.POST.get('vagas', curso.vagas))
                     curso.duracao_meses = int(request.POST.get('duracao_meses', curso.duracao_meses))
                     curso.nota_minima = request.POST.get('nota_minima', curso.nota_minima)
-                    curso.grau = request.POST.get('grau', curso.grau)
+                    curso.grau = grau
                     curso.regime = request.POST.get('regime', curso.regime)
                     curso.modalidade = request.POST.get('modalidade', curso.modalidade)
                     curso.requer_prerequisitos = request.POST.get('requer_prerequisitos') == 'on'
@@ -1967,6 +1986,7 @@ def cursos_disciplinas(request):
     
     context = {
         'cursos': cursos,
+        'niveis': niveis,
         'disciplinas': disciplinas,
         'duracao_choices': Curso.DURACAO_CHOICES,
         'active': 'cursos'
@@ -2681,12 +2701,14 @@ def listar_cursos(request):
         return redirect('painel_principal')
     
     cursos = Curso.objects.all()
+    niveis = NivelAcademico.objects.all()
     # Adicionamos disciplinas para compatibilidade se o template esperar
     from .models import Disciplina
     disciplinas = Disciplina.objects.all()
     
     return render(request, 'core/cursos_disciplinas.html', {
         'cursos': cursos,
+        'niveis': niveis,
         'disciplinas': disciplinas,
         'duracao_choices': Curso.DURACAO_CHOICES,
         'total_cursos': cursos.count(),

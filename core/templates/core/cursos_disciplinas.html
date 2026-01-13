@@ -216,25 +216,29 @@
             <form id="formNovoCurso">
                 {% csrf_token %}
                 <div class="modal-body px-4">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Código</label>
-                        <input type="text" class="form-control" name="codigo" required style="border-radius: 10px;">
-                    </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Nome do Curso</label>
-                            <input type="text" class="form-control" name="nome" required style="border-radius: 10px;">
-                        </div>
-                        <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold">Grau Académico</label>
-                            <select name="grau" class="form-select" required style="border-radius: 10px;">
-                                <option value="licenciatura">Licenciatura</option>
-                                <option value="mestrado">Mestrado</option>
-                                <option value="doutoramento">Doutoramento</option>
-                                <option value="especialidade">Especialidade</option>
-                                <option value="ensino_medio">Ensino Médio</option>
+                            <select name="grau" id="id_grau_novo" class="form-select" required style="border-radius: 10px;" onchange="updateCourseFields(this, 'novo')">
+                                <option value="">Selecionar Grau...</option>
+                                {% for nivel in niveis %}
+                                <option value="{{ nivel.id }}" 
+                                        data-duracao="{{ nivel.duracao_padrao|default:12 }}"
+                                        data-nota="{{ nivel.nota_minima_aprovacao|default:10 }}"
+                                        data-regime="{% if nivel.regime_regular %}diurno{% elif nivel.regime_pos_laboral %}pos-laboral{% else %}diurno{% endif %}">
+                                    {{ nivel.nome }}
+                                </option>
+                                {% endfor %}
                             </select>
                         </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Código</label>
+                            <input type="text" class="form-control" name="codigo" required style="border-radius: 10px;">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nome do Curso</label>
+                        <input type="text" class="form-control" name="nome" required style="border-radius: 10px;">
                     </div>
                     <div class="row">
                         <div class="col-md-4 mb-3">
@@ -243,7 +247,7 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <label class="form-label fw-semibold">Duração</label>
-                            <select class="form-select" name="duracao_meses" required style="border-radius: 10px;">
+                            <select class="form-select" name="duracao_meses" id="id_duracao_novo" required style="border-radius: 10px;">
                                 {% for val, label in duracao_choices %}
                                 <option value="{{ val }}" {% if val == 12 %}selected{% endif %}>{{ label }}</option>
                                 {% endfor %}
@@ -251,7 +255,7 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <label class="form-label fw-semibold">Regime</label>
-                            <select name="regime" class="form-select" required style="border-radius: 10px;">
+                            <select name="regime" id="id_regime_novo" class="form-select" required style="border-radius: 10px;">
                                 <option value="diurno">Diurno</option>
                                 <option value="pos-laboral">Pós-Laboral</option>
                             </select>
@@ -268,7 +272,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold">Nota Mínima</label>
-                            <input type="number" step="0.01" class="form-control" name="nota_minima" value="10" style="border-radius: 10px;">
+                            <input type="number" step="0.01" class="form-control" name="nota_minima" id="id_nota_novo" value="10" style="border-radius: 10px;">
                         </div>
                     </div>
                     <div class="form-check form-switch mb-3">
@@ -297,25 +301,29 @@
                 {% csrf_token %}
                 <input type="hidden" id="editarCurso_id" name="curso_id">
                 <div class="modal-body px-4">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold">Código</label>
-                        <input type="text" class="form-control" id="editarCurso_codigo" name="codigo" required style="border-radius: 10px;">
-                    </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Nome do Curso</label>
-                            <input type="text" class="form-control" id="editarCurso_nome" name="nome" required style="border-radius: 10px;">
-                        </div>
-                        <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold">Grau Académico</label>
-                            <select id="editarCurso_grau" name="grau" class="form-select" required style="border-radius: 10px;">
-                                <option value="licenciatura">Licenciatura</option>
-                                <option value="mestrado">Mestrado</option>
-                                <option value="doutoramento">Doutoramento</option>
-                                <option value="especialidade">Especialidade</option>
-                                <option value="ensino_medio">Ensino Médio</option>
+                            <select id="editarCurso_grau" name="grau" class="form-select" required style="border-radius: 10px;" onchange="updateCourseFields(this, 'editar')">
+                                <option value="">Selecionar Grau...</option>
+                                {% for nivel in niveis %}
+                                <option value="{{ nivel.id }}"
+                                        data-duracao="{{ nivel.duracao_padrao|default:12 }}"
+                                        data-nota="{{ nivel.nota_minima_aprovacao|default:10 }}"
+                                        data-regime="{% if nivel.regime_regular %}diurno{% elif nivel.regime_pos_laboral %}pos-laboral{% else %}diurno{% endif %}">
+                                    {{ nivel.nome }}
+                                </option>
+                                {% endfor %}
                             </select>
                         </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Código</label>
+                            <input type="text" class="form-control" id="editarCurso_codigo" name="codigo" required style="border-radius: 10px;">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nome do Curso</label>
+                        <input type="text" class="form-control" id="editarCurso_nome" name="nome" required style="border-radius: 10px;">
                     </div>
                     <div class="row">
                         <div class="col-md-4 mb-3">
@@ -405,6 +413,33 @@
 </div>
 
 <script>
+    function updateCourseFields(select, prefix) {
+        const option = select.options[select.selectedIndex];
+        if (!option || !option.value) return;
+
+        const duracao = option.dataset.duracao;
+        const nota = option.dataset.nota;
+        const regime = option.dataset.regime;
+
+        if (prefix === 'novo') {
+            const duracaoEl = document.getElementById('id_duracao_novo');
+            const notaEl = document.getElementById('id_nota_novo');
+            const regimeEl = document.getElementById('id_regime_novo');
+            
+            if (duracaoEl) duracaoEl.value = duracao;
+            if (notaEl) notaEl.value = nota;
+            if (regimeEl) regimeEl.value = regime;
+        } else {
+            const duracaoEl = document.getElementById('editarCurso_duracao');
+            const notaEl = document.getElementById('editarCurso_nota');
+            const regimeEl = document.getElementById('editarCurso_regime');
+            
+            if (duracaoEl) duracaoEl.value = duracao;
+            if (notaEl) notaEl.value = nota;
+            if (regimeEl) regimeEl.value = regime;
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         // Toggle Curso Status
         document.querySelectorAll('.btn-toggle-curso').forEach(btn => {

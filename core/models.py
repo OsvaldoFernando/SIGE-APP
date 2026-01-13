@@ -412,7 +412,7 @@ class Curso(models.Model):
     
     codigo = models.CharField(max_length=50, unique=True, default="CURSO", verbose_name="Código do Curso")
     nome = models.CharField(max_length=200, verbose_name="Nome do Curso")
-    grau = models.ForeignKey(NivelAcademico, on_delete=models.PROTECT, related_name='cursos', verbose_name="Grau Académico")
+    grau = models.ForeignKey(NivelAcademico, on_delete=models.CASCADE, related_name='cursos', verbose_name="Grau Académico")
     regime = models.CharField(max_length=20, choices=REGIME_CHOICES, default='diurno', verbose_name="Regime")
     modalidade = models.CharField(max_length=20, choices=MODALIDADE_CHOICES, default='presencial', verbose_name="Modalidade")
     descricao = models.TextField(blank=True, verbose_name="Descrição")

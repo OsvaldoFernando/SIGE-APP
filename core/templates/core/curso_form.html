@@ -30,10 +30,10 @@
                             <div class="col-md-6 mb-4">
                                 <label class="form-label">Grau Académico *</label>
                                 <select name="grau" class="form-select" required>
-                                    <option value="licenciatura" {% if curso.grau == 'licenciatura' %}selected{% endif %}>Licenciatura</option>
-                                    <option value="mestrado" {% if curso.grau == 'mestrado' %}selected{% endif %}>Mestrado</option>
-                                    <option value="doutoramento" {% if curso.grau == 'doutoramento' %}selected{% endif %}>Doutoramento</option>
-                                    <option value="especialidade" {% if curso.grau == 'especialidade' %}selected{% endif %}>Especialidade</option>
+                                    <option value="">Selecione um Grau...</option>
+                                    {% for nivel in niveis %}
+                                    <option value="{{ nivel.id }}" {% if curso.grau.id == nivel.id %}selected{% endif %}>{{ nivel.nome }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>

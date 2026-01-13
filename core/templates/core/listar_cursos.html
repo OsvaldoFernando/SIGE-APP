@@ -208,11 +208,16 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold">Grau Académico</label>
-                            <select name="grau" class="form-select" required style="border-radius: 10px;">
-                                <option value="licenciatura">Licenciatura</option>
-                                <option value="mestrado">Mestrado</option>
-                                <option value="doutoramento">Doutoramento</option>
-                                <option value="especialidade">Especialidade</option>
+                            <select name="grau" id="id_grau_novo" class="form-select" required style="border-radius: 10px;" onchange="updateCourseFields(this, 'novo')">
+                                <option value="">Selecionar Grau...</option>
+                                {% for nivel in niveis %}
+                                <option value="{{ nivel.id }}" 
+                                        data-duracao="{{ nivel.duracao_padrao|default:12 }}"
+                                        data-nota="{{ nivel.nota_minima_aprovacao|default:10 }}"
+                                        data-regime="{% if nivel.regime_regular %}diurno{% elif nivel.regime_pos_laboral %}pos-laboral{% else %}diurno{% endif %}">
+                                    {{ nivel.nome }}
+                                </option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>
@@ -223,7 +228,7 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <label class="form-label fw-semibold">Duração</label>
-                            <select class="form-select" name="duracao_meses" required style="border-radius: 10px;">
+                            <select class="form-select" name="duracao_meses" id="id_duracao_novo" required style="border-radius: 10px;">
                                 {% for val, label in duracao_choices %}
                                 <option value="{{ val }}" {% if val == 12 %}selected{% endif %}>{{ label }}</option>
                                 {% endfor %}
@@ -231,7 +236,7 @@
                         </div>
                         <div class="col-md-4 mb-3">
                             <label class="form-label fw-semibold">Regime</label>
-                            <select name="regime" class="form-select" required style="border-radius: 10px;">
+                            <select name="regime" id="id_regime_novo" class="form-select" required style="border-radius: 10px;">
                                 <option value="diurno">Diurno</option>
                                 <option value="pos-laboral">Pós-Laboral</option>
                             </select>
@@ -248,7 +253,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold">Nota Mínima</label>
-                            <input type="number" step="0.01" class="form-control" name="nota_minima" value="10" style="border-radius: 10px;">
+                            <input type="number" step="0.01" class="form-control" name="nota_minima" id="id_nota_novo" value="10" style="border-radius: 10px;">
                         </div>
                     </div>
                     <div class="form-check form-switch mb-3">
@@ -288,11 +293,16 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold">Grau Académico</label>
-                            <select id="editarCurso_grau" name="grau" class="form-select" required style="border-radius: 10px;">
-                                <option value="licenciatura">Licenciatura</option>
-                                <option value="mestrado">Mestrado</option>
-                                <option value="doutoramento">Doutoramento</option>
-                                <option value="especialidade">Especialidade</option>
+                            <select id="editarCurso_grau" name="grau" class="form-select" required style="border-radius: 10px;" onchange="updateCourseFields(this, 'editar')">
+                                <option value="">Selecionar Grau...</option>
+                                {% for nivel in niveis %}
+                                <option value="{{ nivel.id }}"
+                                        data-duracao="{{ nivel.duracao_padrao|default:12 }}"
+                                        data-nota="{{ nivel.nota_minima_aprovacao|default:10 }}"
+                                        data-regime="{% if nivel.regime_regular %}diurno{% elif nivel.regime_pos_laboral %}pos-laboral{% else %}diurno{% endif %}">
+                                    {{ nivel.nome }}
+                                </option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>
@@ -384,6 +394,25 @@
 </div>
 
 <script>
+    function updateCourseFields(select, prefix) {
+        const option = select.options[select.selectedIndex];
+        if (!option.value) return;
+
+        const duracao = option.dataset.duracao;
+        const nota = option.dataset.nota;
+        const regime = option.dataset.regime;
+
+        if (prefix === 'novo') {
+            document.getElementById('id_duracao_novo').value = duracao;
+            document.getElementById('id_nota_novo').value = nota;
+            document.getElementById('id_regime_novo').value = regime;
+        } else {
+            document.getElementById('editarCurso_duracao').value = duracao;
+            document.getElementById('editarCurso_nota').value = nota;
+            document.getElementById('editarCurso_regime').value = regime;
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const btnNovoHeader = document.getElementById('btnNovoHeader');
         
