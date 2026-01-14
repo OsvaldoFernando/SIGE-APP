@@ -2646,6 +2646,42 @@ def atribuicao_turmas(request):
     return render(request, 'core/atribuicao_turmas_view.html', context)
 
 @login_required
+def detalhe_turma(request, turma_id):
+    """View para ver detalhes da turma e gerenciar suas disciplinas"""
+    from .models import Turma, TurmaDisciplina, Disciplina, User
+    turma = get_object_or_404(Turma, id=turma_id)
+    disciplinas_turma = TurmaDisciplina.objects.filter(turma=turma).select_related('disciplina', 'professor', 'sala')
+    
+    # Professores para o select
+    professores = User.objects.filter(perfil__nivel_acesso='professor')
+    from .models import Sala
+    salas = Sala.objects.filter(ativa=True)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'atualizar_professor':
+            td_id = request.POST.get('td_id')
+            prof_id = request.POST.get('professor_id')
+            sala_id = request.POST.get('sala_id')
+            
+            td = get_object_or_404(TurmaDisciplina, id=td_id)
+            if prof_id:
+                td.professor_id = prof_id
+            if sala_id:
+                td.sala_id = sala_id
+            td.save()
+            messages.success(request, f"Vínculo da disciplina {td.disciplina.nome} atualizado.")
+            return redirect('detalhe_turma', turma_id=turma.id)
+
+    context = {
+        'turma': turma,
+        'disciplinas_turma': disciplinas_turma,
+        'professores': professores,
+        'salas': salas,
+    }
+    return render(request, 'core/detalhe_turma_view.html', context)
+
+@login_required
 def assiduidade_docentes(request):
     """View para assiduidade de docentes"""
     context = {}

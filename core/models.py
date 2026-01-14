@@ -680,27 +680,27 @@ class Turma(models.Model):
     
     nome = models.CharField(max_length=100, verbose_name="Nome da Turma")
     curso = models.ForeignKey('core.Curso', on_delete=models.CASCADE, related_name='turmas_academica')
-    ano_lectivo = models.ForeignKey('core.AnoAcademico', on_delete=models.CASCADE, related_name='turmas_academica')
-    ano_academico = models.PositiveIntegerField(verbose_name="Ano Académico (ex: 1, 2, 3)")
-    periodo_curricular = models.PositiveIntegerField(verbose_name="Semestre/Trimestre")
+    ano_lectivo = models.ForeignKey('core.AnoAcademico', on_delete=models.CASCADE, related_name='turmas_academica', null=True)
+    ano_academico = models.PositiveIntegerField(verbose_name="Ano Académico (ex: 1, 2, 3)", default=1)
+    periodo_curricular = models.PositiveIntegerField(verbose_name="Semestre/Trimestre", default=1)
     turno = models.CharField(max_length=10, choices=TURNO_CHOICES, default='manha')
     capacidade = models.PositiveIntegerField(default=40)
     ativa = models.BooleanField(default=True)
-    data_criacao = models.DateTimeField(auto_now_add=True)
+    data_criacao = models.DateTimeField(default=timezone.now, verbose_name="Data de Criação")
     
     disciplinas_turma = models.ManyToManyField('core.Disciplina', through='TurmaDisciplina', related_name='turmas_disciplina')
 
     class Meta:
         verbose_name = "Turma"
         verbose_name_plural = "Turmas"
-        unique_together = ['nome', 'ano_lectivo', 'curso']
+        unique_together = ['nome', 'curso']
 
     def __str__(self):
         return f"{self.nome} - {self.curso.nome} ({self.ano_lectivo})"
 
 class TurmaDisciplina(models.Model):
-    turma = models.ForeignKey('core.Turma', on_delete=models.CASCADE)
-    disciplina = models.ForeignKey('core.Disciplina', on_delete=models.CASCADE)
+    turma = models.ForeignKey(Turma, on_delete=models.CASCADE)
+    disciplina = models.ForeignKey(Disciplina, on_delete=models.CASCADE)
     professor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, limit_choices_to={'perfil__nivel_acesso': 'professor'})
     sala = models.ForeignKey('core.Sala', on_delete=models.SET_NULL, null=True, blank=True)
     
@@ -967,20 +967,6 @@ class Professor(models.Model):
     
     def __str__(self):
         return self.nome_completo
-
-class Turma(models.Model):
-    nome = models.CharField(max_length=100, verbose_name="Nome da Turma")
-    curso = models.ForeignKey(Curso, on_delete=models.CASCADE, related_name='turmas', verbose_name="Curso")
-    ano_letivo = models.CharField(max_length=9, verbose_name="Ano Letivo (ex: 2024/2025)")
-    professor_titular = models.ForeignKey(Professor, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Professor Titular")
-    
-    class Meta:
-        verbose_name = "Turma"
-        verbose_name_plural = "Turmas"
-        ordering = ['ano_letivo', 'nome']
-    
-    def __str__(self):
-        return f"{self.nome} - {self.curso.nome} ({self.ano_letivo})"
 
 class Aluno(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)

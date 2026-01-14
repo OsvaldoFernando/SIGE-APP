@@ -1,0 +1,137 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Detalhes da Turma - SIGE{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-2">
+                    <li class="breadcrumb-item"><a href="{% url 'painel_principal' %}" class="text-decoration-none">Painel</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'atribuicao_turmas' %}" class="text-decoration-none">Turmas</a></li>
+                    <li class="breadcrumb-item active">{{ turma.nome }}</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold mb-0">Detalhes da Turma: <span class="text-primary">{{ turma.nome }}</span></h2>
+            <p class="text-muted">{{ turma.curso.nome }} - {{ turma.ano_lectivo.codigo }}</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h5 class="fw-bold mb-3">Informações Gerais</h5>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><strong>Turno:</strong> {{ turma.get_turno_display }}</li>
+                    <li class="mb-2"><strong>Ano Académico:</strong> {{ turma.ano_academico }}º Ano</li>
+                    <li class="mb-2"><strong>Período:</strong> {{ turma.periodo_curricular }}º Período</li>
+                    <li class="mb-2"><strong>Capacidade:</strong> {{ turma.capacidade }} alunos</li>
+                    <li><strong>Status:</strong> 
+                        {% if turma.ativa %}
+                            <span class="badge bg-success">Ativa</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inativa</span>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-white border-0 py-3 ps-4">
+                    <h5 class="fw-bold mb-0">Disciplinas e Professores</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Disciplina</th>
+                                <th>Professor</th>
+                                <th>Sala</th>
+                                <th class="text-end pe-4">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for td in disciplinas_turma %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="fw-bold text-dark">{{ td.disciplina.nome }}</div>
+                                    <small class="text-muted">{{ td.disciplina.codigo }}</small>
+                                </td>
+                                <td>
+                                    {% if td.professor %}
+                                        {{ td.professor.get_full_name|default:td.professor.username }}
+                                    {% else %}
+                                        <span class="text-danger small"><i class="bi bi-exclamation-triangle me-1"></i>Não atribuído</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ td.sala.nome|default:"-" }}</td>
+                                <td class="text-end pe-4">
+                                    <button class="btn btn-sm btn-light rounded-pill" data-bs-toggle="modal" data-bs-target="#modalEdit{{ td.id }}">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    
+                                    <!-- Modal Editar Atribuição -->
+                                    <div class="modal fade" id="modalEdit{{ td.id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content border-0 shadow-lg rounded-4 text-start">
+                                                <div class="modal-header border-0">
+                                                    <h5 class="modal-title fw-bold">Atribuir Professor/Sala</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <form method="POST">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="action" value="atualizar_professor">
+                                                    <input type="hidden" name="td_id" value="{{ td.id }}">
+                                                    <div class="modal-body">
+                                                        <p class="small text-muted mb-3">Disciplina: <strong>{{ td.disciplina.nome }}</strong></p>
+                                                        
+                                                        <div class="mb-3">
+                                                            <label class="form-label small fw-bold">Professor</label>
+                                                            <select name="professor_id" class="form-select">
+                                                                <option value="">Selecione o Professor</option>
+                                                                {% for prof in professores %}
+                                                                <option value="{{ prof.id }}" {% if td.professor_id == prof.id %}selected{% endif %}>
+                                                                    {{ prof.get_full_name|default:prof.username }}
+                                                                </option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label class="form-label small fw-bold">Sala</label>
+                                                            <select name="sala_id" class="form-select">
+                                                                <option value="">Selecione a Sala</option>
+                                                                {% for sala in salas %}
+                                                                <option value="{{ sala.id }}" {% if td.sala_id == sala.id %}selected{% endif %}>
+                                                                    {{ sala.nome }}
+                                                                </option>
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer border-0">
+                                                        <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Cancelar</button>
+                                                        <button type="submit" class="btn btn-primary rounded-pill px-4">Salvar</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">Nenhuma disciplina vinculada.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

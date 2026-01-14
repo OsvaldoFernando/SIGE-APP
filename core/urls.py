@@ -52,6 +52,7 @@ urlpatterns = [
     path('assiduidade/', views.assiduidade, name='assiduidade'),
     path('assiduidade-docentes/', views.assiduidade_docentes, name='assiduidade_docentes'),
     path('atribuicao-turmas/', views.atribuicao_turmas, name='atribuicao_turmas'),
+    path('turma/<int:turma_id>/detalhes/', views.detalhe_turma, name='detalhe_turma'),
     path('bolsas-beneficios/', views.bolsas_beneficios, name='bolsas_beneficios'),
     path('cronograma-academico/', views.cronograma_academico, name='cronograma_academico'),
     path('configuracoes/globais/', views.configuracoes_globais, name='configuracoes_globais'),

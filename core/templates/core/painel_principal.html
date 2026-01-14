@@ -243,6 +243,13 @@
         }
     </style>
 
+    <!-- Estilos específicos para remover scroll indesejado -->
+    <style>
+        html, body {
+            scroll-behavior: auto !important;
+        }
+    </style>
+
     <div id="menusContainer">
         <!-- SEÇÃO DE MATRÍCULA -->
         <div class="menu-section animate__animated animate__fadeInUp">
@@ -319,7 +326,7 @@
                     </a>
                 </div>
                 <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.7s;">
-                    <a href="#" class="text-decoration-none h-100 d-block">
+                    <a href="{% url 'atribuicao_turmas' %}" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
                                 <div class="icon-wrapper">

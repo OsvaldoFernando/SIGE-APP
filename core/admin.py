@@ -192,8 +192,8 @@ class ProfessorAdmin(admin.ModelAdmin):
 
 @admin.register(Turma)
 class TurmaAdmin(admin.ModelAdmin):
-    list_display = ['nome', 'curso', 'ano_letivo', 'professor_titular']
-    list_filter = ['curso', 'ano_letivo']
+    list_display = ['nome', 'curso', 'ano_lectivo', 'ano_academico', 'turno', 'ativa']
+    list_filter = ['curso', 'ano_lectivo', 'turno', 'ativa']
     search_fields = ['nome', 'curso__nome']
 
 @admin.register(Aluno)

@@ -45,7 +45,7 @@
                             <span class="badge bg-secondary rounded-pill">{{ turma.turmadisciplina_set.count }}</span>
                         </td>
                         <td class="text-end pe-4">
-                            <button class="btn btn-sm btn-outline-primary rounded-pill">Ver Detalhes</button>
+                            <a href="{% url 'detalhe_turma' turma.id %}" class="btn btn-sm btn-outline-primary rounded-pill">Ver Detalhes</a>
                         </td>
                     </tr>
                     {% empty %}
@@ -101,7 +101,7 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Ano Académico</label>
-                            <select name="ano_academico" class="form-select" required>
+                            <select name="ano_academico" id="id_ano_academico" class="form-select" required>
                                 <option value="1">1º Ano</option>
                                 <option value="2">2º Ano</option>
                                 <option value="3">3º Ano</option>
@@ -136,4 +136,54 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cursoSelect = document.querySelector('select[name="curso"]');
+            const anoAcademicoSelect = document.getElementById('id_ano_academico');
+            
+            // Mapeamento de duração e tipo de período dos cursos
+            const cursoData = [
+                {% for curso in cursos %}
+                { 
+                    id: "{{ curso.id }}", 
+                    duracao: {% if curso.grau.duracao_padrao %}{{ curso.grau.duracao_padrao }}{% else %}Math.ceil({{ curso.duracao_meses|default:48 }} / 12){% endif %},
+                    tipo_periodo: "{{ curso.grau.tipo_periodo|default:'semestre' }}"
+                },
+                {% endfor %}
+            ];
+
+            cursoSelect.addEventListener('change', function() {
+                const selectedCursoId = this.value;
+                const curso = cursoData.find(c => c.id === selectedCursoId);
+                const periodoSelect = document.querySelector('select[name="periodo"]');
+                
+                if (curso) {
+                    // Atualizar Ano Académico
+                    const duracao = curso.duracao;
+                    anoAcademicoSelect.innerHTML = '';
+                    for (let i = 1; i <= duracao; i++) {
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = i + 'º Ano';
+                        anoAcademicoSelect.appendChild(option);
+                    }
+
+                    // Atualizar Semestre / Trimestre
+                    periodoSelect.innerHTML = '';
+                    const numPeriodos = curso.tipo_periodo === 'trimestre' ? 3 : 2;
+                    const labelPeriodo = curso.tipo_periodo === 'trimestre' ? 'Trimestre' : 'Semestre';
+                    
+                    for (let i = 1; i <= numPeriodos; i++) {
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = i + 'º ' + labelPeriodo;
+                        periodoSelect.appendChild(option);
+                    }
+                }
+            });
+        });
+    </script>
 {% endblock %}
