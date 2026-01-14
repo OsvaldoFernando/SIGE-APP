@@ -8,7 +8,6 @@
         <div style="width: 280px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 20px; position: fixed; left: 0; top: 80px; height: calc(100vh - 80px); overflow-y: auto;">
             <h5 style="color: #fff; margin-bottom: 20px;">Área de Trabalho</h5>
             <ul style="list-style: none; padding: 0; margin: 0;">
-                <li><a href="{% url 'cursos_disciplinas' %}" class="nav-link {% if active == 'cursos' %}active{% endif %}" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📚 Cursos e Disciplinas</a></li>
                 <li><a href="{% url 'grelha_curricular' %}" class="nav-link {% if active == 'grelha' %}active{% endif %}" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📋 Grelha Curricular</a></li>
                 <li><a href="{% url 'cronograma_academico' %}" class="nav-link {% if active == 'cronograma' %}active{% endif %}" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📅 Cronograma Acadêmico</a></li>
                 <li><a href="{% url 'periodo_letivo' %}" class="nav-link {% if active == 'periodo' %}active{% endif %}" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">⏱️ Período Letivo</a></li>
@@ -24,13 +23,6 @@
             <h1 style="color: #1e3c72; margin-bottom: 30px; text-align: center;">Área de Trabalho</h1>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                <a href="{% url 'cursos_disciplinas' %}" style="text-decoration: none;">
-                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #1e3c72; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
-                        <h5 style="color: #1e3c72; margin-bottom: 10px;">📚 Cursos e Disciplinas</h5>
-                        <p style="color: #666; margin: 0;">Gerenciar cursos, disciplinas e sua estrutura curricular.</p>
-                    </div>
-                </a>
-
                 <a href="{% url 'grelha_curricular' %}" style="text-decoration: none;">
                     <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #17a2b8; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
                         <h5 style="color: #17a2b8; margin-bottom: 10px;">📋 Grelha Curricular</h5>

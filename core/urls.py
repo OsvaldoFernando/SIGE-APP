@@ -54,6 +54,7 @@ urlpatterns = [
     path('atribuicao-turmas/', views.atribuicao_turmas, name='atribuicao_turmas'),
     path('bolsas-beneficios/', views.bolsas_beneficios, name='bolsas_beneficios'),
     path('cronograma-academico/', views.cronograma_academico, name='cronograma_academico'),
+    path('configuracoes/globais/', views.configuracoes_globais, name='configuracoes_globais'),
     path('cursos-disciplinas/', views.cursos_disciplinas, name='cursos_disciplinas'),
     path('departamentos/', views.departamentos, name='departamentos'),
     path('faturas-pagamentos/', views.faturas_pagamentos, name='faturas_pagamentos'),

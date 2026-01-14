@@ -2,7 +2,43 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse, FileResponse
 from django.utils import timezone
-from .models import Curso, Inscricao, ConfiguracaoEscola, Escola, AnoAcademico, Notificacao, PerfilUsuario, Subscricao, PagamentoSubscricao, RecuperacaoSenha, Documento, Semestre, PeriodoLectivo, GradeCurricular, NivelAcademico
+from django.contrib.auth.decorators import login_required
+from .models import (
+    Curso, Inscricao, ConfiguracaoEscola, Escola, AnoAcademico, Notificacao, 
+    PerfilUsuario, Subscricao, PagamentoSubscricao, RecuperacaoSenha, 
+    Documento, Semestre, PeriodoLectivo, GradeCurricular, NivelAcademico,
+    ConfiguracaoAcademica
+)
+
+@login_required
+def configuracoes_globais(request):
+    if request.user.perfil.nivel_acesso not in ['admin', 'super_admin']:
+        messages.error(request, "Acesso negado.")
+        return redirect('painel_principal')
+    
+    config = ConfiguracaoAcademica.objects.first()
+    if not config:
+        config = ConfiguracaoAcademica.objects.create()
+    
+    if request.method == 'POST':
+        config.percentagem_prova_continua = request.POST.get('pc', 40)
+        config.peso_avaliacao_continua = request.POST.get('peso_pc', 1)
+        config.percentagem_exame_final = request.POST.get('ef', 60)
+        config.dispensa_apenas_complementares = 'dispensa_complementares' in request.POST
+        config.exigir_duas_positivas_dispensa = 'duas_positivas' in request.POST
+        config.aplicar_lei_da_setima_global = 'lei_setima_global' in request.POST
+        config.aplicar_regras_projeto_especiais = 'regras_projeto' in request.POST
+        config.minimo_presenca_obrigatoria = request.POST.get('presenca', 75)
+        config.ativar_barreiras_progressao = 'ativar_barreiras' in request.POST
+        config.permite_equivalencia_automatica = 'equivalencia_automatica' in request.POST
+        config.anos_com_barreira_atraso = request.POST.get('barreiras', "3,5")
+        config.limite_semestres_trancamento = request.POST.get('trancamento', 2)
+        config.limite_tempo_exclusao_anos = request.POST.get('exclusao', 1)
+        config.save()
+        messages.success(request, "Configurações globais atualizadas com sucesso!")
+        return redirect('configuracoes_globais')
+        
+    return render(request, 'core/configuracoes_globais.html', {'config': config})
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
@@ -2051,6 +2087,7 @@ def grelha_curricular(request):
                 grade.media_minima_exame = request.POST.get('media_exame', 10)
                 grade.media_reprovacao_direta = request.POST.get('media_reprovacao', 7)
                 grade.max_disciplinas_atraso = request.POST.get('max_atraso', 2)
+                grade.aplicar_lei_da_setima = request.POST.get('lei_da_setima') == 'on'
                 grade.permite_exame_especial = request.POST.get('exame_especial') == 'on'
                 grade.precedencia_automatica_romana = request.POST.get('precedencia_automatica') == 'on'
                 grade.save()
@@ -2157,6 +2194,7 @@ def grelha_curricular(request):
         'periodos_range': periodos_range,
         'tipo_periodo_label': tipo_periodo_label if curso_selecionado_id else "Semestre",
         'stats': stats,
+        'config_global': ConfiguracaoAcademica.objects.first(),
         'active': 'grelha'
     })
 

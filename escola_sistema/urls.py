@@ -25,6 +25,7 @@ urlpatterns = [
     path('candidatos/exportar-aprovados/', views.gerar_lista_aprovados_pdf, name='exportar_aprovados'),
     # path('dashboard/', views.dashboard, name='dashboard'),
     path('painel/', views.painel_principal, name='painel_principal'),
+    path('configuracoes/globais/', views.configuracoes_globais, name='configuracoes_globais'),
     path('trocar-ano/', views.trocar_ano, name='trocar_ano'),
     path('perfil/', views.perfil_usuario, name='perfil_usuario'),
     path('avisos/', views.quadro_avisos, name='quadro_avisos'),

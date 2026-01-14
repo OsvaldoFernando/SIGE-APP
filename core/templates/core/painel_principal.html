@@ -279,32 +279,6 @@
                 <h3 class="mb-0 fw-bold">Configurações Académicas</h3>
             </div>
             <div class="row g-4 menu-items">
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.2s;">
-                    <a href="{% url 'listar_cursos' %}" class="text-decoration-none h-100 d-block">
-                        <div class="card shadow-sm card-menu p-4">
-                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
-                                <div class="icon-wrapper">
-                                    <i class="bi bi-mortarboard fs-2 text-primary"></i>
-                                </div>
-                                <h6 class="card-title">Cursos</h6>
-                                <p class="card-text mb-0">Gerencie e configure a oferta formativa da instituição.</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.3s;">
-                    <a href="{% url 'cursos_disciplinas' %}" class="text-decoration-none h-100 d-block">
-                        <div class="card shadow-sm card-menu p-4">
-                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
-                                <div class="icon-wrapper">
-                                    <i class="bi bi-book fs-2 text-primary"></i>
-                                </div>
-                                <h6 class="card-title">Disciplinas</h6>
-                                <p class="card-text mb-0">Administre o conteúdo programático e disciplinas.</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
                 <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.4s;">
                     <a href="{% url 'grelha_curricular' %}" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
@@ -383,19 +357,6 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 1.0s;">
-                    <a href="#" class="text-decoration-none h-100 d-block">
-                        <div class="card shadow-sm card-menu p-4">
-                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
-                                <div class="icon-wrapper">
-                                    <i class="bi bi-clock-history fs-2 text-primary"></i>
-                                </div>
-                                <h6 class="card-title">Regimes</h6>
-                                <p class="card-text mb-0">Configuração de turnos e regimes de estudo.</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
                 <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 1.1s;">
                     <a href="#" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
@@ -448,32 +409,6 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 1.5s;">
-                    <a href="#" class="text-decoration-none h-100 d-block">
-                        <div class="card shadow-sm card-menu p-4">
-                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
-                                <div class="icon-wrapper">
-                                    <i class="bi bi-star fs-2 text-primary"></i>
-                                </div>
-                                <h6 class="card-title">Avaliações</h6>
-                                <p class="card-text mb-0">Lançamento e consolidação de resultados.</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 1.6s;">
-                    <a href="#" class="text-decoration-none h-100 d-block">
-                        <div class="card shadow-sm card-menu p-4">
-                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
-                                <div class="icon-wrapper">
-                                    <i class="bi bi-diagram-2 fs-2 text-primary"></i>
-                                </div>
-                                <h6 class="card-title">Precedências</h6>
-                                <p class="card-text mb-0">Controle de requisitos de disciplinas.</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
                 <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 1.7s;">
                     <a href="#" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
@@ -488,6 +423,19 @@
                     </a>
                 </div>
                 <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 1.8s;">
+                    <a href="/configuracoes/globais/" class="text-decoration-none h-100 d-block">
+                        <div class="card shadow-sm card-menu p-4">
+                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
+                                <div class="icon-wrapper">
+                                    <i class="bi bi-shield-lock fs-2 text-primary"></i>
+                                </div>
+                                <h6 class="card-title">Regras Globais</h6>
+                                <p class="card-text mb-0">Configurações institucionais de notas e faltas.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 1.9s;">
                     <a href="{% url 'cronograma_academico' %}" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -496,32 +444,6 @@
                                 </div>
                                 <h6 class="card-title">Calendário Acadêmico</h6>
                                 <p class="card-text mb-0">Gerencie datas, marcos e eventos importantes da instituição.</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 1.9s;">
-                    <a href="#" class="text-decoration-none h-100 d-block">
-                        <div class="card shadow-sm card-menu p-4">
-                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
-                                <div class="icon-wrapper">
-                                    <i class="bi bi-tags fs-2 text-primary"></i>
-                                </div>
-                                <h6 class="card-title">Tipos de Disciplinas</h6>
-                                <p class="card-text mb-0">Classificação e categorias curriculares.</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 2.0s;">
-                    <a href="#" class="text-decoration-none h-100 d-block">
-                        <div class="card shadow-sm card-menu p-4">
-                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
-                                <div class="icon-wrapper">
-                                    <i class="bi bi-infinity fs-2 text-primary"></i>
-                                </div>
-                                <h6 class="card-title">Avaliação Contínua</h6>
-                                <p class="card-text mb-0">Monitoramento sistemático do progresso.</p>
                             </div>
                         </div>
                     </a>

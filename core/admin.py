@@ -3,8 +3,17 @@ from .models import (
     ConfiguracaoEscola, Curso, Disciplina, Escola, Inscricao, Professor, 
     Turma, Aluno, Pai, AnoAcademico, PerfilUsuario, Notificacao, Subscricao, 
     PagamentoSubscricao, RecuperacaoSenha, Documento, PrerequisitoDisciplina,
-    HistoricoAcademico, NotaDisciplina, PeriodoLectivo
+    HistoricoAcademico, NotaDisciplina, PeriodoLectivo, ConfiguracaoAcademica
 )
+
+@admin.register(ConfiguracaoAcademica)
+class ConfiguracaoAcademicaAdmin(admin.ModelAdmin):
+    list_display = ['percentagem_prova_continua', 'percentagem_exame_final', 'minimo_presenca_obrigatoria']
+    
+    def has_add_permission(self, request):
+        if ConfiguracaoAcademica.objects.exists():
+            return False
+        return super().has_add_permission(request)
 
 @admin.register(PeriodoLectivo)
 class PeriodoLectivoAdmin(admin.ModelAdmin):

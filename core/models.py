@@ -458,6 +458,41 @@ class Curso(models.Model):
     def get_duracao_display_full(self):
         return f"{self.get_duracao_meses_display()}"
 
+class ConfiguracaoAcademica(models.Model):
+    # Regras de Avaliação
+    percentagem_prova_continua = models.PositiveIntegerField(default=40, verbose_name="% Prova Contínua")
+    peso_avaliacao_continua = models.PositiveIntegerField(default=1, help_text="Peso da avaliação contínua no cálculo final (ex: 1)", verbose_name="Peso Avaliação Contínua")
+    percentagem_exame_final = models.PositiveIntegerField(default=60, verbose_name="% Exame Final")
+    
+    # Regras de Dispensa
+    dispensa_apenas_complementares = models.BooleanField(default=False, verbose_name="Dispensa apenas disciplinas complementares", help_text="Se ativo, disciplinas nucleares/obrigatórias não permitem dispensa")
+    exigir_duas_positivas_dispensa = models.BooleanField(default=True, verbose_name="Exigir duas provas parcelares positivas para dispensa", help_text="Se ativo, qualquer nota negativa nas parcelares bloqueia a dispensa, mesmo com média >= 14")
+    
+    aplicar_lei_da_setima_global = models.BooleanField(default=True, verbose_name="Aplicar Lei da Sétima Institucional", help_text="Ativa a regra de média mínima 7 em avaliações parciais para toda a escola")
+    aplicar_regras_projeto_especiais = models.BooleanField(default=True, verbose_name="Aplicar Regras Especiais para Projeto", help_text="Ativa regras diferenciadas para disciplinas de projeto (Exame=Projeto, etc)")
+    
+    # Regras de Assiduidade
+    minimo_presenca_obrigatoria = models.PositiveIntegerField(default=75, verbose_name="% Mínimo Presença")
+    
+    # Regras de Progressão Institucional
+    ativar_barreiras_progressao = models.BooleanField(default=True, verbose_name="Ativar Barreiras de Progressão")
+    permite_equivalencia_automatica = models.BooleanField(default=True, verbose_name="Permite Equivalência Automática")
+    anos_com_barreira_atraso = models.CharField(max_length=100, default="3,5", help_text="Anos que exigem zero atrasos (ex: 3,5)")
+    limite_semestres_trancamento = models.PositiveIntegerField(default=2, verbose_name="Máximo Semestres Trancamento")
+    limite_tempo_exclusao_anos = models.PositiveIntegerField(default=1, verbose_name="Anos para Exclusão por Inatividade")
+
+    class Meta:
+        verbose_name = "Configuração Académica Global"
+        verbose_name_plural = "Configurações Académicas Globais"
+
+    def __str__(self):
+        return "Configurações Globais do Sistema"
+
+    def save(self, *args, **kwargs):
+        if not self.pk and ConfiguracaoAcademica.objects.exists():
+            return
+        super().save(*args, **kwargs)
+
 class GradeCurricular(models.Model):
     ESTADO_CHOICES = [
         ('rascunho', 'Rascunho'),
@@ -478,6 +513,7 @@ class GradeCurricular(models.Model):
     descricao = models.TextField(blank=True, verbose_name="Descrição")
     
     # Regras Académicas da Grelha
+    aplicar_lei_da_setima = models.BooleanField(default=True, verbose_name="Aplicar 'Lei da Sétima'", help_text="Média < 7 em avaliações parciais implica reprovação direta")
     media_aprovacao_direta = models.DecimalField(max_digits=4, decimal_places=2, default=14.00, verbose_name="Média para Dispensa/Aprovação Direta")
     media_minima_exame = models.DecimalField(max_digits=4, decimal_places=2, default=10.00, verbose_name="Média Mínima para Exame")
     media_reprovacao_direta = models.DecimalField(max_digits=4, decimal_places=2, default=7.00, verbose_name="Média para Reprovação Direta")
