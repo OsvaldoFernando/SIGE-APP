@@ -578,6 +578,24 @@ class Reclamacao(models.Model):
     def __str__(self):
         return f"Reclamação {self.id} - {self.estudante.username}"
 
+class Sala(models.Model):
+    TIPO_CHOICES = [
+        ('normal', 'Normal'),
+        ('laboratorio', 'Laboratório'),
+    ]
+    
+    nome = models.CharField(max_length=100, verbose_name="Nome da Sala")
+    capacidade = models.PositiveIntegerField(verbose_name="Capacidade")
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='normal', verbose_name="Tipo")
+    ativa = models.BooleanField(default=True, verbose_name="Estado (Ativa)")
+
+    class Meta:
+        verbose_name = "Sala"
+        verbose_name_plural = "Salas"
+
+    def __str__(self):
+        return f"{self.nome} ({self.get_tipo_display()})"
+
 class Disciplina(models.Model):
     TIPO_CHOICES = [
         ('obrigatoria', 'Obrigatória'),
@@ -652,6 +670,42 @@ class PrerequisitoDisciplina(models.Model):
     
     def __str__(self):
         return f"{self.curso.nome} ← {self.disciplina_prerequisito.nome} ({self.nota_minima_prerequisito})"
+
+class Turma(models.Model):
+    TURNO_CHOICES = [
+        ('manha', 'Manhã'),
+        ('tarde', 'Tarde'),
+        ('noite', 'Noite'),
+    ]
+    
+    nome = models.CharField(max_length=100, verbose_name="Nome da Turma")
+    curso = models.ForeignKey('core.Curso', on_delete=models.CASCADE, related_name='turmas_academica')
+    ano_lectivo = models.ForeignKey('core.AnoAcademico', on_delete=models.CASCADE, related_name='turmas_academica')
+    ano_academico = models.PositiveIntegerField(verbose_name="Ano Académico (ex: 1, 2, 3)")
+    periodo_curricular = models.PositiveIntegerField(verbose_name="Semestre/Trimestre")
+    turno = models.CharField(max_length=10, choices=TURNO_CHOICES, default='manha')
+    capacidade = models.PositiveIntegerField(default=40)
+    ativa = models.BooleanField(default=True)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    
+    disciplinas_turma = models.ManyToManyField('core.Disciplina', through='TurmaDisciplina', related_name='turmas_disciplina')
+
+    class Meta:
+        verbose_name = "Turma"
+        verbose_name_plural = "Turmas"
+        unique_together = ['nome', 'ano_lectivo', 'curso']
+
+    def __str__(self):
+        return f"{self.nome} - {self.curso.nome} ({self.ano_lectivo})"
+
+class TurmaDisciplina(models.Model):
+    turma = models.ForeignKey('core.Turma', on_delete=models.CASCADE)
+    disciplina = models.ForeignKey('core.Disciplina', on_delete=models.CASCADE)
+    professor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, limit_choices_to={'perfil__nivel_acesso': 'professor'})
+    sala = models.ForeignKey('core.Sala', on_delete=models.SET_NULL, null=True, blank=True)
+    
+    class Meta:
+        unique_together = ['turma', 'disciplina']
 
 class Escola(models.Model):
     nome = models.CharField(max_length=300, verbose_name="Nome da Escola", unique=True)

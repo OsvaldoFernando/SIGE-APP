@@ -7,7 +7,7 @@ from .models import (
     Curso, Inscricao, ConfiguracaoEscola, Escola, AnoAcademico, Notificacao, 
     PerfilUsuario, Subscricao, PagamentoSubscricao, RecuperacaoSenha, 
     Documento, Semestre, PeriodoLectivo, GradeCurricular, NivelAcademico,
-    ConfiguracaoAcademica, Reclamacao
+    ConfiguracaoAcademica, Reclamacao, Sala
 )
 
 @login_required
@@ -27,6 +27,7 @@ def criar_reclamacao(request):
 @login_required
 def gerir_reclamacoes(request):
     perfil = request.user.perfil
+    from .models import Disciplina
     if perfil.nivel_acesso not in ['admin', 'super_admin', 'secretaria', 'pedagogico']:
         messages.error(request, "Acesso negado.")
         return redirect('painel_principal')
@@ -2087,7 +2088,6 @@ def cursos_disciplinas(request):
     # Forçar atualização de dados dos cursos baseados no nível académico se necessário
     # Isso garante que a listagem mostre dados atualizados
     cursos = Curso.objects.all().select_related('grau')
-    from .models import Disciplina
     disciplinas = Disciplina.objects.all()
     
     context = {
@@ -2100,13 +2100,82 @@ def cursos_disciplinas(request):
     return render(request, 'core/cursos_disciplinas.html', context)
 
 @login_required
+def gerir_salas(request):
+    if request.user.perfil.nivel_acesso not in ['admin', 'super_admin', 'secretaria']:
+        messages.error(request, "Acesso negado.")
+        return redirect('painel_principal')
+    
+    if request.method == 'POST':
+        if 'add_sala' in request.POST:
+            nome = request.POST.get('nome')
+            capacidade = request.POST.get('capacidade')
+            tipo = request.POST.get('tipo')
+            ativa = request.POST.get('ativa') == 'on'
+            
+            Sala.objects.create(
+                nome=nome,
+                capacidade=capacidade,
+                tipo=tipo,
+                ativa=ativa
+            )
+            messages.success(request, f"Sala {nome} cadastrada com sucesso!")
+        
+        elif 'edit_sala' in request.POST:
+            sala_id = request.POST.get('sala_id')
+            sala = get_object_or_404(Sala, id=sala_id)
+            sala.nome = request.POST.get('nome')
+            sala.capacidade = request.POST.get('capacidade')
+            sala.tipo = request.POST.get('tipo')
+            sala.ativa = request.POST.get('ativa') == 'on'
+            sala.save()
+            messages.success(request, f"Sala {sala.nome} atualizada!")
+            
+        elif 'delete_sala' in request.POST:
+            sala_id = request.POST.get('sala_id')
+            sala = get_object_or_404(Sala, id=sala_id)
+            nome = sala.nome
+            sala.delete()
+            messages.success(request, f"Sala {nome} removida.")
+            
+        return redirect('gerir_salas')
+
+    salas = Sala.objects.all().order_by('nome')
+    return render(request, 'core/salas.html', {'salas': salas, 'active': 'salas'})
+
+@login_required
+def criar_sala(request):
+    return redirect('gerir_salas')
+
+@login_required
+def editar_sala(request, sala_id):
+    return redirect('gerir_salas')
+
+@login_required
+def deletar_sala(request, sala_id):
+    return redirect('gerir_salas')
+
+@login_required
 def grelha_curricular(request):
     """View para gerenciar e exibir grelha curricular estruturada"""
+    from .models import Disciplina
     if request.method == 'POST':
         if 'add_disciplina' in request.POST:
             grade_id = request.POST.get('grade_id')
             grade = get_object_or_404(GradeCurricular, id=grade_id)
-            from .models import Disciplina
+            nome = request.POST.get('nome')
+            ano = request.POST.get('ano_curricular')
+            semestre = request.POST.get('semestre_curricular')
+            
+            # Validação: Não permitir a mesma disciplina no mesmo período (ano e semestre/trimestre)
+            if Disciplina.objects.filter(
+                grade_curricular=grade,
+                nome__iexact=nome,
+                ano_curricular=ano,
+                semestre_curricular=semestre
+            ).exists():
+                messages.error(request, f'A disciplina "{nome}" já está cadastrada para este período ({ano}º Ano, {semestre}º Período).')
+                return redirect(f"{request.path}?curso={grade.curso.id}")
+
             disciplina = Disciplina.objects.create(
                 curso=grade.curso,
                 grade_curricular=grade,
@@ -2167,7 +2236,7 @@ def grelha_curricular(request):
                 grade = get_object_or_404(GradeCurricular, id=grade_id)
                 curso_id = grade.curso.id
                 grade.delete()
-                messages.success(request, 'Grelha curricular e suas regras foram removidas com sucesso!')
+                messages.success(request, 'A grelha curricular e todas as suas regras foram removidas com sucesso!')
                 return redirect(f"{request.path}?curso={curso_id}")
 
             # Verifica se já existe uma grade com este curso e versão
@@ -2230,15 +2299,16 @@ def grelha_curricular(request):
             elif d.area_conhecimento == 'projeto':
                 stats['projeto_count'] += 1
 
+    from .models import Disciplina
     if request.method == 'POST' and 'update_disciplina_modal' in request.POST:
         try:
-            from .models import Disciplina
+            config_global = ConfiguracaoAcademica.objects.first()
             disc_id = request.POST.get('disciplina_id')
             disciplina = get_object_or_404(Disciplina, id=disc_id)
             disciplina.nome = request.POST.get('nome')
             disciplina.codigo = request.POST.get('codigo')
             disciplina.carga_horaria = request.POST.get('carga_horaria')
-            if config_global.usar_creditos:
+            if config_global and config_global.usar_creditos:
                 disciplina.creditos = request.POST.get('creditos')
             disciplina.area_conhecimento = request.POST.get('area_conhecimento')
             disciplina.ano_curricular = request.POST.get('ano_curricular')
@@ -2289,6 +2359,8 @@ def grelha_curricular(request):
                 periodos_range = [1, 2]
                 tipo_periodo_label = "Semestre"
 
+    from .models import ConfiguracaoAcademica
+    config_global_render = ConfiguracaoAcademica.objects.first()
     return render(request, 'core/grelha_curricular.html', {
         'cursos': cursos,
         'grades': grades,
@@ -2298,7 +2370,7 @@ def grelha_curricular(request):
         'periodos_range': periodos_range,
         'tipo_periodo_label': tipo_periodo_label if curso_selecionado_id else "Semestre",
         'stats': stats,
-        'config_global': ConfiguracaoAcademica.objects.first(),
+        'config_global': config_global_render,
         'active': 'grelha'
     })
 
@@ -2523,7 +2595,54 @@ def cadastro_professores(request):
 @login_required
 def atribuicao_turmas(request):
     """View para atribuição de turmas e disciplinas"""
-    context = {}
+    from .models import Curso, AnoAcademico, Turma, Disciplina, TurmaDisciplina
+    
+    if request.method == 'POST' and 'criar_turma' in request.POST:
+        try:
+            curso_id = request.POST.get('curso')
+            ano_lectivo_id = request.POST.get('ano_lectivo')
+            ano_academico = request.POST.get('ano_academico')
+            periodo = request.POST.get('periodo')
+            nome = request.POST.get('nome')
+            
+            curso = Curso.objects.get(id=curso_id)
+            ano_l = AnoAcademico.objects.get(id=ano_lectivo_id)
+            
+            # 1. Criar a Turma
+            turma = Turma.objects.create(
+                nome=nome,
+                curso=curso,
+                ano_lectivo=ano_l,
+                ano_academico=ano_academico,
+                periodo_curricular=periodo
+            )
+            
+            # 2. Buscar disciplinas da grelha automaticamente
+            disciplinas = Disciplina.objects.filter(
+                curso=curso,
+                ano_curricular=ano_academico,
+                semestre_curricular=periodo
+            )
+            
+            # 3. Associar disciplinas à turma
+            for disc in disciplinas:
+                TurmaDisciplina.objects.create(turma=turma, disciplina=disc)
+            
+            messages.success(request, f"Turma '{nome}' criada com {disciplinas.count()} disciplinas associadas automaticamente!")
+            return redirect('atribuicao_turmas')
+        except Exception as e:
+            messages.error(request, f"Erro ao criar turma: {str(e)}")
+
+    cursos = Curso.objects.filter(ativo=True)
+    anos_lectivos = AnoAcademico.objects.filter(estado='ATIVO')
+    turmas = Turma.objects.all().select_related('curso', 'ano_lectivo')
+    
+    context = {
+        'cursos': cursos,
+        'anos_lectivos': anos_lectivos,
+        'turmas': turmas,
+        'active': 'turmas'
+    }
     return render(request, 'core/atribuicao_turmas_view.html', context)
 
 @login_required

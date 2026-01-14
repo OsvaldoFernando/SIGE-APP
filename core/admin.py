@@ -3,8 +3,14 @@ from .models import (
     ConfiguracaoEscola, Curso, Disciplina, Escola, Inscricao, Professor, 
     Turma, Aluno, Pai, AnoAcademico, PerfilUsuario, Notificacao, Subscricao, 
     PagamentoSubscricao, RecuperacaoSenha, Documento, PrerequisitoDisciplina,
-    HistoricoAcademico, NotaDisciplina, PeriodoLectivo, ConfiguracaoAcademica
+    HistoricoAcademico, NotaDisciplina, PeriodoLectivo, ConfiguracaoAcademica, Sala
 )
+
+@admin.register(Sala)
+class SalaAdmin(admin.ModelAdmin):
+    list_display = ['nome', 'capacidade', 'tipo', 'ativa']
+    list_filter = ['tipo', 'ativa']
+    search_fields = ['nome']
 
 @admin.register(ConfiguracaoAcademica)
 class ConfiguracaoAcademicaAdmin(admin.ModelAdmin):
