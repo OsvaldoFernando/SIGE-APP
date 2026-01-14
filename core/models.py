@@ -488,6 +488,7 @@ class ConfiguracaoAcademica(models.Model):
     max_disciplinas_atraso = models.PositiveIntegerField(default=2, verbose_name="Limite Cadeiras Atraso")
     permite_exame_especial = models.BooleanField(default=True, verbose_name="Permite Exames Especiais")
     precedencia_automatica_romana = models.BooleanField(default=True, verbose_name="Precedência Automática (I, II, III...)")
+    usar_creditos = models.BooleanField(default=True, verbose_name="Usar Sistema de Créditos", help_text="Se desativado, o campo de créditos será opcional/oculto")
 
     class Meta:
         verbose_name = "Configuração Académica Global"
@@ -541,6 +542,42 @@ class GradeCurricular(models.Model):
     def __str__(self):
         return f"{self.curso.nome} - {self.versao}"
 
+class Reclamacao(models.Model):
+    TIPO_CHOICES = [
+        ('ACADEMICA', 'Académica'),
+        ('FINANCEIRA', 'Financeira'),
+    ]
+    STATUS_CHOICES = [
+        ('PENDENTE', 'Pendente'),
+        ('EM_ANALISE', 'Em Análise'),
+        ('RESOLVIDO', 'Resolvido'),
+        ('REJEITADO', 'Rejeitado'),
+    ]
+    ESTAGIO_CHOICES = [
+        ('SECRETARIA', 'Secretaria / DAAC'),
+        ('DIRETOR', 'Diretor'),
+        ('ADMIN', 'Administrador'),
+        ('SUPER_ADMIN', 'Super Administrador'),
+    ]
+
+    estudante = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reclamacoes')
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES)
+    motivo = models.TextField(verbose_name="Motivo / Descrição")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDENTE')
+    estagio_atual = models.CharField(max_length=20, choices=ESTAGIO_CHOICES, default='SECRETARIA')
+    
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    data_atualizacao = models.DateTimeField(auto_now=True)
+    resposta = models.TextField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Reclamação"
+        verbose_name_plural = "Reclamações"
+        ordering = ['-data_criacao']
+
+    def __str__(self):
+        return f"Reclamação {self.id} - {self.estudante.username}"
+
 class Disciplina(models.Model):
     TIPO_CHOICES = [
         ('obrigatoria', 'Obrigatória'),
@@ -560,14 +597,16 @@ class Disciplina(models.Model):
     area_conhecimento = models.CharField(max_length=30, choices=AREA_CHOICES, default='nuclear', verbose_name="Área de Conhecimento")
     is_projeto = models.BooleanField(default=False, verbose_name="É Disciplina de Projeto?")
     carga_horaria = models.PositiveIntegerField(verbose_name="Carga Horária (horas)", default=40)
-    creditos = models.PositiveIntegerField(default=0, verbose_name="Créditos")
+    creditos = models.PositiveIntegerField(default=0, verbose_name="Créditos", null=True, blank=True)
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='obrigatoria', verbose_name="Tipo")
     descricao = models.TextField(blank=True, verbose_name="Descrição")
     codigo = models.CharField(max_length=50, blank=True, verbose_name="Código da Disciplina")
-    ano_curricular = models.PositiveIntegerField(default=1, verbose_name="Ano Curricular")
+    ano_curricular = models.PositiveIntegerField(default=1, verbose_name="Ano Curricular", null=True, blank=True)
     semestre_curricular = models.PositiveIntegerField(
         default=1, 
-        verbose_name="Período Curricular"
+        verbose_name="Período Curricular",
+        null=True,
+        blank=True
     )
     prerequisitos = models.ManyToManyField('self', symmetrical=False, blank=True, related_name='sucessoras', verbose_name="Pré-requisitos")
     requer_duas_positivas_para_dispensa = models.BooleanField(default=False, verbose_name="Requer Positiva nas Provas Parcelares para Dispensa")

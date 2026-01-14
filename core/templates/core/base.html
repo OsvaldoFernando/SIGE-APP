@@ -402,6 +402,15 @@
                         <a href="{% url 'perfil_usuario' %}" class="user-dropdown-item">
                             <i class="bi bi-person"></i> Perfil
                         </a>
+
+                        {% if user.is_staff %}
+                        <a href="/admin/core/disciplina/" class="user-dropdown-item text-primary">
+                            <i class="bi bi-database-gear text-primary"></i> Gerir Disciplinas (Admin)
+                        </a>
+                        <a href="/admin/" class="user-dropdown-item">
+                            <i class="bi bi-speedometer2"></i> Administração Total
+                        </a>
+                        {% endif %}
                         
                         <div class="user-dropdown-divider"></div>
                         
@@ -476,6 +485,43 @@
                     });
                 </script>
             {% endfor %}
+        {% endif %}
+
+        <!-- Widget de Irregularidades (Cartão de Visita) -->
+        {% if reclamacoes_pendentes %}
+        <div id="complaints-widget" class="fixed-bottom mb-4 ms-4" style="width: 320px; z-index: 1050; animation: slideIn 0.5s ease-out;">
+            <div class="card shadow-lg border-0 bg-white rounded-4 overflow-hidden">
+                <div class="card-header bg-danger bg-opacity-10 border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold text-danger">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Irregularidades Pendentes
+                    </h6>
+                    <button type="button" class="btn-close btn-sm" onclick="document.getElementById('complaints-widget').remove()"></button>
+                </div>
+                <div class="card-body p-3">
+                    {% for rec in reclamacoes_pendentes %}
+                    <div class="d-flex align-items-start gap-3 mb-3" style="border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">
+                        <div class="bg-light rounded-circle p-2 flex-shrink-0">
+                            <i class="bi {% if rec.tipo == 'ACADEMICA' %}bi-book{% else %}bi-cash-coin{% endif %} text-danger fs-5"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <div class="fw-bold text-dark small text-truncate">{{ rec.estudante.username }}</div>
+                            <div class="text-muted" style="font-size: 0.75rem;">{{ rec.get_tipo_display }} - {{ rec.data_criacao|date:"d/m" }}</div>
+                            <p class="text-muted small mb-0 text-truncate" title="{{ rec.motivo }}">{{ rec.motivo }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="card-footer bg-light border-0 text-center py-2">
+                    <a href="{% url 'gerir_reclamacoes' %}" class="btn btn-danger btn-sm w-100 rounded-3">Gerir Irregularidades</a>
+                </div>
+            </div>
+        </div>
+        <style>
+            @keyframes slideIn {
+                from { transform: translateX(-100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        </style>
         {% endif %}
         
         {% block content %}{% endblock %}

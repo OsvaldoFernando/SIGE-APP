@@ -74,4 +74,8 @@ urlpatterns = [
     path('niveis-academicos/novo/', views.nivel_academico_create, name='nivel_academico_create'),
     path('niveis-academicos/<int:pk>/editar/', views.nivel_academico_edit, name='nivel_academico_edit'),
     path('niveis-academicos/<int:pk>/deletar/', views.nivel_academico_delete, name='nivel_academico_delete'),
+    
+    # Reclamações
+    path('reclamacao/nova/', views.criar_reclamacao, name='criar_reclamacao'),
+    path('reclamacoes/gerir/', views.gerir_reclamacoes, name='gerir_reclamacoes'),
 ]

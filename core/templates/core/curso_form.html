@@ -74,6 +74,7 @@
                                       placeholder="Descreva o curso, objetivos e conteúdos principais">{{ curso.descricao|default:'' }}</textarea>
                         </div>
                         
+                        {% if config_academica.usar_creditos %}
                         <div class="row">
                             <div class="col-md-6 mb-4">
                                 <label class="form-label">Número de Vagas *</label>
@@ -91,6 +92,17 @@
                                 <small class="form-text text-muted">Escala de 0 a 20 valores</small>
                             </div>
                         </div>
+                        {% else %}
+                        <div class="row">
+                            <div class="col-md-12 mb-4">
+                                <label class="form-label">Número de Vagas *</label>
+                                <input type="number" name="vagas" class="form-control" 
+                                       value="{{ curso.vagas|default:'30' }}" required min="1" max="500"
+                                       placeholder="Ex: 30">
+                                <small class="form-text text-muted">Total de vagas disponíveis para o curso</small>
+                            </div>
+                        </div>
+                        {% endif %}
                         
                         <div class="mb-4">
                             <div class="form-check form-switch">

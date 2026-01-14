@@ -7,8 +7,41 @@ from .models import (
     Curso, Inscricao, ConfiguracaoEscola, Escola, AnoAcademico, Notificacao, 
     PerfilUsuario, Subscricao, PagamentoSubscricao, RecuperacaoSenha, 
     Documento, Semestre, PeriodoLectivo, GradeCurricular, NivelAcademico,
-    ConfiguracaoAcademica
+    ConfiguracaoAcademica, Reclamacao
 )
+
+@login_required
+def criar_reclamacao(request):
+    if request.method == 'POST':
+        tipo = request.POST.get('tipo')
+        motivo = request.POST.get('motivo')
+        Reclamacao.objects.create(
+            estudante=request.user,
+            tipo=tipo,
+            motivo=motivo
+        )
+        messages.success(request, "Reclamação enviada com sucesso!")
+        return redirect('painel_principal')
+    return render(request, 'core/reclamacao_form.html')
+
+@login_required
+def gerir_reclamacoes(request):
+    perfil = request.user.perfil
+    if perfil.nivel_acesso not in ['admin', 'super_admin', 'secretaria', 'pedagogico']:
+        messages.error(request, "Acesso negado.")
+        return redirect('painel_principal')
+    
+    # Mapeamento básico de estágios por nível de acesso
+    mapeamento = {
+        'secretaria': 'SECRETARIA',
+        'pedagogico': 'DIRETOR',
+        'admin': 'ADMIN',
+        'super_admin': 'SUPER_ADMIN'
+    }
+    estagio = mapeamento.get(perfil.nivel_acesso)
+    reclamacoes = Reclamacao.objects.filter(estagio_atual=estagio)
+    
+    return render(request, 'core/gerir_reclamacoes.html', {'reclamacoes': reclamacoes})
 
 @login_required
 def configuracoes_globais(request):
@@ -44,6 +77,7 @@ def configuracoes_globais(request):
         config_academica.max_disciplinas_atraso = request.POST.get('max_disciplinas_atraso', 2)
         config_academica.permite_exame_especial = 'permite_exame_especial' in request.POST
         config_academica.precedencia_automatica_romana = 'precedencia_automatica_romana' in request.POST
+        config_academica.usar_creditos = 'usar_creditos' in request.POST
         
         config_academica.save()
         messages.success(request, "Configurações globais atualizadas com sucesso!")
@@ -133,6 +167,18 @@ def index(request):
     # Calcular receita de hoje (Exemplo simples)
     receita_hoje = 0 # Valor inicial
     
+    # Notificações de irregularidades para o widget (Cartão de Visita)
+    reclamacoes_pendentes = []
+    if request.user.perfil.nivel_acesso in ['admin', 'super_admin', 'secretaria', 'pedagogico']:
+        mapeamento = {
+            'secretaria': 'SECRETARIA',
+            'pedagogico': 'DIRETOR',
+            'admin': 'ADMIN',
+            'super_admin': 'SUPER_ADMIN'
+        }
+        estagio = mapeamento.get(request.user.perfil.nivel_acesso)
+        reclamacoes_pendentes = Reclamacao.objects.filter(estagio_atual=estagio, status='PENDENTE')[:5]
+
     return render(request, 'core/index.html', {
         'cursos': cursos,
         'config': config,
@@ -142,6 +188,7 @@ def index(request):
         'receita_hoje': receita_hoje,
         'stats_inscricoes': stats_inscricoes,
         'stats_estudantes': stats_estudantes,
+        'reclamacoes_pendentes': reclamacoes_pendentes,
     })
 
 def inscricao_create(request, curso_id):
@@ -783,6 +830,7 @@ def cursos_lista(request):
 @login_required
 def curso_create(request):
     niveis = NivelAcademico.objects.all()
+    config_academica = ConfiguracaoAcademica.objects.first()
     if request.method == 'POST':
         grau_id = request.POST.get('grau')
         try:
@@ -799,7 +847,7 @@ def curso_create(request):
             modalidade=request.POST['modalidade'],
             vagas=request.POST['vagas'],
             duracao_meses=request.POST['duracao_meses'],
-            nota_minima=request.POST['nota_minima'],
+            nota_minima=request.POST.get('nota_minima', 10),
             descricao=request.POST.get('descricao', ''),
             requer_prerequisitos='requer_prerequisitos' in request.POST
         )
@@ -808,12 +856,13 @@ def curso_create(request):
             return JsonResponse({'success': True, 'message': 'Curso criado com sucesso!'})
         messages.success(request, f'Curso "{curso.nome}" cadastrado com sucesso!')
         return redirect('cursos_lista')
-    return render(request, 'core/curso_form.html', {'niveis': niveis})
+    return render(request, 'core/curso_form.html', {'niveis': niveis, 'config_academica': config_academica})
 
 @login_required
 def curso_edit(request, curso_id):
     curso = get_object_or_404(Curso, id=curso_id)
     niveis = NivelAcademico.objects.all()
+    config_academica = ConfiguracaoAcademica.objects.first()
     if request.method == 'POST':
         grau_id = request.POST.get('grau')
         grau = get_object_or_404(NivelAcademico, id=grau_id)
@@ -823,7 +872,7 @@ def curso_edit(request, curso_id):
         curso.modalidade = request.POST['modalidade']
         curso.vagas = request.POST['vagas']
         curso.duracao_meses = request.POST['duracao_meses']
-        curso.nota_minima = request.POST['nota_minima']
+        curso.nota_minima = request.POST.get('nota_minima', 10)
         curso.descricao = request.POST.get('descricao', '')
         curso.requer_prerequisitos = 'requer_prerequisitos' in request.POST
         curso.save()
@@ -831,7 +880,7 @@ def curso_edit(request, curso_id):
             return JsonResponse({'success': True, 'message': 'Curso atualizado com sucesso!'})
         messages.success(request, f'Curso "{curso.nome}" atualizado com sucesso!')
         return redirect('cursos_lista')
-    return render(request, 'core/curso_form.html', {'curso': curso, 'niveis': niveis})
+    return render(request, 'core/curso_form.html', {'curso': curso, 'niveis': niveis, 'config_academica': config_academica})
 
 @login_required
 def curso_toggle(request, curso_id):
@@ -861,13 +910,15 @@ def curso_delete(request, curso_id):
 
 @login_required
 def disciplina_create(request):
+    config_academica = ConfiguracaoAcademica.objects.first()
     if request.method == 'POST':
         curso_id = request.POST.get('curso_id')
         curso = get_object_or_404(Curso, id=curso_id)
         disciplina = Disciplina.objects.create(
             nome=request.POST['nome'],
             curso=curso,
-            carga_horaria=request.POST['carga_horaria']
+            carga_horaria=request.POST['carga_horaria'],
+            creditos=request.POST.get('creditos', 0) if config_academica and config_academica.usar_creditos else 0
         )
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': True, 'message': 'Disciplina criada com sucesso!'})
@@ -2061,8 +2112,8 @@ def grelha_curricular(request):
                 grade_curricular=grade,
                 nome=request.POST.get('nome'),
                 area_conhecimento=request.POST.get('area_conhecimento', 'nuclear'),
-                ano_curricular=request.POST.get('ano'),
-                semestre_curricular=request.POST.get('periodo'),
+                ano_curricular=request.POST.get('ano_curricular'),
+                semestre_curricular=request.POST.get('semestre_curricular'),
                 tipo=request.POST.get('tipo'),
                 is_projeto=request.POST.get('is_projeto') == 'on',
                 carga_horaria=request.POST.get('carga_horaria') or 40,
@@ -2147,6 +2198,7 @@ def grelha_curricular(request):
     grade_ativa = None
     stats = {'total_creditos': 0, 'total_horas': 0, 'total_disciplinas': 0, 'nuclear_count': 0}
     
+    tipo_periodo_label = "Semestre"  # Valor padrão para evitar UnboundLocalError
     if curso_selecionado_id:
         curso = get_object_or_404(Curso, id=curso_selecionado_id)
         grade_ativa = GradeCurricular.objects.filter(curso=curso, estado='ativo').first()
@@ -2156,14 +2208,49 @@ def grelha_curricular(request):
         disciplinas = grade_ativa.disciplinas.all() if grade_ativa else []
         
         # Estatísticas
+        stats = {
+            'total_creditos': 0, 
+            'total_horas': 0, 
+            'total_disciplinas': 0, 
+            'nuclear_count': 0,
+            'complementar_count': 0,
+            'geral_count': 0,
+            'projeto_count': 0
+        }
         for d in disciplinas:
-            stats['total_creditos'] += d.creditos
-            stats['total_horas'] += d.carga_horaria
+            stats['total_creditos'] += d.creditos or 0
+            stats['total_horas'] += d.carga_horaria or 0
             stats['total_disciplinas'] += 1
             if d.area_conhecimento == 'nuclear':
                 stats['nuclear_count'] += 1
+            elif d.area_conhecimento == 'complementar':
+                stats['complementar_count'] += 1
+            elif d.area_conhecimento == 'geral':
+                stats['geral_count'] += 1
+            elif d.area_conhecimento == 'projeto':
+                stats['projeto_count'] += 1
 
-        # Calcula anos baseado na grade, no nível académico ou no curso
+    if request.method == 'POST' and 'update_disciplina_modal' in request.POST:
+        try:
+            from .models import Disciplina
+            disc_id = request.POST.get('disciplina_id')
+            disciplina = get_object_or_404(Disciplina, id=disc_id)
+            disciplina.nome = request.POST.get('nome')
+            disciplina.codigo = request.POST.get('codigo')
+            disciplina.carga_horaria = request.POST.get('carga_horaria')
+            if config_global.usar_creditos:
+                disciplina.creditos = request.POST.get('creditos')
+            disciplina.area_conhecimento = request.POST.get('area_conhecimento')
+            disciplina.ano_curricular = request.POST.get('ano_curricular')
+            disciplina.semestre_curricular = request.POST.get('semestre_curricular')
+            disciplina.save()
+            messages.success(request, f'Disciplina "{disciplina.nome}" atualizada com sucesso!')
+        except Exception as e:
+            messages.error(request, f'Erro ao atualizar disciplina: {str(e)}')
+        return redirect(f"{request.path}?curso={curso_selecionado_id}")
+
+    # Calcula anos baseado na grade, no nível académico ou no curso
+    if curso_selecionado_id:
         if grade_ativa:
             if grade_ativa.curso.grau and grade_ativa.curso.grau.duracao_padrao:
                 anos = grade_ativa.curso.grau.duracao_padrao
