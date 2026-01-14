@@ -16,29 +16,43 @@ def configuracoes_globais(request):
         messages.error(request, "Acesso negado.")
         return redirect('painel_principal')
     
-    config = ConfiguracaoAcademica.objects.first()
-    if not config:
-        config = ConfiguracaoAcademica.objects.create()
+    config_academica = ConfiguracaoAcademica.objects.first()
+    if not config_academica:
+        config_academica = ConfiguracaoAcademica.objects.create()
+    
+    config_escola = ConfiguracaoEscola.objects.first()
     
     if request.method == 'POST':
-        config.percentagem_prova_continua = request.POST.get('pc', 40)
-        config.peso_avaliacao_continua = request.POST.get('peso_pc', 1)
-        config.percentagem_exame_final = request.POST.get('ef', 60)
-        config.dispensa_apenas_complementares = 'dispensa_complementares' in request.POST
-        config.exigir_duas_positivas_dispensa = 'duas_positivas' in request.POST
-        config.aplicar_lei_da_setima_global = 'lei_setima_global' in request.POST
-        config.aplicar_regras_projeto_especiais = 'regras_projeto' in request.POST
-        config.minimo_presenca_obrigatoria = request.POST.get('presenca', 75)
-        config.ativar_barreiras_progressao = 'ativar_barreiras' in request.POST
-        config.permite_equivalencia_automatica = 'equivalencia_automatica' in request.POST
-        config.anos_com_barreira_atraso = request.POST.get('barreiras', "3,5")
-        config.limite_semestres_trancamento = request.POST.get('trancamento', 2)
-        config.limite_tempo_exclusao_anos = request.POST.get('exclusao', 1)
-        config.save()
+        config_academica.percentagem_prova_continua = request.POST.get('pc', 40)
+        config_academica.peso_avaliacao_continua = request.POST.get('peso_pc', 1)
+        config_academica.percentagem_exame_final = request.POST.get('ef', 60)
+        config_academica.dispensa_apenas_complementares = 'dispensa_complementares' in request.POST
+        config_academica.exigir_duas_positivas_dispensa = 'duas_positivas' in request.POST
+        config_academica.aplicar_lei_da_setima_global = 'lei_setima_global' in request.POST
+        config_academica.aplicar_regras_projeto_especiais = 'regras_projeto' in request.POST
+        config_academica.minimo_presenca_obrigatoria = request.POST.get('presenca', 75)
+        config_academica.ativar_barreiras_progressao = 'ativar_barreiras' in request.POST
+        config_academica.permite_equivalencia_automatica = 'equivalencia_automatica' in request.POST
+        config_academica.anos_com_barreira_atraso = request.POST.get('barreiras', "3,5")
+        config_academica.limite_semestres_trancamento = request.POST.get('trancamento', 2)
+        config_academica.limite_tempo_exclusao_anos = request.POST.get('exclusao', 1)
+        
+        # Novas regras globais
+        config_academica.media_aprovacao_direta = request.POST.get('media_aprovacao_direta', 14.0)
+        config_academica.media_minima_exame = request.POST.get('media_minima_exame', 10.0)
+        config_academica.media_reprovacao_direta = request.POST.get('media_reprovacao_direta', 7.0)
+        config_academica.max_disciplinas_atraso = request.POST.get('max_disciplinas_atraso', 2)
+        config_academica.permite_exame_especial = 'permite_exame_especial' in request.POST
+        config_academica.precedencia_automatica_romana = 'precedencia_automatica_romana' in request.POST
+        
+        config_academica.save()
         messages.success(request, "Configurações globais atualizadas com sucesso!")
         return redirect('configuracoes_globais')
         
-    return render(request, 'core/configuracoes_globais.html', {'config': config})
+    return render(request, 'core/configuracoes_globais.html', {
+        'config': config_academica,
+        'config_escola': config_escola
+    })
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
@@ -115,6 +129,9 @@ def index(request):
         'registrados': Inscricao.objects.filter(status_inscricao='matriculado').count(), # Supondo que existe este status
         'ativos': Inscricao.objects.filter(status_inscricao='ativo').count(), # Supondo que existe este status
     }
+    
+    # Calcular receita de hoje (Exemplo simples)
+    receita_hoje = 0 # Valor inicial
     
     return render(request, 'core/index.html', {
         'cursos': cursos,

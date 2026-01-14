@@ -123,7 +123,7 @@
             display: flex;
             align-items: center;
             padding: 0 20px;
-            z-index: 1000;
+            z-index: 10001; /* Garante que fique acima de tudo */
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         .user-info {
@@ -164,6 +164,7 @@
             padding: 0.5rem;
             min-width: 220px;
             margin-top: 8px !important;
+            z-index: 9999; /* Garante que o menu fique acima de outros elementos */
         }
         .user-dropdown-header {
             display: flex;
@@ -339,7 +340,7 @@
                 <div class="user-info">
                     <a href="/" class="user-logo" style="height: 48px; display: flex; align-items: center; text-decoration: none;">
                         {% if config.logo %}
-                            <img src="{{ config.logo.url }}" alt="Logo" style="height: 100%; max-width: 150px; object-fit: contain;" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\'fw-bold fs-4 text-white\'>SIGE</span>';">
+                            <img src="{{ config.logo.url }}" alt="Logo" style="height: 48px; width: auto; max-width: 150px; object-fit: contain; display: block;">
                         {% else %}
                             <span class="fw-bold fs-4 text-white">SIGE</span>
                         {% endif %}

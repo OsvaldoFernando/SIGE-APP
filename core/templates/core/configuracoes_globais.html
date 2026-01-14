@@ -1,155 +1,220 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
 {% block title %}Configurações Globais - SIGE{% endblock %}
 
 {% block content %}
-<div class="container py-5">
+<div class="container-fluid py-4 bg-light min-vh-100">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="card-header bg-primary text-white p-4">
-                    <div class="d-flex align-items-center">
-                        <div class="bg-white bg-opacity-20 p-2 rounded-3 me-3">
-                            <i class="bi bi-shield-lock-fill fs-3"></i>
-                        </div>
-                        <div>
-                            <h4 class="fw-bold mb-0">Configurações Académicas Globais</h4>
-                            <p class="mb-0 small opacity-75">Defina as diretrizes institucionais do sistema</p>
-                        </div>
+        <div class="col-xl-11 col-xxl-10">
+            <!-- Header -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div>
+                        <h2 class="fw-bold text-dark mb-0">Configurações Académicas</h2>
+                        <p class="text-muted mb-0">Gestão centralizada de diretrizes institucionais</p>
                     </div>
-                </div>
-                
-                <form method="POST" class="card-body p-4 bg-light">
-                    {% csrf_token %}
-                    
-                    <!-- Seção de Avaliação -->
-                    <div class="mb-5">
-                        <h5 class="fw-bold text-primary mb-4 border-bottom pb-2">
-                            <i class="bi bi-calculator me-2"></i>Regras de Avaliação (Nota Final)
-                        </h5>
-                        <div class="row g-4">
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Peso Prova Contínua (%)</label>
-                                <div class="input-group input-group-lg">
-                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-percent text-muted"></i></span>
-                                    <input type="number" name="pc" class="form-control border-start-0 shadow-sm" value="{{ config.percentagem_prova_continua }}" min="0" max="100">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Peso Avaliação Contínua</label>
-                                <div class="input-group input-group-lg">
-                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-hash text-muted"></i></span>
-                                    <input type="number" name="peso_pc" class="form-control border-start-0 shadow-sm" value="{{ config.peso_avaliacao_continua }}" min="1">
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Peso Exame Final (%)</label>
-                                <div class="input-group input-group-lg">
-                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-percent text-muted"></i></span>
-                                    <input type="number" name="ef" class="form-control border-start-0 shadow-sm" value="{{ config.percentagem_exame_final }}" min="0" max="100">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-4 d-flex flex-wrap gap-3">
-                            <div class="form-check form-switch p-3 bg-white rounded-3 border shadow-sm d-inline-flex align-items-center" style="padding-left: 3.5rem !important;">
-                                <input class="form-check-input" type="checkbox" name="lei_setima_global" id="leiSetimaGlobal" {% if config.aplicar_lei_da_setima_global %}checked{% endif %}>
-                                <label class="form-check-label fw-bold ms-2 mb-0" for="leiSetimaGlobal">Ativar Lei da Sétima (Global)</label>
-                            </div>
-                            <div class="form-check form-switch p-3 bg-white rounded-3 border shadow-sm d-inline-flex align-items-center" style="padding-left: 3.5rem !important;">
-                                <input class="form-check-input" type="checkbox" name="regras_projeto" id="regrasProjeto" {% if config.aplicar_regras_projeto_especiais %}checked{% endif %}>
-                                <label class="form-check-label fw-bold ms-2 mb-0" for="regrasProjeto">Ativar Regras de Projeto (Global)</label>
-                            </div>
-                        </div>
-
-                        <div class="row g-4 mt-3">
-                            <div class="col-md-6">
-                                <div class="form-check form-switch p-3 bg-white rounded-3 border shadow-sm h-100 d-flex align-items-center" style="padding-left: 3.5rem !important;">
-                                    <input class="form-check-input" type="checkbox" name="dispensa_complementares" id="dispensaComp" {% if config.dispensa_apenas_complementares %}checked{% endif %}>
-                                    <label class="form-check-label fw-bold ms-2 mb-0" for="dispensaComp">Dispensa apenas Disciplinas Complementares</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-check form-switch p-3 bg-white rounded-3 border shadow-sm h-100 d-flex align-items-center" style="padding-left: 3.5rem !important;">
-                                    <input class="form-check-input" type="checkbox" name="duas_positivas" id="duasPositivas" {% if config.exigir_duas_positivas_dispensa %}checked{% endif %}>
-                                    <label class="form-check-label fw-bold ms-2 mb-0" for="duasPositivas">Exigir 2 Parcelares Positivas p/ Dispensa</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-text mt-2"><i class="bi bi-info-circle me-1"></i>Controles institucionais para aplicação automática de regras acadêmicas.</div>
-                    </div>
-
-                    <!-- Seção de Assiduidade -->
-                    <div class="mb-5">
-                        <h5 class="fw-bold text-info mb-4 border-bottom pb-2">
-                            <i class="bi bi-person-check me-2"></i>Frequência e Assiduidade
-                        </h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Presença Mínima Exigida (%)</label>
-                                <div class="input-group input-group-lg">
-                                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-calendar-check text-muted"></i></span>
-                                    <input type="number" name="presenca" class="form-control border-start-0 shadow-sm" value="{{ config.minimo_presenca_obrigatoria }}" min="0" max="100">
-                                </div>
-                                <div class="form-text mt-2">Obrigatório para ter acesso às provas de exame.</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Seção de Progressão -->
-                    <div class="mb-5">
-                        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-2">
-                            <h5 class="fw-bold text-dark mb-0">
-                                <i class="bi bi-arrow-up-circle me-2"></i>Progressão e Retenção
-                            </h5>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" name="ativar_barreiras" id="ativarBarreiras" {% if config.ativar_barreiras_progressao %}checked{% endif %}>
-                                <label class="form-check-label fw-bold text-primary" for="ativarBarreiras">Ativar Barreiras</label>
-                            </div>
-                            <div class="form-check form-switch ms-3">
-                                <input class="form-check-input" type="checkbox" name="equivalencia_automatica" id="equivalenciaAutomatica" {% if config.permite_equivalencia_automatica %}checked{% endif %}>
-                                <label class="form-check-label fw-bold text-success" for="equivalenciaAutomatica">Equivalência Automática</label>
-                            </div>
-                        </div>
-                        <div class="row g-4" id="secaoBarreiras" style="{% if not config.ativar_barreiras_progressao %}display: none;{% endif %}">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Barreiras de Progressão (Anos)</label>
-                                <input type="text" name="barreiras" class="form-control form-control-lg shadow-sm" value="{{ config.anos_com_barreira_atraso }}" placeholder="ex: 3,5">
-                                <div class="form-text mt-2">Anos que exigem zero cadeiras em atraso.</div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Máx. Semestres Trancamento</label>
-                                <input type="number" name="trancamento" class="form-control form-control-lg shadow-sm" value="{{ config.limite_semestres_trancamento }}" min="1">
-                            </div>
-                        </div>
-                        <div class="row g-4 mt-2">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Anos p/ Exclusão Automática</label>
-                                <input type="number" name="exclusao" class="form-control form-control-lg shadow-sm" value="{{ config.limite_tempo_exclusao_anos }}" min="1">
-                            </div>
-                        </div>
-                    </div>
-
-                    <script>
-                        document.getElementById('ativarBarreiras').addEventListener('change', function() {
-                            document.getElementById('secaoBarreiras').style.display = this.checked ? 'flex' : 'none';
-                        });
-                    </script>
-
-                    <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg fw-bold py-3 rounded-pill shadow-lg">
-                            <i class="bi bi-save2-fill me-2"></i>GUARDAR CONFIGURAÇÕES INSTITUCIONAIS
-                        </button>
-                    </div>
-                </form>
-                
-                <div class="card-footer bg-white p-4 border-0 text-center">
-                    <a href="{% url 'painel_principal' %}" class="btn btn-link text-muted text-decoration-none">
-                        <i class="bi bi-arrow-left me-2"></i>Voltar ao Painel Principal
-                    </a>
                 </div>
             </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                
+                <div class="row g-4">
+                    <!-- Abas de Navegação Moderna -->
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body p-2">
+                                <ul class="nav nav-pills nav-fill gap-2" id="configTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active py-3 fw-bold" id="tab-avaliacao" data-bs-toggle="pill" data-bs-target="#content-avaliacao" type="button" role="tab">
+                                            <i class="bi bi-calculator me-2"></i>Avaliação
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link py-3 fw-bold" id="tab-assiduidade" data-bs-toggle="pill" data-bs-target="#content-assiduidade" type="button" role="tab">
+                                            <i class="bi bi-person-check me-2"></i>Assiduidade
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link py-3 fw-bold" id="tab-progressao" data-bs-toggle="pill" data-bs-target="#content-progressao" type="button" role="tab">
+                                            <i class="bi bi-arrow-up-circle me-2"></i>Progressão
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link py-3 fw-bold" id="tab-grelhas" data-bs-toggle="pill" data-bs-target="#content-grelhas" type="button" role="tab">
+                                            <i class="bi bi-mortarboard me-2"></i>Regras de Grelha
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conteúdo das Abas -->
+                    <div class="col-12">
+                        <div class="tab-content" id="configTabsContent">
+                            <!-- Aba 1: Avaliação -->
+                            <div class="tab-pane fade show active" id="content-avaliacao" role="tabpanel">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body p-4">
+                                        <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-calculator me-2"></i>Pesos e Fórmulas</h5>
+                                        <div class="row g-4 mb-4">
+                                            <div class="col-md-4">
+                                                <label class="form-label small fw-bold text-muted">Peso Prova Contínua (%)</label>
+                                                <input type="number" name="pc" class="form-control form-control-lg" value="{{ config.percentagem_prova_continua }}" min="0" max="100">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small fw-bold text-muted">Peso Aval. Contínua</label>
+                                                <input type="number" name="peso_pc" class="form-control form-control-lg" value="{{ config.peso_avaliacao_continua }}" min="1">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label small fw-bold text-muted">Peso Exame Final (%)</label>
+                                                <input type="number" name="ef" class="form-control form-control-lg" value="{{ config.percentagem_exame_final }}" min="0" max="100">
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="form-check form-switch p-3 border rounded-3">
+                                                    <input class="form-check-input ms-0 me-3" type="checkbox" name="lei_setima_global" id="leiSetimaGlobal" {% if config.aplicar_lei_da_setima_global %}checked{% endif %}>
+                                                    <label class="form-check-label fw-bold" for="leiSetimaGlobal">Aplicar Lei da Sétima</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-check form-switch p-3 border rounded-3">
+                                                    <input class="form-check-input ms-0 me-3" type="checkbox" name="regras_projeto" id="regrasProjeto" {% if config.aplicar_regras_projeto_especiais %}checked{% endif %}>
+                                                    <label class="form-check-label fw-bold" for="regrasProjeto">Regras de Projeto Especiais</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Aba 2: Assiduidade -->
+                            <div class="tab-pane fade" id="content-assiduidade" role="tabpanel">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body p-4">
+                                        <h5 class="fw-bold mb-4 text-info"><i class="bi bi-person-check me-2"></i>Controle de Frequência</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label class="form-label small fw-bold text-muted">Presença Mínima Exigida (%)</label>
+                                                <div class="input-group input-group-lg">
+                                                    <input type="number" name="presenca" class="form-control" value="{{ config.minimo_presenca_obrigatoria }}" min="0" max="100">
+                                                    <span class="input-group-text bg-light">%</span>
+                                                </div>
+                                                <p class="form-text mt-2">Estudantes com presença abaixo deste limite não serão admitidos a exame.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Aba 3: Progressão -->
+                            <div class="tab-pane fade" id="content-progressao" role="tabpanel">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body p-4">
+                                        <div class="d-flex justify-content-between align-items-center mb-4">
+                                            <h5 class="fw-bold mb-0 text-warning"><i class="bi bi-arrow-up-circle me-2"></i>Permanência</h5>
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" name="ativar_barreiras" id="ativarBarreiras" {% if config.ativar_barreiras_progressao %}checked{% endif %}>
+                                                <label class="form-check-label fw-bold" for="ativarBarreiras">Ativar Barreiras</label>
+                                            </div>
+                                        </div>
+                                        <div class="row g-4">
+                                            <div class="col-md-6">
+                                                <label class="form-label small fw-bold text-muted">Anos com Barreiras (Ex: 3,5)</label>
+                                                <input type="text" name="barreiras" class="form-control" value="{{ config.anos_com_barreira_atraso }}">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label small fw-bold text-muted">Máx. Semestres Trancados</label>
+                                                <input type="number" name="trancamento" class="form-control" value="{{ config.limite_semestres_trancamento }}">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label small fw-bold text-muted">Anos p/ Exclusão</label>
+                                                <input type="number" name="exclusao" class="form-control" value="{{ config.limite_tempo_exclusao_anos }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Aba 4: Grelhas -->
+                            <div class="tab-pane fade" id="content-grelhas" role="tabpanel">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body p-4">
+                                        <h5 class="fw-bold mb-4 text-success"><i class="bi bi-mortarboard me-2"></i>Regras de Grelha Curricular</h5>
+                                        <div class="row g-4 mb-4">
+                                            <div class="col-md-3">
+                                                <div class="p-3 bg-success bg-opacity-10 rounded-3 text-center border border-success-subtle">
+                                                    <label class="small fw-bold text-success d-block mb-2">APROVAÇÃO (≥)</label>
+                                                    <input type="number" step="0.5" name="media_aprovacao_direta" class="form-control border-0 bg-transparent text-center fw-bold fs-4" value="{{ config.media_aprovacao_direta|stringformat:'.1f' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="p-3 bg-primary bg-opacity-10 rounded-3 text-center border border-primary-subtle">
+                                                    <label class="small fw-bold text-primary d-block mb-2">MÍN. EXAME (≥)</label>
+                                                    <input type="number" step="0.5" name="media_minima_exame" class="form-control border-0 bg-transparent text-center fw-bold fs-4" value="{{ config.media_minima_exame|stringformat:'.1f' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="p-3 bg-danger bg-opacity-10 rounded-3 text-center border border-danger-subtle">
+                                                    <label class="small fw-bold text-danger d-block mb-2">REPROVAÇÃO (<)</label>
+                                                    <input type="number" step="0.5" name="media_reprovacao_direta" class="form-control border-0 bg-transparent text-center fw-bold fs-4" value="{{ config.media_reprovacao_direta|stringformat:'.1f' }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="p-3 bg-secondary bg-opacity-10 rounded-3 text-center border border-secondary-subtle">
+                                                    <label class="small fw-bold text-secondary d-block mb-2">MÁX. ATRASO</label>
+                                                    <input type="number" name="max_disciplinas_atraso" class="form-control border-0 bg-transparent text-center fw-bold fs-4" value="{{ config.max_disciplinas_atraso }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botão de Salvar -->
+                    <div class="col-12 mt-4 pb-5 mb-5">
+                        <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-bold rounded-pill shadow-sm">
+                            <i class="bi bi-save me-2"></i>GUARDAR CONFIGURAÇÕES INSTITUCIONAIS
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<style>
+    .nav-pills .nav-link { 
+        color: #6c757d; 
+        background: white; 
+        border: 1px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+    .nav-pills .nav-link.active { 
+        background-color: var(--bs-primary); 
+        color: white; 
+        border-color: var(--bs-primary);
+        box-shadow: 0 4px 12px rgba(0, 97, 242, 0.2);
+    }
+    .nav-pills .nav-link:hover:not(.active) {
+        background-color: #f8f9fa;
+        border-color: #adb5bd;
+    }
+    .card { border-radius: 1rem; }
+    .form-control-lg { border-radius: 0.75rem; }
+    .btn-primary { 
+        background: linear-gradient(135deg, #0061f2 0%, #6900f2 100%); 
+        border: none;
+    }
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0052cc 0%, #5900cc 100%);
+        transform: translateY(-2px);
+    }
+</style>
 {% endblock %}

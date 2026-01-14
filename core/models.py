@@ -481,6 +481,14 @@ class ConfiguracaoAcademica(models.Model):
     limite_semestres_trancamento = models.PositiveIntegerField(default=2, verbose_name="Máximo Semestres Trancamento")
     limite_tempo_exclusao_anos = models.PositiveIntegerField(default=1, verbose_name="Anos para Exclusão por Inatividade")
 
+    # Novas Regras Globais Académicas
+    media_aprovacao_direta = models.DecimalField(max_digits=4, decimal_places=2, default=14.0, verbose_name="Média Aprovação Direta")
+    media_minima_exame = models.DecimalField(max_digits=4, decimal_places=2, default=10.0, verbose_name="Média Mínima Exame")
+    media_reprovacao_direta = models.DecimalField(max_digits=4, decimal_places=2, default=7.0, verbose_name="Média Reprovação Direta")
+    max_disciplinas_atraso = models.PositiveIntegerField(default=2, verbose_name="Limite Cadeiras Atraso")
+    permite_exame_especial = models.BooleanField(default=True, verbose_name="Permite Exames Especiais")
+    precedencia_automatica_romana = models.BooleanField(default=True, verbose_name="Precedência Automática (I, II, III...)")
+
     class Meta:
         verbose_name = "Configuração Académica Global"
         verbose_name_plural = "Configurações Académicas Globais"

@@ -13,3 +13,7 @@ gunicorn
 pillow
 qrcode
 reportlab
+django
+gunicorn
+qrcode
+reportlab
