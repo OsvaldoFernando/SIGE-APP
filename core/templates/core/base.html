@@ -16,6 +16,33 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Correção Radical para o tremor da modal */
+        html {
+            overflow: hidden;
+            height: 100%;
+        }
+        body {
+            height: 100%;
+            overflow-y: scroll; /* Força o scroll no body para ser o container principal */
+            padding-right: 0 !important;
+            margin: 0;
+        }
+        
+        /* Impede o Bootstrap de tentar "ajustar" o body */
+        body.modal-open {
+            overflow: hidden !important;
+            padding-right: 0 !important;
+        }
+
+        .modal {
+            background: rgba(0, 0, 0, 0.5); /* Backdrop customizado para evitar conflitos */
+        }
+
+        /* Força o backdrop a não causar reflow */
+        .modal-backdrop {
+            display: none !important; 
+        }
+
         :root {
             --primary-color: #1e3a8a;
             --secondary-color: #059669;
@@ -414,6 +441,10 @@
                         
                         <a href="{% url 'gerir_salas' %}" class="user-dropdown-item">
                             <i class="bi bi-door-open"></i> Gerir Salas
+                        </a>
+                        
+                        <a href="{% url 'listar_professores' %}" class="user-dropdown-item">
+                            <i class="bi bi-person-video3"></i> Gerir Professores
                         </a>
                         
                         <div class="user-dropdown-divider"></div>

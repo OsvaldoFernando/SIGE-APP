@@ -1,0 +1,54 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Novo Professor - SIGE{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-primary py-4 px-4 border-0">
+                    <h4 class="fw-bold text-white mb-0">Cadastro de Professor</h4>
+                    <p class="text-white text-opacity-75 small mb-0">Insira as informações básicas para criar o acesso do docente</p>
+                </div>
+                <div class="card-body p-5">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Nome</label>
+                                <input type="text" name="first_name" class="form-control rounded-3" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Apelido</label>
+                                <input type="text" name="last_name" class="form-control rounded-3" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Usuário (Username)</label>
+                                <input type="text" name="username" class="form-control rounded-3" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">E-mail</label>
+                                <input type="email" name="email" class="form-control rounded-3" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Telefone</label>
+                                <input type="text" name="telefone" class="form-control rounded-3">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-muted">Senha Inicial</label>
+                                <input type="password" name="password" class="form-control rounded-3" required>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-3 mt-5">
+                            <a href="{% url 'listar_professores' %}" class="btn btn-light rounded-pill px-4 fw-bold text-muted">Cancelar</a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-lg">Cadastrar Professor</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

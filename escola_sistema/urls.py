@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from core import views
@@ -136,7 +136,7 @@ urlpatterns = [
     path('criar-curso/', views.criar_curso, name='criar_curso'),
     path('detalhe-curso/<int:curso_id>/', views.detalhe_curso, name='detalhe_curso'),
     path('editar-curso/<int:curso_id>/', views.editar_curso, name='editar_curso'),
-    path('deletar-curso/<int:curso_id>/', views.deletar_curso, name='deletar_curso'),
+    path('', include('core.urls')),
 ]
 
 if settings.DEBUG:

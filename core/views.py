@@ -3489,3 +3489,46 @@ def nivel_academico_delete(request, pk):
         messages.success(request, 'Nível académico removido com sucesso!')
         return redirect('nivel_academico_lista')
     return render(request, 'core/confirm_delete.html', {'object': nivel, 'type': 'Nível Académico'})
+
+@login_required
+def listar_professores(request):
+    if request.user.perfil.nivel_acesso not in ['admin', 'super_admin', 'pedagogico', 'secretaria']:
+        messages.error(request, "Acesso negado.")
+        return redirect('painel_principal')
+    
+    professores = User.objects.filter(perfil__nivel_acesso='professor').select_related('perfil')
+    return render(request, 'core/professores_lista.html', {'professores': professores})
+
+@login_required
+def criar_professor(request):
+    if request.user.perfil.nivel_acesso not in ['admin', 'super_admin', 'pedagogico']:
+        messages.error(request, "Acesso negado.")
+        return redirect('painel_principal')
+        
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        nome = request.POST.get('first_name')
+        apelido = request.POST.get('last_name')
+        telefone = request.POST.get('telefone')
+        
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Nome de usuário já existe.")
+        else:
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                first_name=nome,
+                last_name=apelido
+            )
+            perfil, _ = PerfilUsuario.objects.get_or_create(user=user)
+            perfil.nivel_acesso = 'professor'
+            perfil.telefone = telefone
+            perfil.save()
+            
+            messages.success(request, f"Professor {user.get_full_name()} criado com sucesso!")
+            return redirect('listar_professores')
+            
+    return render(request, 'core/professor_form.html')
