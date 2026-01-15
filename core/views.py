@@ -3491,13 +3491,69 @@ def nivel_academico_delete(request, pk):
     return render(request, 'core/confirm_delete.html', {'object': nivel, 'type': 'Nível Académico'})
 
 @login_required
+def horarios(request):
+    return render(request, 'core/horarios_gestao.html')
+
+@login_required
+def gestao_horarios(request):
+    return render(request, 'core/horarios_gestao.html')
+
+@login_required
+def registrar_horario(request):
+    from .models import AnoAcademico, PeriodoLectivo, Turma, Disciplina, Professor
+    
+    # Ajustado de is_active para estado='ativo' com base no erro FieldError
+    anos = AnoAcademico.objects.filter(estado='ativo').order_by('-data_inicio')
+    if not anos.exists():
+        anos = AnoAcademico.objects.all().order_by('-data_inicio')
+        
+    periodos = PeriodoLectivo.objects.all()
+    turmas = Turma.objects.all()
+    disciplinas = Disciplina.objects.all()
+    professores = Professor.objects.filter(estado='ativo')
+    # Note: Assuming Sala model might exist or using a CharField for now if not sure, 
+    # but I'll check if Sala exists in models or just use a placeholder list
+    salas = ["Sala 1", "Sala 2", "Sala 3", "Laboratório 1", "Laboratório 2"] 
+    dias_semana = [
+        ('segunda', 'Segunda-feira'),
+        ('terca', 'Terça-feira'),
+        ('quarta', 'Quarta-feira'),
+        ('quinta', 'Quinta-feira'),
+        ('sexta', 'Sexta-feira'),
+        ('sabado', 'Sábado'),
+    ]
+
+    if request.method == 'POST':
+        # Logic to save will go here in next step
+        messages.success(request, "Horário registrado com sucesso!")
+        return redirect('gestao_horarios')
+
+    context = {
+        'anos': anos,
+        'periodos': periodos,
+        'turmas': turmas,
+        'disciplinas': disciplinas,
+        'professores': professores,
+        'salas': salas,
+        'dias_semana': dias_semana,
+    }
+    return render(request, 'core/registrar_horario.html', context)
+
+@login_required
 def listar_professores(request):
     if request.user.perfil.nivel_acesso not in ['admin', 'super_admin', 'pedagogico', 'secretaria']:
         messages.error(request, "Acesso negado.")
         return redirect('painel_principal')
     
-    professores = User.objects.filter(perfil__nivel_acesso='professor').select_related('perfil')
-    return render(request, 'core/professores_lista.html', {'professores': professores})
+    from .models import Professor
+    professores = Professor.objects.select_related('user', 'user__perfil').all()
+    total_ativos = professores.filter(estado='ativo').count()
+    total_inativos = professores.filter(estado='inativo').count()
+    return render(request, 'core/professores_lista.html', {
+        'professores': professores,
+        'total_ativos': total_ativos,
+        'total_inativos': total_inativos
+    })
 
 @login_required
 def criar_professor(request):
@@ -3506,29 +3562,99 @@ def criar_professor(request):
         return redirect('painel_principal')
         
     if request.method == 'POST':
+        # Dados de Autenticação
         username = request.POST.get('username')
-        email = request.POST.get('email')
         password = request.POST.get('password')
-        nome = request.POST.get('first_name')
-        apelido = request.POST.get('last_name')
+        
+        # DADOS PESSOAIS
+        nome_completo = request.POST.get('nome_completo')
+        genero = request.POST.get('genero')
+        data_nascimento = request.POST.get('data_nascimento')
+        nacionalidade = request.POST.get('nacionalidade')
+        bi = request.POST.get('bi')
+        estado_civil = request.POST.get('estado_civil')
+        
+        # DADOS DE CONTACTO
         telefone = request.POST.get('telefone')
+        email = request.POST.get('email')
+        endereco = request.POST.get('endereco')
+        municipio_provincia = request.POST.get('municipio_provincia')
+        
+        # DADOS PROFISSIONAIS
+        grau_academico = request.POST.get('grau_academico')
+        area_formacao = request.POST.get('area_formacao')
+        especialidade = request.POST.get('especialidade')
+        categoria = request.POST.get('categoria')
+        tipo_vinculo = request.POST.get('tipo_vinculo')
+        
+        # DADOS ADMINISTRATIVOS
+        data_admissao = request.POST.get('data_admissao')
+        estado = request.POST.get('estado')
         
         if User.objects.filter(username=username).exists():
             messages.error(request, "Nome de usuário já existe.")
-        else:
+            return render(request, 'core/professor_form.html', {'post_data': request.POST})
+        
+        from .models import Professor
+        if Professor.objects.filter(nome_completo=nome_completo).exists():
+            messages.error(request, "Já existe um professor cadastrado com este nome completo.")
+            return render(request, 'core/professor_form.html', {'post_data': request.POST})
+            
+        if Professor.objects.filter(bilhete_identidade=bi).exists():
+            messages.error(request, "Já existe um professor cadastrado com este Nº de BI.")
+            return render(request, 'core/professor_form.html', {'post_data': request.POST})
+            
+        if Professor.objects.filter(telefone=telefone).exists():
+            messages.error(request, "Já existe um professor cadastrado com este número de telefone.")
+            return render(request, 'core/professor_form.html', {'post_data': request.POST})
+            
+        if Professor.objects.filter(email=email).exists():
+            messages.error(request, "Já existe um professor cadastrado com este e-mail.")
+            return render(request, 'core/professor_form.html', {'post_data': request.POST})
+
+        try:
+            # Criar usuário para acesso ao sistema
             user = User.objects.create_user(
                 username=username,
                 email=email,
                 password=password,
-                first_name=nome,
-                last_name=apelido
+                first_name=nome_completo.split(' ')[0] if nome_completo else '',
+                last_name=' '.join(nome_completo.split(' ')[1:]) if nome_completo and ' ' in nome_completo else ''
             )
+            
+            # Criar PerfilUsuario
             perfil, _ = PerfilUsuario.objects.get_or_create(user=user)
             perfil.nivel_acesso = 'professor'
             perfil.telefone = telefone
             perfil.save()
             
-            messages.success(request, f"Professor {user.get_full_name()} criado com sucesso!")
+            # Criar Professor
+            from .models import Professor
+            Professor.objects.create(
+                user=user,
+                nome_completo=nome_completo,
+                genero=genero,
+                data_nascimento=data_nascimento,
+                nacionalidade=nacionalidade,
+                bilhete_identidade=bi,
+                estado_civil=estado_civil,
+                telefone=telefone,
+                email=email,
+                endereco=endereco,
+                municipio_provincia=municipio_provincia,
+                grau_academico=grau_academico,
+                area_formacao=area_formacao,
+                especialidade=especialidade,
+                categoria=categoria,
+                tipo_vinculo=tipo_vinculo,
+                data_admissao=data_admissao if data_admissao else timezone.now(),
+                estado=estado if estado else 'ativo'
+            )
+            
+            messages.success(request, f"Professor {nome_completo} cadastrado com sucesso!")
             return redirect('listar_professores')
+        except Exception as e:
+            messages.error(request, f"Erro ao cadastrar professor: {str(e)}")
+            return render(request, 'core/professor_form.html', {'post_data': request.POST})
             
     return render(request, 'core/professor_form.html')

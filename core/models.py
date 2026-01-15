@@ -950,15 +950,56 @@ class NotaDisciplina(models.Model):
 
 class Professor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
-    nome_completo = models.CharField(max_length=200, verbose_name="Nome Completo")
-    bilhete_identidade = models.CharField(max_length=50, verbose_name="Bilhete de Identidade")
+    codigo_professor = models.CharField(max_length=20, unique=True, verbose_name="Código do Professor", blank=True)
+    nome_completo = models.CharField(max_length=200, verbose_name="Nome Completo", unique=True)
+    genero = models.CharField(max_length=20, choices=[('M', 'Masculino'), ('F', 'Feminino')], verbose_name="Género", default='M')
     data_nascimento = models.DateField(verbose_name="Data de Nascimento")
-    sexo = models.CharField(max_length=1, choices=[('M', 'Masculino'), ('F', 'Feminino')], verbose_name="Sexo")
-    telefone = models.CharField(max_length=20, verbose_name="Telefone")
-    email = models.EmailField(verbose_name="Email")
+    nacionalidade = models.CharField(max_length=100, verbose_name="Nacionalidade", default="Angolana")
+    bilhete_identidade = models.CharField(max_length=50, verbose_name="Nº do BI", unique=True)
+    estado_civil = models.CharField(max_length=50, verbose_name="Estado Civil", blank=True)
+    
+    # DADOS DE CONTACTO
+    telefone = models.CharField(max_length=20, verbose_name="Telefone", unique=True)
+    email = models.EmailField(verbose_name="Email", unique=True)
     endereco = models.TextField(verbose_name="Endereço")
-    especialidade = models.CharField(max_length=200, verbose_name="Especialidade")
-    data_contratacao = models.DateField(verbose_name="Data de Contratação", default=timezone.now)
+    municipio_provincia = models.CharField(max_length=200, verbose_name="Município / Província", blank=True)
+    
+    # DADOS PROFISSIONAIS
+    GRAU_ACADEMICO_CHOICES = [
+        ('licenciado', 'Licenciado'),
+        ('mestre', 'Mestre'),
+        ('doutor', 'Doutor'),
+    ]
+    grau_academico = models.CharField(max_length=20, choices=GRAU_ACADEMICO_CHOICES, verbose_name="Grau Académico", blank=True)
+    area_formacao = models.CharField(max_length=200, verbose_name="Área de Formação", blank=True)
+    especialidade = models.CharField(max_length=200, verbose_name="Especialidade", blank=True, null=True)
+    
+    CATEGORIA_CHOICES = [
+        ('assistente_estagiario', 'Assistente Estagiário'),
+        ('assistente', 'Assistente'),
+        ('auxiliar', 'Auxiliar'),
+        ('associado', 'Associado'),
+        ('professor_catedratico', 'Professor Catedrático'),
+        ('docente_convidado', 'Docente Convidado'),
+    ]
+    categoria = models.CharField(max_length=50, choices=CATEGORIA_CHOICES, verbose_name="Categoria", blank=True)
+    
+    TIPO_VINCULO_CHOICES = [
+        ('efetivo', 'Efetivo'),
+        ('colaborador', 'Colaborador'),
+        ('estagiario', 'Estagiário'),
+    ]
+    tipo_vinculo = models.CharField(max_length=20, choices=TIPO_VINCULO_CHOICES, verbose_name="Tipo de Vínculo", blank=True)
+    
+    # DADOS ADMINISTRATIVOS
+    data_admissao = models.DateField(verbose_name="Data de Admissão", default=timezone.now)
+    data_contratacao = models.DateField(verbose_name="Data de Contratação", default=timezone.now) # Mantendo por compatibilidade se necessário
+    
+    ESTADO_CHOICES = [
+        ('ativo', 'Ativo'),
+        ('inativo', 'Inativo'),
+    ]
+    estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='ativo', verbose_name="Estado")
     
     class Meta:
         verbose_name = "Professor"
@@ -966,7 +1007,21 @@ class Professor(models.Model):
         ordering = ['nome_completo']
     
     def __str__(self):
-        return self.nome_completo
+        return f"{self.codigo_professor} - {self.nome_completo}" if self.codigo_professor else self.nome_completo
+
+    def save(self, *args, **kwargs):
+        if not self.codigo_professor:
+            ano = timezone.now().year
+            ultimo = Professor.objects.filter(codigo_professor__contains=f"PROF/{ano}/").order_by('-id').first()
+            if ultimo:
+                try:
+                    numero = int(ultimo.codigo_professor.split('/')[-1]) + 1
+                except:
+                    numero = 1
+            else:
+                numero = 1
+            self.codigo_professor = f"PROF/{ano}/{numero:04d}"
+        super().save(*args, **kwargs)
 
 class Aluno(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)

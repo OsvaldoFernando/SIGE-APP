@@ -257,7 +257,7 @@
                 <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3 animate__animated animate__pulse animate__infinite">
                     <i class="bi bi-file-earmark-text text-primary fs-4"></i>
                 </div>
-                <h3 class="mb-0 fw-bold">Secretária / DAAC</h3>
+                <h3 class="mb-0 fw-bold">Execução académica</h3>
             </div>
             <div class="row g-4 menu-items">
                 <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn">
@@ -269,6 +269,48 @@
                                 </div>
                                 <h6 class="card-title">Gestão Acadêmica</h6>
                                 <p class="card-text mb-0">Controle total de matrículas e inscrições acadêmicas.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <!-- NOVO CARD: CORPO DOCENTE -->
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.1s;">
+                    <a href="{% url 'listar_professores' %}" class="text-decoration-none h-100 d-block">
+                        <div class="card shadow-sm card-menu p-4">
+                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
+                                <div class="icon-wrapper">
+                                    <i class="bi bi-people-fill fs-2 text-primary"></i>
+                                </div>
+                                <h6 class="card-title">Corpo Docente</h6>
+                                <p class="card-text mb-0">Gestão de professores e equipe acadêmica.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <!-- CARD MOVIDO: TURMAS -->
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.2s;">
+                    <a href="{% url 'atribuicao_turmas' %}" class="text-decoration-none h-100 d-block">
+                        <div class="card shadow-sm card-menu p-4">
+                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
+                                <div class="icon-wrapper">
+                                    <i class="bi bi-people fs-2 text-primary"></i>
+                                </div>
+                                <h6 class="card-title">Turmas</h6>
+                                <p class="card-text mb-0">Gestão e enturmação de estudantes.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <!-- NOVO CARD: HORÁRIO -->
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.3s;">
+                    <a href="{% url 'gestao_horarios' %}" class="text-decoration-none h-100 d-block">
+                        <div class="card shadow-sm card-menu p-4">
+                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
+                                <div class="icon-wrapper">
+                                    <i class="bi bi-clock-history fs-2 text-primary"></i>
+                                </div>
+                                <h6 class="card-title">Horário</h6>
+                                <p class="card-text mb-0">Gestão de horários e tempos lectivos.</p>
                             </div>
                         </div>
                     </a>
@@ -312,7 +354,7 @@
                         </div>
                     </a>
                 </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.6s;">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.7s;">
                     <a href="{% url 'ano_academico_lista' %}" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
@@ -321,19 +363,6 @@
                                 </div>
                                 <h6 class="card-title">Ano Lectivo</h6>
                                 <p class="card-text mb-0">Calendário e períodos de funcionamento.</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.7s;">
-                    <a href="{% url 'atribuicao_turmas' %}" class="text-decoration-none h-100 d-block">
-                        <div class="card shadow-sm card-menu p-4">
-                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
-                                <div class="icon-wrapper">
-                                    <i class="bi bi-people fs-2 text-primary"></i>
-                                </div>
-                                <h6 class="card-title">Turmas</h6>
-                                <p class="card-text mb-0">Gestão e enturmação de estudantes.</p>
                             </div>
                         </div>
                     </a>

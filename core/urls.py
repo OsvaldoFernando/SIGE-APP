@@ -55,4 +55,6 @@ urlpatterns = [
     path('turma/<int:turma_id>/detalhes/', views.detalhe_turma, name='detalhe_turma'),
     path('professores/', views.listar_professores, name='listar_professores'),
     path('professores/novo/', views.criar_professor, name='criar_professor'),
+    path('horarios/', views.gestao_horarios, name='gestao_horarios'),
+    path('horarios/registrar/', views.registrar_horario, name='registrar_horario'),
 ]

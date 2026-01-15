@@ -1,0 +1,100 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Gestão de Horários - SIGE{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-5" style="background-color: #f8fafc; min-height: 100vh;">
+    <!-- Breadcrumb e Voltar -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb small mb-2">
+            <li class="breadcrumb-item"><a href="{% url 'painel_principal' %}" class="text-decoration-none">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Execução Académica</li>
+            <li class="breadcrumb-item active" aria-current="page">Horário</li>
+        </ol>
+        <a href="{% url 'painel_principal' %}" class="btn btn-dark btn-sm rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 32px; height: 32px;">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <span class="ms-2 fw-bold text-dark">Dashboard</span>
+    </nav>
+
+    <div class="row g-4 mt-2">
+        <!-- Card: Registrar Horário -->
+        <div class="col-md-4">
+            <a href="{% url 'registrar_horario' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 overflow-hidden transition-hover" style="background: linear-gradient(135deg, #4b5563 0%, #1f2937 100%); border-radius: 12px;">
+                    <div class="card-body p-4 d-flex align-items-center">
+                        <div class="me-3 text-white">
+                            <i class="bi bi-clock-fill" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-white fw-bold mb-1">Registrar horário</h4>
+                            <p class="text-white-50 small mb-0">Definir tempos lectivos e intervalos.</p>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-black bg-opacity-20 border-0 py-2 px-4 d-flex justify-content-between align-items-center">
+                        <span class="text-white small fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">Configurar</span>
+                        <i class="bi bi-plus-circle text-white"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Card: Gerenciar Horários -->
+        <div class="col-md-4">
+            <a href="#" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 overflow-hidden transition-hover" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); border-radius: 12px;">
+                    <div class="card-body p-4 d-flex align-items-center">
+                        <div class="me-3 text-white">
+                            <i class="bi bi-calendar-week" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-white fw-bold mb-1">Gerenciar horários</h4>
+                            <p class="text-white-50 small mb-0">Aulas, professores e turmas.</p>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-black bg-opacity-20 border-0 py-2 px-4 d-flex justify-content-between align-items-center">
+                        <span class="text-white small fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">Acessar</span>
+                        <i class="bi bi-chevron-right text-white"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Card: Visualizar Grade -->
+        <div class="col-md-4">
+            <a href="#" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 overflow-hidden transition-hover" style="background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%); border-radius: 12px;">
+                    <div class="card-body p-4 d-flex align-items-center">
+                        <div class="me-3 text-white">
+                            <i class="bi bi-table" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-white fw-bold mb-1">Visualizar grade</h4>
+                            <p class="text-white-50 small mb-0">Grade horária completa.</p>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-black bg-opacity-20 border-0 py-2 px-4 d-flex justify-content-between align-items-center">
+                        <span class="text-white small fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">Ver Grade</span>
+                        <i class="bi bi-chevron-right text-white"></i>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition-hover {
+        transition: all 0.3s ease;
+    }
+    .transition-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+    }
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: ">";
+        font-size: 0.8rem;
+        vertical-align: middle;
+    }
+</style>
+{% endblock %}

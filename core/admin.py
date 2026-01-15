@@ -186,9 +186,24 @@ class InscricaoAdmin(admin.ModelAdmin):
 
 @admin.register(Professor)
 class ProfessorAdmin(admin.ModelAdmin):
-    list_display = ['nome_completo', 'bilhete_identidade', 'especialidade', 'telefone', 'email']
-    search_fields = ['nome_completo', 'bilhete_identidade', 'especialidade']
-    list_filter = ['sexo', 'data_contratacao']
+    list_display = ['codigo_professor', 'nome_completo', 'categoria', 'tipo_vinculo', 'estado', 'telefone']
+    search_fields = ['codigo_professor', 'nome_completo', 'bilhete_identidade', 'especialidade']
+    list_filter = ['categoria', 'tipo_vinculo', 'estado', 'grau_academico', 'genero']
+    readonly_fields = ['codigo_professor', 'data_admissao']
+    fieldsets = (
+        ('Identificação', {
+            'fields': ('codigo_professor', 'nome_completo', 'genero', 'data_nascimento', 'nacionalidade', 'bilhete_identidade', 'estado_civil')
+        }),
+        ('Dados Profissionais', {
+            'fields': ('grau_academico', 'area_formacao', 'especialidade', 'categoria', 'tipo_vinculo')
+        }),
+        ('Contacto', {
+            'fields': ('telefone', 'email', 'endereco', 'municipio_provincia')
+        }),
+        ('Administrativo', {
+            'fields': ('data_admissao', 'estado', 'user')
+        }),
+    )
 
 @admin.register(Turma)
 class TurmaAdmin(admin.ModelAdmin):
@@ -199,7 +214,7 @@ class TurmaAdmin(admin.ModelAdmin):
 @admin.register(Aluno)
 class AlunoAdmin(admin.ModelAdmin):
     list_display = ['numero_estudante', 'nome_completo', 'turma', 'telefone', 'email']
-    list_filter = ['turma', 'sexo', 'data_matricula']
+    list_filter = ['turma', 'data_matricula']
     search_fields = ['numero_estudante', 'nome_completo', 'bilhete_identidade']
     readonly_fields = ['numero_estudante', 'data_matricula']
 

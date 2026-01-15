@@ -1,0 +1,299 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Registrar Horário - SIGE{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0" style="background-color: #f1f5f9; min-height: 100vh;">
+    <!-- Top Header Style -->
+    <div class="bg-white border-bottom py-3 px-4 mb-4 shadow-sm">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <a href="{% url 'gestao_horarios' %}" class="btn btn-light rounded-circle me-3 shadow-sm border" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-arrow-left fs-5"></i>
+                </a>
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb small mb-0 text-muted">
+                            <li class="breadcrumb-item">Gestão académica</li>
+                            <li class="breadcrumb-item">Horário</li>
+                            <li class="breadcrumb-item active fw-bold text-primary">Registrar</li>
+                        </ol>
+                    </nav>
+                    <h4 class="mb-0 fw-bold text-dark">Configuração de Horário Lectivo</h4>
+                </div>
+            </div>
+            <div class="d-none d-md-block">
+                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill fw-medium">
+                    <i class="bi bi-info-circle me-1"></i> Preencha todos os campos obrigatórios
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container pb-5">
+        <div class="row justify-content-center">
+            <div class="col-xl-10">
+                <form method="POST" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Tabs Navigation -->
+                    <ul class="nav nav-pills nav-justified mb-4 p-1 bg-white border rounded-pill shadow-sm" id="horarioTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active rounded-pill fw-bold py-3" id="academico-tab" data-bs-toggle="pill" data-bs-target="#academico" type="button" role="tab">
+                                <i class="bi bi-book-half me-2"></i> 1. Estrutura Académica
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link rounded-pill fw-bold py-3" id="tempo-tab" data-bs-toggle="pill" data-bs-target="#tempo" type="button" role="tab">
+                                <i class="bi bi-stopwatch me-2"></i> 2. Cronograma & Tempo
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link rounded-pill fw-bold py-3" id="atribuicao-tab" data-bs-toggle="pill" data-bs-target="#atribuicao" type="button" role="tab">
+                                <i class="bi bi-person-workspace me-2"></i> 3. Atribuição & Validação
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="horarioTabsContent">
+                        <!-- Tab 1: Estrutura Académica -->
+                        <div class="tab-pane fade show active" id="academico" role="tabpanel">
+                            <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+                                <div class="card-header bg-primary text-white py-3 px-4">
+                                    <h6 class="mb-0 fw-bold d-flex align-items-center">
+                                        <i class="bi bi-book-half me-2"></i> Dados Base do Horário
+                                    </h6>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="row g-4">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold text-secondary">Ano Lectivo</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-calendar-event text-primary"></i></span>
+                                                <select name="ano_lectivo" class="form-select border-start-0 ps-0 shadow-none" required style="border-left: none !important;">
+                                                    <option value="">Selecionar Ano</option>
+                                                    {% for ano in anos %}
+                                                    <option value="{{ ano.id }}">{{ ano.ano }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold text-secondary">Período</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-clock-history text-primary"></i></span>
+                                                <select name="periodo" class="form-select border-start-0 ps-0 shadow-none" required style="border-left: none !important;">
+                                                    <option value="">Selecionar Período</option>
+                                                    {% for p in periodos %}
+                                                    <option value="{{ p.id }}">{{ p.nome }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label small fw-bold text-secondary mb-3 d-block">Temporalidade do Horário</label>
+                                            <div class="btn-group w-100" role="group">
+                                                <input type="radio" class="btn-check" name="tempo_tipo" id="semestre1" value="1_semestre" checked>
+                                                <label class="btn btn-outline-primary py-3 fw-bold flex-fill" for="semestre1">1º Semestre</label>
+                                                <input type="radio" class="btn-check" name="tempo_tipo" id="semestre2" value="2_semestre">
+                                                <label class="btn btn-outline-primary py-3 fw-bold flex-fill" for="semestre2">2º Semestre</label>
+                                                <input type="radio" class="btn-check" name="tempo_tipo" id="trimestre" value="trimestre">
+                                                <label class="btn btn-outline-primary py-3 fw-bold flex-fill" for="trimestre">Trimestre</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-5 d-flex justify-content-end">
+                                        <button type="button" class="btn btn-primary px-5 py-2 rounded-pill fw-bold shadow-sm" onclick="bootstrap.Tab.getOrCreateInstance(document.querySelector('#tempo-tab')).show()">
+                                            Próximo Passo <i class="bi bi-arrow-right ms-2"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab 2: Cronograma & Tempo -->
+                        <div class="tab-pane fade" id="tempo" role="tabpanel">
+                            <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+                                <div class="card-header bg-success text-white py-3 px-4">
+                                    <h6 class="mb-0 fw-bold d-flex align-items-center">
+                                        <i class="bi bi-stopwatch me-2"></i> Cronograma Diário
+                                    </h6>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="mb-5">
+                                        <label class="form-label small fw-bold text-secondary mb-4 d-block text-center">Dia da Semana</label>
+                                        <div class="row g-3">
+                                            {% for dia_id, dia_nome in dias_semana %}
+                                            <div class="col-md-4">
+                                                <input type="radio" class="btn-check" name="dia_semana" id="dia_{{ dia_id }}" value="{{ dia_id }}" {% if forloop.first %}checked{% endif %} required>
+                                                <label class="btn btn-outline-success w-100 py-3 fw-bold" for="dia_{{ dia_id }}">{{ dia_nome }}</label>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="row g-4 justify-content-center">
+                                        <div class="col-md-5">
+                                            <label class="form-label small fw-bold text-secondary">Hora Início</label>
+                                            <div class="input-group input-group-lg">
+                                                <span class="input-group-text bg-white"><i class="bi bi-clock text-success"></i></span>
+                                                <input type="time" name="hora_inicio" class="form-control border fw-bold shadow-none" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <label class="form-label small fw-bold text-secondary">Hora Fim</label>
+                                            <div class="input-group input-group-lg">
+                                                <span class="input-group-text bg-white"><i class="bi bi-clock-fill text-success"></i></span>
+                                                <input type="time" name="hora_fim" class="form-control border fw-bold shadow-none" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-5 d-flex justify-content-between">
+                                        <button type="button" class="btn btn-light px-4 py-2 rounded-pill fw-bold border" onclick="bootstrap.Tab.getOrCreateInstance(document.querySelector('#academico-tab')).show()">
+                                            <i class="bi bi-arrow-left me-2"></i> Anterior
+                                        </button>
+                                        <button type="button" class="btn btn-success px-5 py-2 rounded-pill fw-bold shadow-sm" onclick="bootstrap.Tab.getOrCreateInstance(document.querySelector('#atribuicao-tab')).show()">
+                                            Próximo Passo <i class="bi bi-arrow-right ms-2"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tab 3: Atribuição & Validação -->
+                        <div class="tab-pane fade" id="atribuicao" role="tabpanel">
+                            <div class="row g-4">
+                                <div class="col-lg-7">
+                                    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden h-100">
+                                        <div class="card-header bg-dark text-white py-3 px-4">
+                                            <h6 class="mb-0 fw-bold d-flex align-items-center">
+                                                <i class="bi bi-person-workspace me-2"></i> Atribuição Docente
+                                            </h6>
+                                        </div>
+                                        <div class="card-body p-4">
+                                            <div class="row g-4">
+                                                <div class="col-md-6">
+                                                    <label class="form-label small fw-bold text-secondary">Turma</label>
+                                                    <select name="turma" class="form-select shadow-none py-2" required>
+                                                        <option value="">Selecionar Turma</option>
+                                                        {% for t in turmas %}
+                                                        <option value="{{ t.id }}">{{ t.nome }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label small fw-bold text-secondary">Disciplina</label>
+                                                    <select name="disciplina" class="form-select shadow-none py-2" required>
+                                                        <option value="">Selecionar Disciplina</option>
+                                                        {% for d in disciplinas %}
+                                                        <option value="{{ d.id }}">{{ d.nome }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label small fw-bold text-secondary">Professor Responsável</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-person-badge text-primary"></i></span>
+                                                        <select name="professor" class="form-select border-start-0 ps-0 shadow-none py-2" required style="border-left: none !important;">
+                                                            <option value="">Selecionar Professor</option>
+                                                            {% for prof in professores %}
+                                                            <option value="{{ prof.id }}">{{ prof.nome_completo }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label small fw-bold text-secondary">Sala / Localização</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-geo-alt text-primary"></i></span>
+                                                        <select name="sala" class="form-select border-start-0 ps-0 shadow-none py-2" required style="border-left: none !important;">
+                                                            <option value="">Selecionar Sala</option>
+                                                            {% for sala in salas %}
+                                                            <option value="{{ sala }}">{{ sala }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5">
+                                    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden border-top border-4 border-warning h-100">
+                                        <div class="card-body p-4">
+                                            <h6 class="text-dark fw-bold mb-4 d-flex align-items-center">
+                                                <i class="bi bi-shield-lock-fill text-warning me-2 fs-4"></i> Validação Final
+                                            </h6>
+                                            <div class="bg-light p-4 rounded-4 border mb-4 text-center">
+                                                <label class="form-label small fw-bold text-secondary mb-3 d-block">Estado do Horário</label>
+                                                <select name="estado_horario" class="form-select form-select-lg border-warning bg-warning bg-opacity-10 fw-bold text-center" required>
+                                                    <option value="ativo" selected>✓ ATIVO</option>
+                                                    <option value="suspenso">⚠ SUSPENSO</option>
+                                                    <option value="cancelado">✗ CANCELADO</option>
+                                                </select>
+                                                <div class="alert alert-warning border-0 small mt-3 mb-0 py-2">
+                                                    <i class="bi bi-info-circle me-1"></i> Apenas horários ativos são publicados.
+                                                </div>
+                                            </div>
+                                            <div class="d-grid gap-2 mt-auto">
+                                                <button type="submit" class="btn btn-primary btn-lg rounded-pill py-3 fw-bold shadow transition-hover">
+                                                    <i class="bi bi-check-circle-fill me-2"></i> CONCLUIR REGISTRO
+                                                </button>
+                                                <button type="button" class="btn btn-light px-4 py-2 rounded-pill fw-bold border mt-2" onclick="bootstrap.Tab.getOrCreateInstance(document.querySelector('#tempo-tab')).show()">
+                                                    <i class="bi bi-arrow-left me-2"></i> Voltar ao Tempo
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition-hover {
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .transition-hover:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        padding: 0.6rem 0.75rem;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        background-color: #fff !important;
+    }
+    .input-group-text {
+        border: 1px solid #e2e8f0;
+        color: #64748b;
+    }
+    .nav-pills .nav-link {
+        color: #64748b;
+        transition: all 0.3s ease;
+    }
+    .nav-pills .nav-link.active {
+        background-color: #3b82f6;
+        color: white;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    .tab-pane {
+        animation: slideUp 0.4s ease-out;
+    }
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .smaller {
+        font-size: 0.75rem;
+    }
+</style>
+{% endblock %}

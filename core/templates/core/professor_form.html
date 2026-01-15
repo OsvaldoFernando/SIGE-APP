@@ -3,47 +3,292 @@
 {% block title %}Novo Professor - SIGE{% endblock %}
 
 {% block content %}
-<div class="container py-5">
+<div class="container-fluid px-4 py-5" style="background-color: #f8fafc; min-height: 100vh;">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="card-header bg-primary py-4 px-4 border-0">
-                    <h4 class="fw-bold text-white mb-0">Cadastro de Professor</h4>
-                    <p class="text-white text-opacity-75 small mb-0">Insira as informações básicas para criar o acesso do docente</p>
+        <div class="col-xl-10 col-xxl-8">
+            <!-- Cabeçalho -->
+            <div class="mb-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <h1 class="h3 fw-bold text-dark mb-1">Cadastrar Novo Docente</h1>
+                    <p class="text-secondary mb-0 small"><i class="bi bi-info-circle me-1"></i> Preencha as informações para integrar um novo professor à instituição.</p>
                 </div>
-                <div class="card-body p-5">
-                    <form method="POST">
+                <a href="{% url 'listar_professores' %}" class="btn btn-outline-secondary border-0 rounded-pill px-3 transition-hover">
+                    <i class="bi bi-arrow-left me-1"></i> Voltar à Lista
+                </a>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-body p-0">
+                    <form method="POST" class="needs-validation" novalidate>
                         {% csrf_token %}
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-muted">Nome</label>
-                                <input type="text" name="first_name" class="form-control rounded-3" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-muted">Apelido</label>
-                                <input type="text" name="last_name" class="form-control rounded-3" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-muted">Usuário (Username)</label>
-                                <input type="text" name="username" class="form-control rounded-3" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-muted">E-mail</label>
-                                <input type="email" name="email" class="form-control rounded-3" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-muted">Telefone</label>
-                                <input type="text" name="telefone" class="form-control rounded-3">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold small text-muted">Senha Inicial</label>
-                                <input type="password" name="password" class="form-control rounded-3" required>
-                            </div>
-                        </div>
                         
-                        <div class="d-flex gap-3 mt-5">
-                            <a href="{% url 'listar_professores' %}" class="btn btn-light rounded-pill px-4 fw-bold text-muted">Cancelar</a>
-                            <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-lg">Cadastrar Professor</button>
+                        <div class="row g-0">
+                            <!-- Menu Lateral de Navegação do Formulário -->
+                            <div class="col-lg-3 bg-light border-end d-none d-lg-block">
+                                <div class="p-4 sticky-top" style="top: 20px;">
+                                    <nav id="form-nav" class="nav flex-column gap-2">
+                                        <a class="nav-link active rounded-3 py-2 px-3 fw-medium small" href="#acesso">
+                                            <i class="bi bi-shield-lock me-2"></i>Acesso ao Sistema
+                                        </a>
+                                        <a class="nav-link rounded-3 py-2 px-3 fw-medium small text-dark" href="#pessoais">
+                                            <i class="bi bi-person me-2"></i>Dados Pessoais
+                                        </a>
+                                        <a class="nav-link rounded-3 py-2 px-3 fw-medium small text-dark" href="#profissionais">
+                                            <i class="bi bi-briefcase me-2"></i>Dados Profissionais
+                                        </a>
+                                        <a class="nav-link rounded-3 py-2 px-3 fw-medium small text-dark" href="#contacto">
+                                            <i class="bi bi-telephone me-2"></i>Contactos e Endereço
+                                        </a>
+                                        <a class="nav-link rounded-3 py-2 px-3 fw-medium small text-dark" href="#administrativo">
+                                            <i class="bi bi-clipboard-data me-2"></i>Administrativo
+                                        </a>
+                                    </nav>
+                                </div>
+                            </div>
+
+                            <!-- Conteúdo do Formulário -->
+                            <div class="col-lg-9">
+                                <div class="p-4 p-md-5">
+                                    
+                                    <!-- DADOS DE ACESSO -->
+                                    <section id="acesso" class="mb-5">
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3 text-primary">
+                                                <i class="bi bi-shield-lock fs-5"></i>
+                                            </div>
+                                            <h5 class="fw-bold mb-0">Acesso ao Sistema</h5>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small">Usuário (Username) <span class="text-danger">*</span></label>
+                                                <div class="input-group has-validation">
+                                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-at text-muted"></i></span>
+                                                    <input type="text" name="username" class="form-control bg-light border-start-0 ps-0" placeholder="professor.nome" pattern="^[a-zA-Z0-9._]+$" minlength="3" maxlength="30" value="{{ post_data.username|default:'' }}" required>
+                                                    <div class="invalid-feedback">
+                                                        Mínimo 3 caracteres, letras, números, ponto ou underline.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small">Senha Inicial <span class="text-danger">*</span></label>
+                                                <div class="input-group has-validation">
+                                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-muted"></i></span>
+                                                    <input type="password" name="password" class="form-control bg-light border-start-0 ps-0" placeholder="••••••••" minlength="8" required>
+                                                    <div class="invalid-feedback">
+                                                        A senha deve ter no mínimo 8 caracteres.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <hr class="my-5 opacity-5">
+
+                                    <!-- DADOS PESSOAIS -->
+                                    <section id="pessoais" class="mb-5">
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3 text-primary">
+                                                <i class="bi bi-person fs-5"></i>
+                                            </div>
+                                            <h5 class="fw-bold mb-0">Dados Pessoais</h5>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-12">
+                                                <label class="form-label fw-semibold small">Nome Completo <span class="text-danger">*</span></label>
+                                                <input type="text" name="nome_completo" class="form-control shadow-none" pattern="^[A-Za-zÀ-ÖØ-öø-ÿ\s']+$" minlength="5" value="{{ post_data.nome_completo|default:'' }}" required>
+                                                <div class="invalid-feedback">
+                                                    Insira o nome completo (apenas letras).
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold small">Género <span class="text-danger">*</span></label>
+                                                <select name="genero" class="form-select shadow-none" required>
+                                                    <option value="" disabled {% if not post_data.genero %}selected{% endif %}>Selecionar...</option>
+                                                    <option value="M" {% if post_data.genero == 'M' %}selected{% endif %}>Masculino</option>
+                                                    <option value="F" {% if post_data.genero == 'F' %}selected{% endif %}>Feminino</option>
+                                                </select>
+                                                <div class="invalid-feedback">Selecione o género.</div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold small">Data de Nascimento <span class="text-danger">*</span></label>
+                                                <input type="date" name="data_nascimento" class="form-control shadow-none" value="{{ post_data.data_nascimento|default:'' }}" required>
+                                                <div class="invalid-feedback">Data inválida.</div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold small">Nacionalidade <span class="text-danger">*</span></label>
+                                                <input type="text" name="nacionalidade" class="form-control shadow-none" value="{{ post_data.nacionalidade|default:'Angolana' }}" required>
+                                                <div class="invalid-feedback">Campo obrigatório.</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small">Nº do BI <span class="text-danger">*</span></label>
+                                                <input type="text" name="bi" class="form-control shadow-none" pattern="^[0-9]{9}[A-Z]{2}[0-9]{3}$" placeholder="Ex: 000000000LA000" value="{{ post_data.bi|default:'' }}" required>
+                                                <div class="invalid-feedback">
+                                                    Formato inválido (ex: 123456789LA123).
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small">Estado Civil</label>
+                                                <select name="estado_civil" class="form-select shadow-none">
+                                                    <option value="Solteiro(a)" {% if post_data.estado_civil == 'Solteiro(a)' %}selected{% endif %}>Solteiro(a)</option>
+                                                    <option value="Casado(a)" {% if post_data.estado_civil == 'Casado(a)' %}selected{% endif %}>Casado(a)</option>
+                                                    <option value="Divorciado(a)" {% if post_data.estado_civil == 'Divorciado(a)' %}selected{% endif %}>Divorciado(a)</option>
+                                                    <option value="Viúvo(a)" {% if post_data.estado_civil == 'Viúvo(a)' %}selected{% endif %}>Viúvo(a)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <hr class="my-5 opacity-5">
+
+                                    <!-- DADOS PROFISSIONAIS -->
+                                    <section id="profissionais" class="mb-5">
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3 text-primary">
+                                                <i class="bi bi-briefcase fs-5"></i>
+                                            </div>
+                                            <h5 class="fw-bold mb-0">Dados Profissionais</h5>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small">Grau Académico <span class="text-danger">*</span></label>
+                                                <select name="grau_academico" class="form-select shadow-none" required>
+                                                    <option value="" disabled {% if not post_data.grau_academico %}selected{% endif %}>Selecionar...</option>
+                                                    <option value="licenciado" {% if post_data.grau_academico == 'licenciado' %}selected{% endif %}>Licenciado</option>
+                                                    <option value="mestre" {% if post_data.grau_academico == 'mestre' %}selected{% endif %}>Mestre</option>
+                                                    <option value="doutor" {% if post_data.grau_academico == 'doutor' %}selected{% endif %}>Doutor</option>
+                                                </select>
+                                                <div class="invalid-feedback">Selecione o grau académico.</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small">Área de Formação <span class="text-danger">*</span></label>
+                                                <input type="text" name="area_formacao" class="form-control shadow-none" placeholder="Ex: Engenharia Informática" value="{{ post_data.area_formacao|default:'' }}" required>
+                                                <div class="invalid-feedback">Informe a área de formação.</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small">Categoria Profissional <span class="text-danger">*</span></label>
+                                                <select name="categoria" class="form-select shadow-none" required>
+                                                    <option value="" disabled {% if not post_data.categoria %}selected{% endif %}>Selecionar...</option>
+                                                    <option value="assistente_estagiario" {% if post_data.categoria == 'assistente_estagiario' %}selected{% endif %}>Assistente Estagiário</option>
+                                                    <option value="assistente" {% if post_data.categoria == 'assistente' %}selected{% endif %}>Assistente</option>
+                                                    <option value="auxiliar" {% if post_data.categoria == 'auxiliar' %}selected{% endif %}>Auxiliar</option>
+                                                    <option value="associado" {% if post_data.categoria == 'associado' %}selected{% endif %}>Associado</option>
+                                                    <option value="professor_catedratico" {% if post_data.categoria == 'professor_catedratico' %}selected{% endif %}>Professor Catedrático</option>
+                                                    <option value="docente_convidado" {% if post_data.categoria == 'docente_convidado' %}selected{% endif %}>Docente Convidado</option>
+                                                </select>
+                                                <div class="invalid-feedback">Selecione a categoria.</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small">Tipo de Vínculo <span class="text-danger">*</span></label>
+                                                <select name="tipo_vinculo" class="form-select shadow-none" required>
+                                                    <option value="" disabled {% if not post_data.tipo_vinculo %}selected{% endif %}>Selecionar...</option>
+                                                    <option value="efetivo" {% if post_data.tipo_vinculo == 'efetivo' %}selected{% endif %}>Efetivo</option>
+                                                    <option value="colaborador" {% if post_data.tipo_vinculo == 'colaborador' %}selected{% endif %}>Colaborador</option>
+                                                    <option value="estagiario" {% if post_data.tipo_vinculo == 'estagiario' %}selected{% endif %}>Estagiário</option>
+                                                </select>
+                                                <div class="invalid-feedback">Selecione o tipo de vínculo.</div>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <hr class="my-5 opacity-5">
+
+                                    <!-- DADOS DE CONTACTO -->
+                                    <section id="contacto" class="mb-5">
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3 text-primary">
+                                                <i class="bi bi-telephone fs-5"></i>
+                                            </div>
+                                            <h5 class="fw-bold mb-0">Contactos e Endereço</h5>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small">Telefone <span class="text-danger">*</span></label>
+                                                <div class="input-group has-validation">
+                                                    <span class="input-group-text bg-white"><i class="bi bi-phone text-muted"></i></span>
+                                                    <input type="tel" name="telefone" class="form-control border-start-0" pattern="^[9][0-9]{8}$" placeholder="9XXXXXXXX" value="{{ post_data.telefone|default:'' }}" required>
+                                                    <div class="invalid-feedback">
+                                                        Nº de telefone inválido (deve começar com 9 e ter 9 dígitos).
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small">Email <span class="text-danger">*</span></label>
+                                                <div class="input-group has-validation">
+                                                    <span class="input-group-text bg-white"><i class="bi bi-envelope text-muted"></i></span>
+                                                    <input type="email" name="email" class="form-control border-start-0" value="{{ post_data.email|default:'' }}" required>
+                                                    <div class="invalid-feedback">Insira um e-mail válido.</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small">Província <span class="text-danger">*</span></label>
+                                                <select name="provincia" id="provincia" class="form-select shadow-none" required>
+                                                    <option value="" disabled {% if not post_data.provincia %}selected{% endif %}>Selecionar...</option>
+                                                </select>
+                                                <div class="invalid-feedback">Selecione a província.</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small">Município <span class="text-danger">*</span></label>
+                                                <select name="municipio" id="municipio" class="form-select shadow-none" required disabled>
+                                                    <option value="" disabled selected>Aguardando província...</option>
+                                                </select>
+                                                <div class="invalid-feedback">Selecione o município.</div>
+                                            </div>
+                                            
+                                            <input type="hidden" name="municipio_provincia" id="municipio_provincia_hidden" value="{{ post_data.municipio_provincia|default:'' }}">
+
+                                            <div class="col-12">
+                                                <label class="form-label fw-semibold small">Endereço de Residência</label>
+                                                <textarea name="endereco" class="form-control" rows="2" placeholder="Rua, Bairro, Nº da Casa...">{{ post_data.endereco|default:'' }}</textarea>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <hr class="my-5 opacity-5">
+
+                                    <!-- DADOS ADMINISTRATIVOS -->
+                                    <section id="administrativo" class="mb-5">
+                                        <div class="d-flex align-items-center mb-4">
+                                            <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3 text-primary">
+                                                <i class="bi bi-clipboard-data fs-5"></i>
+                                            </div>
+                                            <h5 class="fw-bold mb-0">Administrativo</h5>
+                                        </div>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small">Data de Admissão</label>
+                                                <input type="date" name="data_admissao" class="form-control" value="{{ post_data.data_admissao|default:'' }}">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small">Estado do Docente</label>
+                                                <select name="estado" class="form-select">
+                                                    <option value="ativo" {% if post_data.estado == 'ativo' %}selected{% endif %}>Ativo</option>
+                                                    <option value="inativo" {% if post_data.estado == 'inativo' %}selected{% endif %}>Inativo</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <!-- Ações -->
+                                    <div class="mt-5 pt-4 border-top d-flex gap-3">
+                                        <button type="submit" id="submitBtn" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm transition-hover">
+                                            <i class="bi bi-check2-circle me-2"></i> Finalizar Cadastro
+                                        </button>
+                                        <a href="{% url 'listar_professores' %}" class="btn btn-light btn-lg rounded-pill px-4 fw-semibold text-muted">
+                                            Cancelar
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -51,4 +296,158 @@
         </div>
     </div>
 </div>
+
+<style>
+    .transition-hover {
+        transition: all 0.2s ease-in-out;
+    }
+    .transition-hover:hover {
+        transform: translateY(-2px);
+    }
+    #form-nav .nav-link {
+        color: #64748b;
+        transition: all 0.2s;
+    }
+    #form-nav .nav-link:hover {
+        background-color: #f1f5f9;
+        color: var(--bs-primary);
+    }
+    #form-nav .nav-link.active {
+        background-color: var(--bs-primary) !important;
+        color: white !important;
+        box-shadow: 0 4px 6px -1px rgba(var(--bs-primary-rgb), 0.2);
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 4px rgba(var(--bs-primary-rgb), 0.1);
+    }
+    .input-group-text {
+        border-color: #dee2e6;
+    }
+    section {
+        scroll-margin-top: 30px;
+    }
+    .invalid-feedback {
+        font-size: 0.75rem;
+    }
+</style>
+
+<script>
+    const angolaData = {
+        "Bengo": ["Ambriz", "Bula Atumba", "Dande", "Dembos", "Nambuangongo", "Pango Aluquém"],
+        "Benguela": ["Balombo", "Baía Farta", "Benguela", "Catumbela", "Chongoroi", "Ganda", "Lobito", "Passo", "Uíge"],
+        "Bié": ["Andulo", "Camacupa", "Catabola", "Chitembo", "Chinguar", "Cuemba", "Cunhinga", "Kuito", "Nharea"],
+        "Cabinda": ["Belize", "Buco-Zau", "Cabinda", "Cacongo"],
+        "Cuando Cubango": ["Calai", "Cuangar", "Cuchi", "Cuito Cuanavale", "Dirico", "Mavinga", "Menongue", "Nancova", "Rivungo"],
+        "Cuanza Norte": ["Ambaca", "Banga", "Bolongongo", "Cambambe", "Cazengo", "Golungo Alto", "Gonguembo", "Lucala", "Quiculungo", "Samba Caju"],
+        "Cuanza Sul": ["Amboim", "Cassongue", "Cela", "Conda", "Ebo", "Libolo", "Mussende", "Porto Amboim", "Quibala", "Quilenda", "Seles", "Sumbe"],
+        "Cunene": ["Cahama", "Cuanhama", "Curoca", "Cuvelai", "Namacunde", "Ombadja"],
+        "Huambo": ["Bailundo", "Caála", "Catchiungo", "Chicala-Cholohanga", "Chinjenje", "Huambo", "Londuimbali", "Longonjo", "Mungo", "Tchicala-Tcholoanga", "Ucuma"],
+        "Huíla": ["Caconda", "Cacula", "Caluquembe", "Chiange", "Chibia", "Chicomba", "Chipindo", "Cuvango", "Humpata", "Jamba", "Lubango", "Matala", "Quilengues", "Quipungo"],
+        "Luanda": ["Belas", "Cacuaco", "Cazenga", "Icolo e Bengo", "Luanda", "Quiçama", "Kilamba Kiaxi", "Talatona", "Viana"],
+        "Lunda Norte": ["Cambulo", "Capenda-Camulemba", "Caungula", "Chitato", "Cuango", "Cuilo", "Lubalo", "Lucapa", "Xá-Muteba"],
+        "Lunda Sul": ["Cacolo", "Dala", "Muconda", "Saurimo"],
+        "Malanje": ["Cacuso", "Calandula", "Cambundi-Catembo", "Cangandala", "Caombo", "Cuaba Nzogo", "Cunda-dia-Baze", "Luquembo", "Malanje", "Marimba", "Massango", "Mucari", "Quela", "Quirima"],
+        "Moxico": ["Alto Zambeze", "Bundas", "Camanongue", "Cameia", "Léua", "Luau", "Luacano", "Luchazes", "Moxico"],
+        "Namibe": ["Bibala", "Camucuio", "Moçâmedes", "Tômbua", "Virei"],
+        "Uíge": ["Alto Cauale", "Ambuila", "Bembe", "Buengas", "Bungo", "Damba", "Milunga", "Mucaba", "Negage", "Puri", "Quimbele", "Quitexe", "Sanza Pombo", "Songo", "Uíge", "Zombo"],
+        "Zaire": ["Cuimba", "M'banza Kongo", "Noqui", "N'zeto", "Soylo", "Tomboco"]
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const provinciaSelect = document.getElementById('provincia');
+        const municipioSelect = document.getElementById('municipio');
+        const hiddenInput = document.getElementById('municipio_provincia_hidden');
+        const initialValue = hiddenInput.value;
+        
+        let initialProv = "";
+        let initialMun = "";
+        
+        if (initialValue && initialValue.includes(' / ')) {
+            [initialMun, initialProv] = initialValue.split(' / ');
+        }
+
+        // Popular províncias
+        Object.keys(angolaData).sort().forEach(prov => {
+            const option = new Option(prov, prov);
+            if (prov === initialProv) option.selected = true;
+            provinciaSelect.add(option);
+        });
+
+        function updateMunicipios(prov, selectedMun = "") {
+            municipioSelect.innerHTML = '<option value="" disabled selected>Selecionar município...</option>';
+            if (prov && angolaData[prov]) {
+                municipioSelect.disabled = false;
+                angolaData[prov].sort().forEach(mun => {
+                    const option = new Option(mun, mun);
+                    if (mun === selectedMun) option.selected = true;
+                    municipioSelect.add(option);
+                });
+            } else {
+                municipioSelect.disabled = true;
+            }
+        }
+
+        provinciaSelect.addEventListener('change', function() {
+            updateMunicipios(this.value);
+            updateHidden();
+        });
+
+        municipioSelect.addEventListener('change', updateHidden);
+
+        function updateHidden() {
+            if (municipioSelect.value && provinciaSelect.value) {
+                hiddenInput.value = `${municipioSelect.value} / ${provinciaSelect.value}`;
+            } else {
+                hiddenInput.value = "";
+            }
+        }
+
+        // Inicializar municípios se houver valor inicial
+        if (initialProv) {
+            updateMunicipios(initialProv, initialMun);
+        }
+
+        // Validação nativa do Bootstrap
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    
+                    const firstInvalid = form.querySelector(':invalid');
+                    if (firstInvalid) {
+                        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+
+        // Script de navegação ativa no scroll
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('#form-nav .nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 150) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                    link.classList.remove('text-dark');
+                } else {
+                    link.classList.add('text-dark');
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}
