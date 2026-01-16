@@ -250,7 +250,70 @@
         }
     </style>
 
-    <div id="menusContainer">
+        <!-- SEÇÃO RECURSOS HUMANOS (RH) - OBRIGATÓRIA -->
+        <div class="menu-section animate__animated animate__fadeInUp" style="display: block !important; visibility: visible !important; opacity: 1 !important; z-index: 999 !important; position: relative !important; animation-delay: 0.05s;">
+            <div class="section-header d-flex align-items-center">
+                <div class="bg-success bg-opacity-10 p-2 rounded-3 me-3">
+                    <i class="bi bi-people-fill text-success fs-4"></i>
+                </div>
+                <h3 class="mb-0 fw-bold">Recursos Humanos (RH)</h3>
+            </div>
+            <div class="row g-4 menu-items">
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn">
+                    <a href="{% url 'rh_novo_registro' %}" class="text-decoration-none h-100 d-block">
+                        <div class="card shadow-sm card-menu p-4">
+                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
+                                <div class="icon-wrapper" style="background: rgba(25, 135, 84, 0.1); color: #198754;">
+                                    <i class="bi bi-person-plus-fill fs-2"></i>
+                                </div>
+                                <h6 class="card-title">Novo Registro</h6>
+                                <p class="card-text mb-0">Cadastro de novos colaboradores e registros de RH.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.1s;">
+                    <a href="{% url 'registrar_horario' %}" class="text-decoration-none h-100 d-block">
+                        <div class="card shadow-sm card-menu p-4">
+                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
+                                <div class="icon-wrapper" style="background: rgba(13, 110, 253, 0.1); color: #0d6efd;">
+                                    <i class="bi bi-clock-history fs-2"></i>
+                                </div>
+                                <h6 class="card-title">Horário</h6>
+                                <p class="card-text mb-0">Gestão e registro de horários de trabalho.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.2s;">
+                    <a href="{% url 'painel_rh_faltas' %}" class="text-decoration-none h-100 d-block">
+                        <div class="card shadow-sm card-menu p-4">
+                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
+                                <div class="icon-wrapper" style="background: rgba(220, 53, 69, 0.1); color: #dc3545;">
+                                    <i class="bi bi-person-x fs-2"></i>
+                                </div>
+                                <h6 class="card-title">Faltas</h6>
+                                <p class="card-text mb-0">Monitoramento de assiduidade e controle de faltas.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.3s;">
+                    <a href="#" class="text-decoration-none h-100 d-block">
+                        <div class="card shadow-sm card-menu p-4">
+                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
+                                <div class="icon-wrapper" style="background: rgba(13, 202, 240, 0.1); color: #0dcaf0;">
+                                    <i class="bi bi-briefcase-fill fs-2"></i>
+                                </div>
+                                <h6 class="card-title">Execução</h6>
+                                <p class="card-text mb-0">Acompanhamento de metas e execução de tarefas.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
         <!-- SEÇÃO DE MATRÍCULA -->
         <div class="menu-section animate__animated animate__fadeInUp">
             <div class="section-header d-flex align-items-center">
@@ -311,6 +374,20 @@
                                 </div>
                                 <h6 class="card-title">Horário</h6>
                                 <p class="card-text mb-0">Gestão de horários e tempos lectivos.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <!-- NOVO CARD: LANÇAMENTO DE NOTAS -->
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.4s;">
+                    <a href="{% url 'lancamento_notas' %}" class="text-decoration-none h-100 d-block">
+                        <div class="card shadow-sm card-menu p-4">
+                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
+                                <div class="icon-wrapper" style="background: rgba(255, 193, 7, 0.1); color: #ffc107;">
+                                    <i class="bi bi-journal-check fs-2"></i>
+                                </div>
+                                <h6 class="card-title">Lançamento de Notas</h6>
+                                <p class="card-text mb-0">Registro e gestão de avaliações acadêmicas.</p>
                             </div>
                         </div>
                     </a>

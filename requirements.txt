@@ -8,3 +8,8 @@ gunicorn
 pillow
 qrcode
 reportlab
+Django
+gunicorn
+pillow
+qrcode
+reportlab

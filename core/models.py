@@ -1104,6 +1104,19 @@ class Professor(models.Model):
             self.codigo_professor = f"PROF/{ano}/{numero:04d}"
         super().save(*args, **kwargs)
 
+class ProfessorDisciplina(models.Model):
+    professor = models.ForeignKey(Professor, on_delete=models.CASCADE, related_name='professor_disciplinas')
+    disciplina = models.ForeignKey('Disciplina', on_delete=models.CASCADE)
+    data_atribuicao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Professor Disciplina"
+        verbose_name_plural = "Professor Disciplinas"
+        unique_together = ['professor', 'disciplina']
+
+    def __str__(self):
+        return f"{self.professor.nome_completo} - {self.disciplina.nome}"
+
 class Aluno(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     nome_completo = models.CharField(max_length=200, verbose_name="Nome Completo")

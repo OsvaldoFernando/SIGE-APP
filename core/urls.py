@@ -29,6 +29,7 @@ urlpatterns = [
     path('horarios/confirmar/<int:horario_id>/', views.confirmar_aula, name='confirmar_aula'),
     path('rh/faltas/', views.painel_rh_faltas, name='painel_rh_faltas'),
     path('rh/novo/', views.rh_novo_registro, name='rh_novo_registro'),
+    path('rh/', views.index, name='rh_index_fallback'),
     path('utilizadores/', views.listar_utilizadores, name='listar_utilizadores'),
     path('utilizadores/novo/', views.criar_utilizador, name='criar_utilizador'),
     path('utilizadores/<int:user_id>/editar/', views.editar_utilizador, name='editar_utilizador'),
@@ -67,4 +68,6 @@ urlpatterns = [
     path('horarios/editar/<int:pk>/', views.editar_horario, name='editar_horario'),
     path('horarios/deletar/<int:pk>/', views.deletar_horario, name='deletar_horario'),
     path('configuracao-escola/', views.gestao_configuracao_escola, name='gestao_configuracao_escola'),
+    path('professores/<int:professor_id>/associar-disciplina/', views.associar_disciplina_professor, name='associar_disciplina_professor'),
+    path('professores/remover-disciplina/<int:relacao_id>/', views.remover_disciplina_professor, name='remover_disciplina_professor'),
 ]

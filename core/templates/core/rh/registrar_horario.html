@@ -1,0 +1,76 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Atribuir Horário - SIGE{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" style="background-color: #f0f2f5; min-height: 90vh;">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="card-header bg-primary text-white p-4">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-calendar-plus me-2"></i>Atribuir Grade de Horário</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold small">Professor</label>
+                                <select name="professor" class="form-select rounded-3" required>
+                                    <option value="">Selecione o Professor</option>
+                                    {% for p in professores %}
+                                        <option value="{{ p.id }}" {% if professor_id_preselected == p.id|stringformat:"i" %}selected{% endif %}>
+                                            {{ p.nome_completo }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Disciplina</label>
+                                <select name="disciplina" class="form-select rounded-3" required>
+                                    <option value="">Selecione a Disciplina</option>
+                                    {% for d in disciplinas %}
+                                        <option value="{{ d.id }}">{{ d.nome }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small">Dia da Semana</label>
+                                <select name="dia_semana" class="form-select rounded-3" required>
+                                    <option value="1">Segunda-feira</option>
+                                    <option value="2">Terça-feira</option>
+                                    <option value="3">Quarta-feira</option>
+                                    <option value="4">Quinta-feira</option>
+                                    <option value="5">Sexta-feira</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small">Hora Início</label>
+                                <input type="time" name="hora_inicio" class="form-control rounded-3" required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small">Hora Fim</label>
+                                <input type="time" name="hora_fim" class="form-control rounded-3" required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold small">Tempos de Aula</label>
+                                <input type="number" name="tempos_aula" class="form-control rounded-3" value="2" min="1">
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+                            <a href="javascript:history.back()" class="btn btn-light rounded-pill px-4">Cancelar</a>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4">Salvar Horário</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

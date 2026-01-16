@@ -40,6 +40,12 @@ CSRF_TRUSTED_ORIGINS = [
 if os.environ.get('REPLIT_DEV_DOMAIN'):
     CSRF_TRUSTED_ORIGINS.append(f"https://{os.environ['REPLIT_DEV_DOMAIN']}")
 
+SESSION_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_HTTPONLY = False  # Permite que o JS acesse o cookie se necessário
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -144,7 +150,7 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
-# Session timeout (2 minutes)
-SESSION_COOKIE_AGE = 120
+# Session timeout (30 minutes)
+SESSION_COOKIE_AGE = 1800
 SESSION_SAVE_EVERY_REQUEST = True
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False

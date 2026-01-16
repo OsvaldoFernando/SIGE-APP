@@ -1,0 +1,98 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Lançamento de Notas - SIGE{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" style="background-color: #f0f2f5; min-height: 90vh;">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-warning text-dark p-4 d-flex justify-content-between align-items-center">
+            <h4 class="mb-0 fw-bold"><i class="bi bi-journal-check me-2"></i>Lançamento de Notas (Matriculados)</h4>
+            <a href="{% url 'painel_principal' %}" class="btn btn-dark rounded-pill px-4 btn-sm">Voltar</a>
+        </div>
+        <div class="card-body p-4">
+            <!-- Filtros de Dependência -->
+            <form method="GET" class="row g-3 mb-4 p-3 bg-light rounded-4 border">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Ano Académico</label>
+                    <select name="ano" class="form-select rounded-3" onchange="this.form.submit()">
+                        <option value="">Selecione o Ano</option>
+                        {% for a in anos %}
+                            <option value="{{ a.id }}" {% if ano_sel == a.id|stringformat:"i" %}selected{% endif %}>{{ a.codigo }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Turma</label>
+                    <select name="turma" class="form-select rounded-3" {% if not turmas %}disabled{% endif %} onchange="this.form.submit()">
+                        <option value="">Selecione a Turma</option>
+                        {% for t in turmas %}
+                            <option value="{{ t.id }}" {% if turma_sel == t.id|stringformat:"i" %}selected{% endif %}>{{ t.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Disciplina</label>
+                    <select name="disciplina" class="form-select rounded-3" {% if not disciplinas %}disabled{% endif %} onchange="this.form.submit()">
+                        <option value="">Selecione a Disciplina</option>
+                        {% for d in disciplinas %}
+                            <option value="{{ d.id }}" {% if disciplina_sel == d.id|stringformat:"i" %}selected{% endif %}>{{ d.nome }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill">Filtrar Alunos</button>
+                </div>
+            </form>
+
+            {% if alunos %}
+            <form method="POST">
+                {% csrf_token %}
+                <div class="table-responsive rounded-4 border">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">ID/Nº Aluno</th>
+                                <th>Nome Completo</th>
+                                <th class="text-center" style="width: 200px;">Nota (0-20)</th>
+                                <th class="pe-4 text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for aluno in alunos %}
+                            <tr>
+                                <td class="ps-4 fw-bold">{{ aluno.numero_estudante }}</td>
+                                <td>{{ aluno.nome_completo }}</td>
+                                <td>
+                                    <input type="number" step="0.01" min="0" max="20" name="nota_{{ aluno.id }}" 
+                                           class="form-control text-center rounded-pill border-warning bg-warning bg-opacity-10 shadow-none" 
+                                           placeholder="0.00">
+                                </td>
+                                <td class="pe-4 text-center">
+                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3">Ativo/Matriculado</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-success rounded-pill px-5 fw-bold shadow-sm">
+                        <i class="bi bi-save me-2"></i>Salvar Notas da Turma
+                    </button>
+                </div>
+            </form>
+            {% elif ano_sel and turma_sel and disciplina_sel %}
+                <div class="alert alert-info rounded-4 border-0 text-center p-5">
+                    <i class="bi bi-people display-4 d-block mb-3"></i>
+                    Nenhum aluno matriculado encontrado para os filtros selecionados.
+                </div>
+            {% else %}
+                <div class="text-center p-5 text-muted">
+                    <i class="bi bi-funnel fs-1 d-block mb-3"></i>
+                    Selecione o Ano, Turma e Disciplina para listar os alunos.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

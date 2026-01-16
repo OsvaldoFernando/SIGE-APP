@@ -33,6 +33,9 @@
                     </p>
                 </div>
                 <div class="d-flex gap-2 align-self-end">
+                    <a href="{% url 'registrar_horario' %}?professor={{ professor.id }}" class="btn btn-success border border-white fw-bold rounded-pill px-4 shadow-sm">
+                        <i class="bi bi-calendar-plus me-2"></i>Atribuir Horário
+                    </a>
                     <a href="{% url 'editar_professor' professor.id %}" class="btn btn-white bg-white text-primary fw-bold rounded-pill px-4 shadow-sm">
                         <i class="bi bi-pencil-square me-2"></i>Editar
                     </a>
@@ -136,12 +139,194 @@
                                     <button class="nav-link rounded-pill fw-bold py-2" id="carreira-tab" data-bs-toggle="tab" data-bs-target="#carreira" type="button">Carreira</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link rounded-pill fw-bold py-2" id="horario-tab" data-bs-toggle="tab" data-bs-target="#horario" type="button">Horários</button>
+                                    <button class="nav-link rounded-pill fw-bold py-2" id="horario-tab" data-bs-toggle="tab" data-bs-target="#horario" type="button">Horários (Agenda)</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link rounded-pill fw-bold py-2" id="turmas-tab" data-bs-toggle="tab" data-bs-target="#turmas" type="button">Turmas Atuais</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link rounded-pill fw-bold py-2" id="historico-tab" data-bs-toggle="tab" data-bs-target="#historico" type="button">Histórico de Aulas</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link rounded-pill fw-bold py-2" id="disciplinas-tab" data-bs-toggle="tab" data-bs-target="#disciplinas" type="button">Disciplinas</button>
                                 </li>
                             </ul>
                         </div>
                         <div class="card-body px-0 pt-4">
                             <div class="tab-content" id="profTabContent">
+                                <div class="tab-pane fade" id="historico">
+                                    <div class="row g-4">
+                                        <div class="col-12">
+                                            <h6 class="fw-bold text-muted mb-3 border-start border-3 border-primary ps-2">Registro Histórico de Docência</h6>
+                                            <div class="table-responsive shadow-sm rounded-4 overflow-hidden border">
+                                                <table class="table table-hover align-middle mb-0 bg-white">
+                                                    <thead class="bg-light">
+                                                        <tr>
+                                                            <th class="border-0 px-4 py-3 small text-uppercase fw-bold text-muted">Ano Lectivo</th>
+                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Turma</th>
+                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Disciplina</th>
+                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Status</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for h in historico_aulas %}
+                                                            <tr>
+                                                                <td class="px-4 py-3">
+                                                                    <span class="fw-bold text-dark">{{ h.ano_lectivo }}</span>
+                                                                </td>
+                                                                <td class="py-3">
+                                                                    <div class="fw-medium">{{ h.turma_nome }}</div>
+                                                                    <div class="text-muted smaller">{{ h.curso_nome }}</div>
+                                                                </td>
+                                                                <td class="py-3">
+                                                                    <div class="fw-bold text-primary">{{ h.disciplina_nome }}</div>
+                                                                </td>
+                                                                <td class="py-3">
+                                                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3">Concluído</span>
+                                                                </td>
+                                                            </tr>
+                                                        {% empty %}
+                                                            <tr>
+                                                                <td colspan="4" class="p-5 text-center bg-light text-muted">
+                                                                    <i class="bi bi-clock-history display-4 opacity-25"></i>
+                                                                    <p class="mt-3 mb-0">Nenhum registro histórico encontrado em anos anteriores.</p>
+                                                                </td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade show active" id="horario">
+                                    <div class="row g-4">
+                                        <div class="col-12">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h6 class="fw-bold text-muted mb-0 border-start border-3 border-primary ps-2">Agenda Acadêmica Completa</h6>
+                                                <a href="{% url 'registrar_horario' %}?professor={{ professor.id }}" class="btn btn-sm btn-success rounded-pill px-3">
+                                                    <i class="bi bi-calendar-plus me-1"></i> Novo Horário
+                                                </a>
+                                            </div>
+                                            <div class="table-responsive shadow-sm rounded-4 overflow-hidden border">
+                                                <table class="table table-hover align-middle mb-0 bg-white">
+                                                    <thead class="bg-light">
+                                                        <tr>
+                                                            <th class="border-0 px-4 py-3 small text-uppercase fw-bold text-muted" style="width: 150px;">Dia</th>
+                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted" style="width: 150px;">Hora</th>
+                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Sala</th>
+                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Turma</th>
+                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Disciplina</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for h in professor.horarios.all|dictsort:"dia_semana" %}
+                                                            <tr>
+                                                                <td class="px-4 py-3">
+                                                                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fw-bold w-100">
+                                                                        {{ h.get_dia_semana_display }}
+                                                                    </span>
+                                                                </td>
+                                                                <td class="py-3 fw-bold text-dark">
+                                                                    <i class="bi bi-clock me-2 text-primary opacity-50"></i>
+                                                                    {{ h.hora_inicio|time:"H:i" }} - {{ h.hora_fim|time:"H:i" }}
+                                                                </td>
+                                                                <td class="py-3">
+                                                                    <span class="text-muted small fw-bold">Sala:</span>
+                                                                    <span class="fw-bold text-dark">{{ h.sala.nome|default:"-" }}</span>
+                                                                </td>
+                                                                <td class="py-3">
+                                                                    <span class="text-muted small fw-bold">Turma:</span>
+                                                                    <span class="fw-bold text-dark">{{ h.turmadisciplina_set.first.turma.nome|default:"-" }}</span>
+                                                                </td>
+                                                                <td class="py-3">
+                                                                    <div class="fw-bold text-primary">{{ h.disciplina.nome }}</div>
+                                                                    <div class="text-muted smaller">{{ h.tempos_aula }} tempos</div>
+                                                                </td>
+                                                            </tr>
+                                                        {% empty %}
+                                                            <tr>
+                                                                <td colspan="5" class="p-5 text-center bg-light text-muted">
+                                                                    <i class="bi bi-calendar-x display-4 opacity-25"></i>
+                                                                    <p class="mt-3 mb-0">Nenhuma aula agendada na grade horária.</p>
+                                                                </td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="turmas">
+                                    <div class="row g-4">
+                                        <div class="col-12">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h6 class="fw-bold text-muted mb-0 border-start border-3 border-primary ps-2">Disciplinas Associadas</h6>
+                                                {% if user.perfil.nivel_acesso in 'admin,super_admin,pedagogico' %}
+                                                <button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#modalAtribuirDisciplina">
+                                                    <i class="bi bi-plus-lg me-1"></i> Associar
+                                                </button>
+                                                {% endif %}
+                                            </div>
+                                            <div class="list-group shadow-sm rounded-4 overflow-hidden">
+                                                {% for relacao in professor.professor_disciplinas.all %}
+                                                    <div class="list-group-item d-flex justify-content-between align-items-center p-4">
+                                                        <div>
+                                                            <div class="fw-bold fs-5 text-dark">{{ relacao.disciplina.nome }}</div>
+                                                            <div class="text-muted small">
+                                                                Código: {{ relacao.disciplina.codigo|default:"N/A" }} | Atribuído em: {{ relacao.data_atribuicao|date:"d/m/Y" }}
+                                                            </div>
+                                                        </div>
+                                                        {% if user.perfil.nivel_acesso in 'admin,super_admin,pedagogico' %}
+                                                        <form method="POST" action="{% url 'remover_disciplina_professor' relacao.id %}" onsubmit="return confirm('Tem certeza que deseja remover esta disciplina?')">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger border-0 rounded-circle">
+                                                                <i class="bi bi-trash"></i>
+                                                            </button>
+                                                        </form>
+                                                        {% endif %}
+                                                    </div>
+                                                {% empty %}
+                                                    <div class="p-5 text-center bg-light">
+                                                        <i class="bi bi-book display-4 text-muted opacity-50"></i>
+                                                        <p class="text-muted mt-3 mb-0">Nenhuma disciplina associada diretamente.</p>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Modal Atribuir Disciplina -->
+                                <div class="modal fade" id="modalAtribuirDisciplina" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content rounded-4 border-0 shadow">
+                                            <form method="POST" action="{% url 'associar_disciplina_professor' professor.id %}">
+                                                {% csrf_token %}
+                                                <div class="modal-header border-0 p-4 pb-0">
+                                                    <h5 class="modal-title fw-bold">Associar Disciplina</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body p-4">
+                                                    <div class="mb-3">
+                                                        <label class="form-label small fw-bold">Selecione a Disciplina</label>
+                                                        <select name="disciplina" class="form-select rounded-3" required>
+                                                            <option value="">---</option>
+                                                            {% for d in todas_disciplinas %}
+                                                                <option value="{{ d.id }}">{{ d.nome }} ({{ d.codigo|default:"Sem código" }})</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer border-0 p-4 pt-0">
+                                                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Fechar</button>
+                                                    <button type="submit" class="btn btn-primary rounded-pill px-4">Confirmar</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="tab-pane fade show active" id="geral">
                                     <div class="row g-4">
                                         <div class="col-md-6">
@@ -215,36 +400,61 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="tab-pane fade" id="horario">
+                                <div class="tab-pane fade show active" id="horario">
                                     <div class="row g-4">
                                         <div class="col-12">
-                                            <h6 class="fw-bold text-muted mb-3 border-start border-3 border-primary ps-2">Minhas Aulas e Confirmação</h6>
-                                            <div class="list-group shadow-sm rounded-4 overflow-hidden">
-                                                {% for h in professor.horarios.all %}
-                                                    <div class="list-group-item d-flex justify-content-between align-items-center p-4">
-                                                        <div>
-                                                            <div class="fw-bold fs-5 text-dark">{{ h.disciplina.nome }}</div>
-                                                            <div class="text-muted d-flex align-items-center gap-2">
-                                                                <i class="bi bi-calendar-event"></i> {{ h.get_dia_semana_display }}
-                                                                <span class="mx-1">|</span>
-                                                                <i class="bi bi-clock"></i> {{ h.hora_inicio|time:"H:i" }} - {{ h.hora_fim|time:"H:i" }}
-                                                                <span class="mx-1">|</span>
-                                                                <span class="badge bg-light text-dark border">{{ h.tempos_aula }} tempos</span>
-                                                            </div>
-                                                        </div>
-                                                        <form method="POST" action="{% url 'confirmar_aula' h.id %}">
-                                                            {% csrf_token %}
-                                                            <button type="submit" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow-sm transition-hover">
-                                                                <i class="bi bi-check-circle me-2"></i> Confirmar Aula Hoje
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                {% empty %}
-                                                    <div class="p-5 text-center bg-light">
-                                                        <i class="bi bi-calendar-x display-4 text-muted opacity-50"></i>
-                                                        <p class="text-muted mt-3 mb-0">Nenhuma grade de horários atribuída para você.</p>
-                                                    </div>
-                                                {% endfor %}
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <h6 class="fw-bold text-muted mb-0 border-start border-3 border-primary ps-2">Agenda Acadêmica Completa</h6>
+                                                <a href="{% url 'registrar_horario' %}?professor={{ professor.id }}" class="btn btn-sm btn-success rounded-pill px-3">
+                                                    <i class="bi bi-calendar-plus me-1"></i> Novo Horário
+                                                </a>
+                                            </div>
+                                            <div class="table-responsive shadow-sm rounded-4 overflow-hidden border">
+                                                <table class="table table-hover align-middle mb-0 bg-white">
+                                                    <thead class="bg-light">
+                                                        <tr>
+                                                            <th class="border-0 px-4 py-3 small text-uppercase fw-bold text-muted" style="width: 150px;">Dia</th>
+                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted" style="width: 150px;">Hora</th>
+                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Sala</th>
+                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Turma</th>
+                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Disciplina</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for h in professor.horarios.all|dictsort:"dia_semana" %}
+                                                            <tr>
+                                                                <td class="px-4 py-3">
+                                                                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fw-bold w-100">
+                                                                        {{ h.get_dia_semana_display }}
+                                                                    </span>
+                                                                </td>
+                                                                <td class="py-3 fw-bold text-dark">
+                                                                    <i class="bi bi-clock me-2 text-primary opacity-50"></i>
+                                                                    {{ h.hora_inicio|time:"H:i" }} - {{ h.hora_fim|time:"H:i" }}
+                                                                </td>
+                                                                <td class="py-3">
+                                                                    <span class="text-muted small fw-bold">Sala:</span>
+                                                                    <span class="fw-bold text-dark">{{ h.sala.nome|default:"-" }}</span>
+                                                                </td>
+                                                                <td class="py-3">
+                                                                    <span class="text-muted small fw-bold">Turma:</span>
+                                                                    <span class="fw-bold text-dark">{{ h.turmadisciplina_set.first.turma.nome|default:"-" }}</span>
+                                                                </td>
+                                                                <td class="py-3">
+                                                                    <div class="fw-bold text-primary">{{ h.disciplina.nome }}</div>
+                                                                    <div class="text-muted smaller">{{ h.tempos_aula }} tempos</div>
+                                                                </td>
+                                                            </tr>
+                                                        {% empty %}
+                                                            <tr>
+                                                                <td colspan="5" class="p-5 text-center bg-light text-muted">
+                                                                    <i class="bi bi-calendar-x display-4 opacity-25"></i>
+                                                                    <p class="mt-3 mb-0">Nenhuma aula agendada na grade horária.</p>
+                                                                </td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
