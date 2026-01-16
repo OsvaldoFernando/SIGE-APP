@@ -44,6 +44,20 @@
                                 <option value="geral" {% if config.tipo_ensino == 'geral' %}selected{% endif %}>Ensino Geral</option>
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Decreto de Legalidade</label>
+                            <input type="text" name="decreto_legalidade" class="form-control" value="{{ config.decreto_legalidade|default:'' }}" placeholder="Ex: Decreto nº 12/22 de 15 de Março">
+                            <div class="form-text small">Este texto aparecerá abaixo do nome da instituição no horário.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Favicon (Ícone do Navegador)</label>
+                            {% if config.favicon %}
+                            <div class="mb-2">
+                                <img src="{{ config.favicon.url }}" alt="Favicon" style="height: 32px;">
+                            </div>
+                            {% endif %}
+                            <input type="file" name="favicon" class="form-control" accept="image/*">
+                        </div>
                     </div>
                 </div>
             </div>

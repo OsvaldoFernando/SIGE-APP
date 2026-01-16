@@ -334,6 +334,7 @@ class ConfiguracaoEscola(models.Model):
     email = models.EmailField(blank=True, verbose_name="Email")
     logo = models.ImageField(upload_to='escola/', blank=True, null=True, verbose_name="Logo da Escola")
     favicon = models.ImageField(upload_to='escola/', blank=True, null=True, verbose_name="Favicon")
+    decreto_legalidade = models.CharField(max_length=500, blank=True, null=True, verbose_name="Decreto de Legalidade", help_text="Decreto que aprova a legalidade da instituição")
     
     # Assinaturas Dinâmicas
     tipo_ensino = models.CharField(

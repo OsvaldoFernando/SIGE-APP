@@ -50,7 +50,12 @@
                         <p class="small fw-bold text-dark mb-0 text-uppercase" style="font-size: 0.55rem; line-height: 1.1;">
                             {{ instituicao.cargo_responsavel_visto|default:"Presidente para Área Académica e Vida Estudantil" }}
                         </p>
-                        <p class="small text-muted mb-0" style="font-size: 0.55rem;">{{ instituicao.nome_responsavel_visto }}</p>
+                        <p class="small text-muted mb-0" style="font-size: 0.55rem;">
+                            {{ instituicao.nome_responsavel_visto }}
+                            {% if instituicao.grau_responsavel_visto %}
+                                , {{ instituicao.grau_responsavel_visto }} 
+                            {% endif %}
+                        </p>
                     </div>
                 </div>
                 
@@ -71,12 +76,14 @@
             </div>
             
             <div class="text-center">
+                <h4 class="fw-bold text-dark mb-0">{{ instituicao.nome_escola }}</h4>
+                {% if instituicao.decreto_legalidade %}
+                    <p class="small text-muted mb-2">{{ instituicao.decreto_legalidade }}</p>
+                {% endif %}
                 <div class="d-flex justify-content-center flex-wrap gap-3 small text-muted border-top border-bottom py-2">
                     <span><strong>CURSO:</strong> {{ turma_selecionada.curso.nome }} ({{ turma_selecionada.curso.codigo }})</span>
                     <span>|</span>
                     <span><strong>TURMA:</strong> {{ turma_selecionada.nome }}</span>
-                    <span>|</span>
-                    <span><strong>GRAU:</strong> {{ turma_selecionada.curso.grau.nome }}</span>
                 </div>
                 <div class="d-flex justify-content-center flex-wrap gap-3 small text-muted mt-2">
                     <span><strong>ANO ACADÉMICO:</strong> {{ ano_sessao.codigo }}</span>
@@ -109,27 +116,31 @@
                         <td class="p-2 border-dark" style="height: 120px; width: 18%; vertical-align: top;">
                             {% for h in grupo.list %}
                                 {% if h.dia_semana == dia_id %}
-                                <div class="p-2 rounded border border-2 mb-2 bg-white text-start shadow-sm h-100 d-flex flex-column justify-content-between" style="border-left: 5px solid #0d6efd !important;">
+                                <div class="p-2 rounded-3 border-0 mb-2 bg-white text-start shadow-sm h-100 d-flex flex-column justify-content-between position-relative overflow-hidden" style="border-left: 4px solid #0d6efd !important; min-height: 100px;">
+                                    <div class="position-absolute top-0 end-0 p-1 opacity-10">
+                                        <i class="bi bi-journal-text fs-4 text-primary"></i>
+                                    </div>
                                     <div>
-                                        <div class="fw-bold text-dark border-bottom pb-1 mb-1" style="font-size: 0.85rem; line-height: 1.2;">
+                                        <div class="fw-bold text-dark pb-1 mb-1" style="font-size: 0.8rem; line-height: 1.2;">
                                             {{ h.disciplina.nome|upper }}
                                         </div>
-                                        <div class="small text-secondary mb-1" style="font-size: 0.75rem;">
-                                            <i class="bi bi-person-badge-fill me-1"></i>
-                                            <strong>
+                                        <div class="small text-secondary mb-1 d-flex align-items-center" style="font-size: 0.7rem;">
+                                            <div class="flex-shrink-0 me-1">
+                                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 18px; height: 18px; font-size: 0.5rem;">
+                                                    <i class="bi bi-person"></i>
+                                                </div>
+                                            </div>
+                                            <strong class="text-truncate">
                                                 {% if h.professor_data.grau_academico %}
                                                     {{ h.professor_data.grau_academico }} 
                                                 {% endif %}
                                                 {{ h.professor.perfil.nome_completo|default:h.professor.username }}
                                             </strong>
-                                            <br>
-                                            <span class="badge bg-light text-dark border p-1 mt-1 fw-normal" style="font-size: 0.65rem;">
-                                                {{ h.professor_data.categoria|default:"Professor" }}
-                                            </span>
                                         </div>
                                     </div>
-                                    <div class="mt-auto d-flex justify-content-center border-top pt-1 text-muted" style="font-size: 0.7rem;">
-                                        <span class="fw-bold text-primary">{{ h.hora_inicio|time:"H:i" }}-{{ h.hora_fim|time:"H:i" }}</span>
+                                    <div class="mt-2 d-flex justify-content-between align-items-center border-top pt-1 text-muted" style="font-size: 0.65rem; display: none !important;">
+                                        <span class="fw-bold text-primary bg-primary bg-opacity-10 px-2 rounded-pill">{{ h.hora_inicio|time:"H:i" }}-{{ h.hora_fim|time:"H:i" }}</span>
+                                        <span class="text-muted"><i class="bi bi-geo-alt me-1"></i>{{ h.sala|default:"-" }}</span>
                                     </div>
                                 </div>
                                 {% endif %}
@@ -150,10 +161,10 @@
         </div>
 
         <!-- Área de Assinaturas -->
-        <div class="card-body p-5 bg-white">
-            <div class="row justify-content-center text-center mt-4">
+        <div class="card-body p-5 bg-white border-top">
+            <div class="row justify-content-center text-center">
                 <!-- Assinatura Centralizada -->
-                <div class="col-md-8">
+                <div class="col-md-8 mb-4">
                     <p class="mb-5 fw-bold text-dark">O RESPONSÁVEL</p>
                     <div class="mt-4 border-bottom border-dark mx-auto" style="width: 350px;"></div>
                     <p class="mt-2 mb-0 fw-bold text-dark text-uppercase" style="font-size: 0.95rem;">
@@ -163,6 +174,23 @@
                     <p class="small text-muted italic">{{ instituicao.grau_responsavel_assinatura }}</p>
                 </div>
             </div>
+
+            <!-- Rodapé de Contacto -->
+            {% if instituicao.telefone or instituicao.email or instituicao.endereco %}
+            <div class="text-center mt-4 pt-3 border-top border-light">
+                <div class="d-flex justify-content-center flex-wrap gap-4 small text-muted">
+                    {% if instituicao.endereco %}
+                        <span><i class="bi bi-geo-alt me-1"></i> {{ instituicao.endereco }}</span>
+                    {% endif %}
+                    {% if instituicao.telefone %}
+                        <span><i class="bi bi-telephone me-1"></i> {{ instituicao.telefone }}</span>
+                    {% endif %}
+                    {% if instituicao.email %}
+                        <span><i class="bi bi-envelope me-1"></i> {{ instituicao.email }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
             
             <div class="text-center mt-5 no-print">
                 <div class="alert alert-info d-inline-block small">

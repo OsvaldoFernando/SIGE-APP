@@ -430,23 +430,6 @@
                             <i class="bi bi-person"></i> Perfil
                         </a>
 
-                        {% if user.is_staff %}
-                        <a href="/admin/core/disciplina/" class="user-dropdown-item text-primary">
-                            <i class="bi bi-database-gear text-primary"></i> Gerir Disciplinas (Admin)
-                        </a>
-                        <a href="/admin/" class="user-dropdown-item">
-                            <i class="bi bi-speedometer2"></i> Administração Total
-                        </a>
-                        {% endif %}
-                        
-                        <a href="{% url 'gerir_salas' %}" class="user-dropdown-item">
-                            <i class="bi bi-door-open"></i> Gerir Salas
-                        </a>
-                        
-                        <a href="{% url 'listar_professores' %}" class="user-dropdown-item">
-                            <i class="bi bi-person-video3"></i> Gerir Professores
-                        </a>
-                        
                         <div class="user-dropdown-divider"></div>
                         
                         <a href="#" onclick="confirmLogout(event)" class="user-dropdown-item user-dropdown-logout">

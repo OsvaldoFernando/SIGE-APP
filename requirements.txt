@@ -40,3 +40,7 @@ reportlab
 django
 gunicorn
 qrcode
+django
+gunicorn
+qrcode
+reportlab

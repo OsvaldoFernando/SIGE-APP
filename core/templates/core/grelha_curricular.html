@@ -22,11 +22,12 @@
     }
     
     .year-marker {
-        width: 52px; height: 52px; background: linear-gradient(135deg, var(--primary-sige), #1d4ed8); 
+        width: auto; min-width: 52px; height: 52px; padding: 0 20px; background: linear-gradient(135deg, var(--primary-sige), #1d4ed8); 
         color: white; border-radius: 16px; display: flex; align-items: center; justify-content: center;
-        font-weight: 800; font-size: 1.4rem; margin-bottom: 2rem; position: relative; z-index: 1;
+        font-weight: 800; font-size: 1.1rem; margin-bottom: 2rem; position: relative; z-index: 1;
         box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
         border: 2px solid rgba(255,255,255,0.2);
+        white-space: nowrap;
     }
     
     .semester-card {
@@ -397,7 +398,13 @@
 
         {% for ano in anos_range %}
         <div class="year-section">
-            <div class="year-marker">{{ ano }}º</div>
+            <div class="year-marker">
+                {% if grade_ativa.curso.grau.tipo_periodo == 'trimestre' %}
+                    {% if ano == 1 %}10ª Classe{% elif ano == 2 %}11ª Classe{% elif ano == 3 %}12ª Classe{% elif ano == 4 %}13ª Classe{% else %}{{ ano }}º{% endif %}
+                {% else %}
+                    {{ ano }}º Ano
+                {% endif %}
+            </div>
             <div class="row g-4">
                 {% for per in periodos_range %}
                 <div class="col-lg-{% if periodos_range|length == 3 %}4{% else %}6{% endif %} col-md-6">

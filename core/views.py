@@ -3756,38 +3756,75 @@ def gestao_configuracao_escola(request):
         if not config:
             config = ConfiguracaoEscola()
         
-        config.nome_escola = request.POST.get('nome_escola')
-        config.endereco = request.POST.get('endereco')
-        config.telefone = request.POST.get('telefone')
-        config.email = request.POST.get('email')
-        config.tipo_ensino = request.POST.get('tipo_ensino')
-        
-        config.nome_responsavel_visto = request.POST.get('nome_responsavel_visto')
-        config.cargo_responsavel_visto = request.POST.get('cargo_responsavel_visto')
-        config.grau_responsavel_visto = request.POST.get('grau_responsavel_visto')
-        
-        config.nome_responsavel_assinatura = request.POST.get('nome_responsavel_assinatura')
-        config.cargo_responsavel_assinatura = request.POST.get('cargo_responsavel_assinatura')
-        config.grau_responsavel_assinatura = request.POST.get('grau_responsavel_assinatura')
-        
-        if request.FILES.get('logo'):
-            config.logo = request.FILES.get('logo')
+        try:
+            config.nome_escola = request.POST.get('nome_escola')
+            config.endereco = request.POST.get('endereco')
+            config.telefone = request.POST.get('telefone')
+            config.email = request.POST.get('email')
+            config.tipo_ensino = request.POST.get('tipo_ensino')
+            config.decreto_legalidade = request.POST.get('decreto_legalidade')
             
-        config.save()
-        messages.success(request, "Configurações atualizadas com sucesso!")
-        return redirect('gestao_configuracao_escola')
+            config.nome_responsavel_visto = request.POST.get('nome_responsavel_visto')
+            config.cargo_responsavel_visto = request.POST.get('cargo_responsavel_visto')
+            config.grau_responsavel_visto = request.POST.get('grau_responsavel_visto')
+            
+            config.nome_responsavel_assinatura = request.POST.get('nome_responsavel_assinatura')
+            config.cargo_responsavel_assinatura = request.POST.get('cargo_responsavel_assinatura')
+            config.grau_responsavel_assinatura = request.POST.get('grau_responsavel_assinatura')
+            
+            if request.FILES.get('logo'):
+                config.logo = request.FILES.get('logo')
+            
+            if request.FILES.get('favicon'):
+                config.favicon = request.FILES.get('favicon')
+                
+            config.save()
+            messages.success(request, "Configurações atualizadas com sucesso!")
+            return redirect('gestao_configuracao_escola')
+        except Exception as e:
+            messages.error(request, f"Erro ao salvar: {str(e)}")
+            # Os dados já estão no objeto 'config', que será passado de volta ao template
         
     return render(request, 'core/configuracao_escola.html', {'config': config})
 
 @login_required
 def listar_professores(request):
+    from .models import Professor
+    from django.db.models import Q
+    
+    query = request.GET.get('q', '')
+    categoria = request.GET.get('categoria', '')
+    estado = request.GET.get('estado', '')
+    
     professores = Professor.objects.select_related('user', 'user__perfil').all()
-    total_ativos = professores.filter(estado='ativo').count()
-    total_inativos = professores.filter(estado='inativo').count()
+    
+    if query:
+        professores = professores.filter(
+            Q(nome_completo__icontains=query) |
+            Q(codigo_professor__icontains=query) |
+            Q(bilhete_identidade__icontains=query)
+        )
+    
+    if categoria:
+        professores = professores.filter(categoria=categoria)
+        
+    if estado:
+        professores = professores.filter(estado=estado)
+        
+    total_ativos = Professor.objects.filter(estado='ativo').count()
+    total_inativos = Professor.objects.filter(estado='inativo').count()
+    
+    # Obter categorias únicas para o filtro
+    categorias = Professor.objects.exclude(categoria__isnull=True).exclude(categoria='').values_list('categoria', flat=True).distinct()
+    
     return render(request, 'core/professores_lista.html', {
         'professores': professores,
         'total_ativos': total_ativos,
-        'total_inativos': total_inativos
+        'total_inativos': total_inativos,
+        'query': query,
+        'categoria_sel': categoria,
+        'estado_sel': estado,
+        'categorias_list': categorias
     })
 
 @login_required
