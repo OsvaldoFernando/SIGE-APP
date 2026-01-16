@@ -1,0 +1,289 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Perfil: {{ professor.nome_completo }} - SIGE{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0 d-flex flex-column" style="background-color: #f0f2f5; min-height: 100vh;">
+    <div class="flex-grow-1">
+        <!-- Hero Header Section -->
+    <div class="position-relative" style="height: 200px; background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);">
+        <div class="container-fluid px-4 h-100 d-flex align-items-end pb-4">
+            <div class="d-flex align-items-center gap-4 w-100">
+                <div class="position-relative">
+                    <div class="rounded-circle border border-4 border-white shadow-lg bg-white d-flex align-items-center justify-content-center fw-bold text-primary overflow-hidden" 
+                         style="width: 140px; height: 140px; font-size: 3.5rem; margin-top: 60px;">
+                        {% if professor.foto %}
+                            <img src="{{ professor.foto.url }}" alt="{{ professor.nome_completo }}" class="w-100 h-100 object-fit-cover">
+                        {% elif professor.user.perfil.foto %}
+                            <img src="{{ professor.user.perfil.foto.url }}" alt="{{ professor.nome_completo }}" class="w-100 h-100 object-fit-cover">
+                        {% else %}
+                            {{ professor.nome_completo|slice:":1"|upper }}
+                        {% endif %}
+                    </div>
+                    {% if professor.estado == 'ativo' %}
+                    <span class="position-absolute bottom-0 end-0 bg-success border border-3 border-white rounded-circle p-2" title="Ativo" style="width: 25px; height: 25px; transform: translate(-10px, -10px);"></span>
+                    {% endif %}
+                </div>
+                <div class="text-white flex-grow-1 pt-5">
+                    <h1 class="display-6 fw-bold mb-1">{{ professor.nome_completo }}</h1>
+                    <p class="lead fs-6 opacity-75 mb-0">
+                        <i class="bi bi-briefcase me-2"></i>{{ professor.get_categoria_display|default:professor.categoria }}
+                        <span class="mx-2">|</span>
+                        <i class="bi bi-geo-alt me-2"></i>{{ professor.municipio_provincia|default:"Angola" }}
+                    </p>
+                </div>
+                <div class="d-flex gap-2 align-self-end">
+                    <a href="{% url 'editar_professor' professor.id %}" class="btn btn-white bg-white text-primary fw-bold rounded-pill px-4 shadow-sm">
+                        <i class="bi bi-pencil-square me-2"></i>Editar
+                    </a>
+                    <button class="btn btn-primary border border-white fw-bold rounded-pill px-4 shadow-sm">
+                        <i class="bi bi-printer me-2"></i>Ficha
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="container-fluid px-4 pb-0 mb-0" style="margin-top: 40px;">
+        <div class="bg-white rounded-4 shadow-sm p-4 mb-0">
+            <div class="row g-4">
+                <!-- Sidebar Info -->
+                <div class="col-lg-4">
+                    <div class="d-flex flex-column gap-4">
+                        <!-- Card de Contatos -->
+                        <div class="border-bottom pb-4">
+                            <h5 class="fw-bold mb-4 d-flex align-items-center">
+                                <i class="bi bi-person-lines-fill text-primary me-2"></i>Contatos & ID
+                            </h5>
+                            <div class="d-flex flex-column gap-3">
+                                <div class="p-3 bg-light rounded-3">
+                                    <label class="small text-muted text-uppercase fw-bold d-block mb-1">ID do Professor</label>
+                                    <span class="fw-bold text-dark">{{ professor.codigo_professor }}</span>
+                                </div>
+                                <div class="p-3 bg-light rounded-3">
+                                    <label class="small text-muted text-uppercase fw-bold d-block mb-1">E-mail</label>
+                                    <span class="fw-bold text-dark text-break">{{ professor.email }}</span>
+                                </div>
+                                <div class="p-3 bg-light rounded-3">
+                                    <label class="small text-muted text-uppercase fw-bold d-block mb-1">Telefone</label>
+                                    <span class="fw-bold text-dark">{{ professor.telefone }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card de Formação -->
+                        <div class="">
+                            <h5 class="fw-bold mb-4 d-flex align-items-center">
+                                <i class="bi bi-mortarboard-fill text-primary me-2"></i>Formação
+                            </h5>
+                            <div class="d-flex align-items-start gap-3 mb-3">
+                                <div class="bg-primary bg-opacity-10 p-2 rounded-3 text-primary">
+                                    <i class="bi bi-award fs-4"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">{{ professor.get_grau_academico_display|title }}</div>
+                                    <div class="text-muted small">{{ professor.area_formacao }}</div>
+                                </div>
+                            </div>
+                            {% if professor.especialidade %}
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="bg-primary bg-opacity-10 p-2 rounded-3 text-primary">
+                                    <i class="bi bi-journal-check fs-4"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold">Especialidade</div>
+                                    <div class="text-muted small">{{ professor.especialidade }}</div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Dashboard Area -->
+                <div class="col-lg-8 border-start ps-lg-5">
+                    <!-- Stat Cards -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light shadow-none rounded-4 p-4 text-center h-100 hover-card">
+                                <div class="display-5 fw-bold text-primary mb-1">08</div>
+                                <div class="small text-muted text-uppercase fw-bold">Turmas Ativas</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light shadow-none rounded-4 p-4 text-center h-100 hover-card">
+                                <div class="display-5 fw-bold text-success mb-1">24h</div>
+                                <div class="small text-muted text-uppercase fw-bold">Carga Semanal</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card border-0 bg-light shadow-none rounded-4 p-4 text-center h-100 hover-card">
+                                <div class="display-5 fw-bold text-warning mb-1">98%</div>
+                                <div class="small text-muted text-uppercase fw-bold">Assiduidade</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detail Tabs Card -->
+                    <div class="card border-0 bg-transparent">
+                        <div class="card-header bg-transparent border-0 p-0 pt-3">
+                            <ul class="nav nav-pills nav-fill gap-2 bg-light rounded-pill p-1" id="profTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active rounded-pill fw-bold py-2" id="geral-tab" data-bs-toggle="tab" data-bs-target="#geral" type="button">Geral</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link rounded-pill fw-bold py-2" id="carreira-tab" data-bs-toggle="tab" data-bs-target="#carreira" type="button">Carreira</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link rounded-pill fw-bold py-2" id="horario-tab" data-bs-toggle="tab" data-bs-target="#horario" type="button">Horários</button>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body px-0 pt-4">
+                            <div class="tab-content" id="profTabContent">
+                                <div class="tab-pane fade show active" id="geral">
+                                    <div class="row g-4">
+                                        <div class="col-md-6">
+                                            <h6 class="fw-bold text-muted mb-3 border-start border-3 border-primary ps-2">Informações Gerais</h6>
+                                            <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+                                                <li class="d-flex justify-content-between py-1 border-bottom">
+                                                    <span class="text-muted small">Código:</span> 
+                                                    <span class="fw-medium text-dark">{{ professor.codigo_professor }}</span>
+                                                </li>
+                                                <li class="d-flex justify-content-between py-1 border-bottom">
+                                                    <span class="text-muted small">Grau Académico:</span> 
+                                                    <span class="fw-medium text-dark">{{ professor.get_grau_academico_display|default:professor.grau_academico|title }}</span>
+                                                </li>
+                                                <li class="d-flex justify-content-between py-1 border-bottom">
+                                                    <span class="text-muted small">Área de Formação:</span> 
+                                                    <span class="fw-medium text-dark text-end ms-2">{{ professor.area_formacao }}</span>
+                                                </li>
+                                                <li class="d-flex justify-content-between py-1 border-bottom">
+                                                    <span class="text-muted small">Categoria:</span> 
+                                                    <span class="fw-medium text-dark text-primary fw-bold">{{ professor.get_categoria_display|default:professor.categoria }}</span>
+                                                </li>
+                                                <li class="d-flex justify-content-between py-1 border-bottom">
+                                                    <span class="text-muted small">Vínculo:</span> 
+                                                    <span class="fw-medium text-dark">{{ professor.get_tipo_vinculo_display|default:professor.tipo_vinculo|title }}</span>
+                                                </li>
+                                                <li class="d-flex justify-content-between py-1">
+                                                    <span class="text-muted small">Estado:</span> 
+                                                    {% if professor.estado == 'ativo' %}
+                                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2">Ativo</span>
+                                                    {% else %}
+                                                    <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-2">Inativo</span>
+                                                    {% endif %}
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h6 class="fw-bold text-muted mb-3 border-start border-3 border-primary ps-2">Contatos e Localização</h6>
+                                            <div class="bg-light p-3 rounded-3 h-100">
+                                                <div class="mb-3">
+                                                    <p class="text-muted small mb-1"><i class="bi bi-envelope-fill text-primary me-2"></i>Email:</p>
+                                                    <p class="text-dark fw-medium text-break mb-0">{{ professor.email }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <p class="text-muted small mb-1"><i class="bi bi-telephone-fill text-primary me-2"></i>Telefone:</p>
+                                                    <p class="text-dark fw-medium mb-0">{{ professor.telefone }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-muted small mb-1"><i class="bi bi-geo-alt-fill text-primary me-2"></i>Endereço:</p>
+                                                    <p class="text-dark small mb-1 lh-sm">{{ professor.endereco }}</p>
+                                                    <p class="text-muted smaller mb-0"><i class="bi bi-pin-map-fill text-primary me-2"></i>{{ professor.municipio_provincia }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="carreira">
+                                    <div class="timeline-modern py-2">
+                                        <div class="d-flex gap-4">
+                                            <div class="timeline-date fw-bold text-primary text-center" style="min-width: 60px;">
+                                                {{ professor.data_admissao|date:"Y" }}
+                                                <div class="small opacity-50">{{ professor.data_admissao|date:"M" }}</div>
+                                            </div>
+                                            <div class="timeline-content border-start border-2 ps-4 pb-4 position-relative">
+                                                <div class="position-absolute top-0 start-0 bg-primary rounded-circle" style="width: 14px; height: 14px; transform: translateX(-8px); margin-top: 5px; border: 3px solid #fff;"></div>
+                                                <h6 class="fw-bold mb-1 text-dark">Admissão Institucional</h6>
+                                                <p class="text-muted small mb-3">Ingresso como {{ professor.get_categoria_display|default:professor.categoria }} sob regime {{ professor.tipo_vinculo }}.</p>
+                                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill">
+                                                    <i class="bi bi-calendar-event me-2"></i>{{ professor.data_admissao|date:"d/m/Y" }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="horario">
+                                    <div class="row g-4">
+                                        <div class="col-12">
+                                            <h6 class="fw-bold text-muted mb-3 border-start border-3 border-primary ps-2">Minhas Aulas e Confirmação</h6>
+                                            <div class="list-group shadow-sm rounded-4 overflow-hidden">
+                                                {% for h in professor.horarios.all %}
+                                                    <div class="list-group-item d-flex justify-content-between align-items-center p-4">
+                                                        <div>
+                                                            <div class="fw-bold fs-5 text-dark">{{ h.disciplina.nome }}</div>
+                                                            <div class="text-muted d-flex align-items-center gap-2">
+                                                                <i class="bi bi-calendar-event"></i> {{ h.get_dia_semana_display }}
+                                                                <span class="mx-1">|</span>
+                                                                <i class="bi bi-clock"></i> {{ h.hora_inicio|time:"H:i" }} - {{ h.hora_fim|time:"H:i" }}
+                                                                <span class="mx-1">|</span>
+                                                                <span class="badge bg-light text-dark border">{{ h.tempos_aula }} tempos</span>
+                                                            </div>
+                                                        </div>
+                                                        <form method="POST" action="{% url 'confirmar_aula' h.id %}">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow-sm transition-hover">
+                                                                <i class="bi bi-check-circle me-2"></i> Confirmar Aula Hoje
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                {% empty %}
+                                                    <div class="p-5 text-center bg-light">
+                                                        <i class="bi bi-calendar-x display-4 text-muted opacity-50"></i>
+                                                        <p class="text-muted mt-3 mb-0">Nenhuma grade de horários atribuída para você.</p>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<style>
+    .hover-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,.08) !important;
+    }
+    .nav-pills .nav-link {
+        color: #64748b;
+        transition: all 0.3s ease;
+    }
+    .nav-pills .nav-link.active {
+        background-color: #fff;
+        color: #1e3a8a;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,.1);
+    }
+    .btn-white:hover {
+        background-color: #f8fafc;
+    }
+    .timeline-modern .timeline-content {
+        min-height: 100px;
+    }
+    .object-fit-cover {
+        object-fit: cover;
+    }
+</style>
+{% endblock %}

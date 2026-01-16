@@ -430,6 +430,17 @@
                             <i class="bi bi-person"></i> Perfil
                         </a>
 
+                        {% if user_perfil.nivel_acesso in 'admin super_admin pedagogico financeiro secretaria' %}
+                        <div class="user-dropdown-divider"></div>
+                        <h6 class="dropdown-header small text-muted text-uppercase fw-bold px-3 pt-2">Administração</h6>
+                        <a href="{% url 'registrar_horario' %}" class="user-dropdown-item">
+                            <i class="bi bi-clock"></i> Registrar Horário
+                        </a>
+                        <a href="{% url 'painel_rh_faltas' %}" class="user-dropdown-item">
+                            <i class="bi bi-person-x"></i> Painel de Faltas (RH)
+                        </a>
+                        {% endif %}
+
                         <div class="user-dropdown-divider"></div>
                         
                         <a href="#" onclick="confirmLogout(event)" class="user-dropdown-item user-dropdown-logout">

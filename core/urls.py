@@ -26,6 +26,8 @@ urlpatterns = [
     path('cursos/<int:curso_id>/toggle/', views.toggle_curso_status, name='toggle_curso_status'),
     
     # URLs para Gestão de Utilizadores
+    path('horarios/confirmar/<int:horario_id>/', views.confirmar_aula, name='confirmar_aula'),
+    path('rh/faltas/', views.painel_rh_faltas, name='painel_rh_faltas'),
     path('utilizadores/', views.listar_utilizadores, name='listar_utilizadores'),
     path('utilizadores/novo/', views.criar_utilizador, name='criar_utilizador'),
     path('utilizadores/<int:user_id>/editar/', views.editar_utilizador, name='editar_utilizador'),
@@ -54,6 +56,8 @@ urlpatterns = [
     path('atribuicao-turmas/', views.atribuicao_turmas, name='atribuicao_turmas'),
     path('turma/<int:turma_id>/detalhes/', views.detalhe_turma, name='detalhe_turma'),
     path('professores/', views.listar_professores, name='listar_professores'),
+    path('professores/<int:professor_id>/perfil/', views.perfil_professor, name='perfil_professor'),
+    path('professores/<int:professor_id>/editar/', views.editar_professor, name='editar_professor'),
     path('professores/novo/', views.criar_professor, name='criar_professor'),
     path('horarios/', views.gestao_horarios, name='gestao_horarios'),
     path('horarios/registrar/', views.registrar_horario, name='registrar_horario'),

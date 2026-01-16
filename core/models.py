@@ -997,6 +997,38 @@ class NotaDisciplina(models.Model):
     def __str__(self):
         return f"{self.historico.inscricao.nome_completo} - {self.disciplina.nome}: {self.nota}"
 
+class HorarioAula(models.Model):
+    DIAS_SEMANA = [
+        (1, 'Segunda-feira'),
+        (2, 'Terça-feira'),
+        (3, 'Quarta-feira'),
+        (4, 'Quinta-feira'),
+        (5, 'Sexta-feira'),
+    ]
+    
+    professor = models.ForeignKey('Professor', on_delete=models.CASCADE, related_name='horarios')
+    disciplina = models.ForeignKey('Disciplina', on_delete=models.CASCADE)
+    dia_semana = models.IntegerField(choices=DIAS_SEMANA)
+    hora_inicio = models.TimeField()
+    hora_fim = models.TimeField()
+    tempos_aula = models.PositiveIntegerField(default=2, help_text="Número de tempos/horas aula nesta sessão")
+    
+    class Meta:
+        verbose_name = "Horário de Aula"
+        verbose_name_plural = "Horários de Aula"
+
+class RegistroPresencaProfessor(models.Model):
+    professor = models.ForeignKey('Professor', on_delete=models.CASCADE)
+    disciplina = models.ForeignKey('Disciplina', on_delete=models.CASCADE)
+    data = models.DateField()
+    horario = models.ForeignKey(HorarioAula, on_delete=models.SET_NULL, null=True)
+    lecionada = models.BooleanField(default=True)
+    observacao = models.TextField(blank=True)
+    
+    class Meta:
+        verbose_name = "Registro de Carga Letiva"
+        verbose_name_plural = "Registros de Carga Letiva"
+
 class Professor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     codigo_professor = models.CharField(max_length=20, unique=True, verbose_name="Código do Professor", blank=True)

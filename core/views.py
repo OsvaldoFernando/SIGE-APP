@@ -3787,6 +3787,154 @@ def gestao_configuracao_escola(request):
         
     return render(request, 'core/configuracao_escola.html', {'config': config})
 
+from django.db.models import Sum, Count, Q
+from django.utils import timezone
+from datetime import timedelta
+from .models import Professor, Disciplina, HorarioAula
+
+@login_required
+def registrar_horario(request):
+    from .models import Professor, Disciplina, HorarioAula, AnoAcademico, PeriodoLectivo, Turma
+    
+    professores = Professor.objects.all()
+    disciplinas = Disciplina.objects.all()
+    turmas = Turma.objects.all()
+    ano_sessao = AnoAcademico.objects.filter(ano_atual=True).first()
+    periodos = PeriodoLectivo.objects.filter(ano_lectivo=ano_sessao)
+    
+    horarios = HorarioAula.objects.all().select_related('professor', 'disciplina').order_by('professor', 'dia_semana', 'hora_inicio')
+    
+    if request.method == 'POST':
+        professor_id = request.POST.get('professor')
+        disciplina_id = request.POST.get('disciplina')
+        dia_semana = request.POST.get('dia_semana')
+        hora_inicio = request.POST.get('hora_inicio')
+        hora_fim = request.POST.get('hora_fim')
+        tempos = request.POST.get('tempos_aula')
+        
+        try:
+            HorarioAula.objects.create(
+                professor_id=professor_id,
+                disciplina_id=disciplina_id,
+                dia_semana=dia_semana,
+                hora_inicio=hora_inicio,
+                hora_fim=hora_fim,
+                tempos_aula=tempos
+            )
+            messages.success(request, "Horário registrado com sucesso!")
+        except Exception as e:
+            messages.error(request, f"Erro ao registrar: {str(e)}")
+            
+        return redirect('registrar_horario')
+
+    return render(request, 'core/registrar_horario.html', {
+        'professores': professores,
+        'disciplinas': disciplinas,
+        'turmas': turmas,
+        'ano_sessao': ano_sessao,
+        'periodos': periodos,
+        'horarios': horarios,
+        'dias_semana': HorarioAula.DIAS_SEMANA
+    })
+
+@login_required
+def confirmar_aula(request, horario_id):
+    from .models import HorarioAula, RegistroPresencaProfessor
+    horario = get_object_or_404(HorarioAula, id=horario_id)
+    
+    # Verifica se o professor é o dono do horário
+    if not hasattr(request.user, 'professor') or request.user.professor != horario.professor:
+        messages.error(request, "Acesso negado.")
+        return redirect('painel_principal')
+    
+    if request.method == 'POST':
+        data = timezone.now().date()
+        # Evita duplicados no mesmo dia
+        if not RegistroPresencaProfessor.objects.filter(horario=horario, data=data).exists():
+            RegistroPresencaProfessor.objects.create(
+                professor=horario.professor,
+                disciplina=horario.disciplina,
+                data=data,
+                horario=horario,
+                lecionada=True
+            )
+            messages.success(request, f"Aula de {horario.disciplina.nome} confirmada com sucesso!")
+        else:
+            messages.warning(request, "Esta aula já foi confirmada hoje.")
+            
+    return redirect('perfil_professor', professor_id=horario.professor.id)
+
+@login_required
+def confirmar_aula(request, horario_id):
+    from .models import HorarioAula, RegistroPresencaProfessor
+    horario = get_object_or_404(HorarioAula, id=horario_id)
+    
+    # Verifica se o professor é o dono do horário
+    if not hasattr(request.user, 'professor') or request.user.professor != horario.professor:
+        messages.error(request, "Acesso negado.")
+        return redirect('painel_principal')
+    
+    if request.method == 'POST':
+        data = timezone.now().date()
+        # Evita duplicados no mesmo dia
+        if not RegistroPresencaProfessor.objects.filter(horario=horario, data=data).exists():
+            RegistroPresencaProfessor.objects.create(
+                professor=horario.professor,
+                disciplina=horario.disciplina,
+                data=data,
+                horario=horario,
+                lecionada=True
+            )
+            messages.success(request, f"Aula de {horario.disciplina.nome} confirmada com sucesso!")
+        else:
+            messages.warning(request, "Esta aula já foi confirmada hoje.")
+            
+    return redirect('perfil_professor', professor_id=horario.professor.id)
+
+@login_required
+def painel_rh_faltas(request):
+    if request.user.perfil.nivel_acesso not in ['admin', 'financeiro', 'pedagogico', 'secretaria']:
+        messages.error(request, "Acesso negado.")
+        return redirect('painel_principal')
+        
+    from .models import Professor, RegistroPresencaProfessor
+    from django.db.models import Sum
+    
+    professores = Professor.objects.all()
+    dados_faltas = []
+    
+    for prof in professores:
+        # Carga semanal total baseada nos horários registrados
+        carga_semanal = prof.horarios.aggregate(total=Sum('tempos_aula'))['total'] or 0
+        total_previsto_mensal = carga_semanal * 4 # 4 semanas
+        
+        # Aulas que o professor confirmou (presença)
+        registros = RegistroPresencaProfessor.objects.filter(
+            professor=prof, 
+            lecionada=True,
+            data__month=timezone.now().month,
+            data__year=timezone.now().year
+        ).select_related('horario')
+        
+        # Soma os tempos das aulas confirmadas
+        total_lecionado = 0
+        for reg in registros:
+            if reg.horario:
+                total_lecionado += reg.horario.tempos_aula
+            else:
+                total_lecionado += 2 # Fallback
+        
+        faltas = max(0, total_previsto_mensal - total_lecionado)
+        
+        dados_faltas.append({
+            'professor': prof,
+            'previsto': total_previsto_mensal,
+            'realizado': total_lecionado,
+            'faltas': faltas
+        })
+        
+    return render(request, 'core/painel_rh_faltas.html', {'dados_faltas': dados_faltas})
+
 @login_required
 def listar_professores(request):
     from .models import Professor
@@ -3825,6 +3973,79 @@ def listar_professores(request):
         'categoria_sel': categoria,
         'estado_sel': estado,
         'categorias_list': categorias
+    })
+
+@login_required
+def perfil_professor(request, professor_id):
+    from .models import Professor
+    professor = get_object_or_404(Professor, id=professor_id)
+    return render(request, 'core/professor_perfil.html', {
+        'professor': professor
+    })
+
+@login_required
+def editar_professor(request, professor_id):
+    from .models import Professor
+    professor = get_object_or_404(Professor, id=professor_id)
+    
+    if request.user.perfil.nivel_acesso not in ['admin', 'super_admin', 'pedagogico']:
+        messages.error(request, "Acesso negado.")
+        return redirect('perfil_professor', professor_id=professor.id)
+        
+    if request.method == 'POST':
+        # DADOS PESSOAIS
+        professor.nome_completo = request.POST.get('nome_completo')
+        professor.genero = request.POST.get('genero')
+        professor.data_nascimento = request.POST.get('data_nascimento')
+        professor.nacionalidade = request.POST.get('nacionalidade')
+        professor.bilhete_identidade = request.POST.get('bi')
+        professor.estado_civil = request.POST.get('estado_civil')
+        
+        # DADOS DE CONTACTO
+        professor.telefone = request.POST.get('telefone')
+        professor.email = request.POST.get('email')
+        professor.endereco = request.POST.get('endereco')
+        professor.municipio_provincia = request.POST.get('municipio_provincia')
+        
+        # DADOS PROFISSIONAIS
+        professor.grau_academico = request.POST.get('grau_academico')
+        professor.area_formacao = request.POST.get('area_formacao')
+        professor.especialidade = request.POST.get('especialidade')
+        professor.categoria = request.POST.get('categoria')
+        professor.tipo_vinculo = request.POST.get('tipo_vinculo')
+        
+        # DADOS ADMINISTRATIVOS
+        if request.POST.get('data_admissao'):
+            professor.data_admissao = request.POST.get('data_admissao')
+        professor.estado = request.POST.get('estado')
+        
+        # FOTO
+        if request.FILES.get('foto'):
+            nova_foto = request.FILES.get('foto')
+            professor.foto = nova_foto
+            # Também atualizar no perfil do usuário para garantir consistência
+            if professor.user and hasattr(professor.user, 'perfil'):
+                professor.user.perfil.foto = nova_foto
+                professor.user.perfil.save()
+            professor.save()
+        
+        try:
+            professor.save()
+            # Atualizar User associado se necessário
+            if professor.user:
+                professor.user.email = professor.email
+                professor.user.first_name = professor.nome_completo.split(' ')[0]
+                professor.user.save()
+            
+            messages.success(request, f"Dados do professor {professor.nome_completo} atualizados!")
+            return redirect('perfil_professor', professor_id=professor.id)
+        except Exception as e:
+            messages.error(request, f"Erro ao atualizar: {str(e)}")
+            
+    return render(request, 'core/professor_form.html', {
+        'professor': professor,
+        'edit_mode': True,
+        'post_data': {}
     })
 
 @login_required
@@ -3929,4 +4150,4 @@ def criar_professor(request):
             messages.error(request, f"Erro ao cadastrar professor: {str(e)}")
             return render(request, 'core/professor_form.html', {'post_data': request.POST})
             
-    return render(request, 'core/professor_form.html')
+    return render(request, 'core/professor_form.html', {'post_data': {}})

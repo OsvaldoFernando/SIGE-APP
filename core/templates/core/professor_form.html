@@ -1,6 +1,6 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Novo Professor - SIGE{% endblock %}
+{% block title %}{% if edit_mode %}Editar Professor: {{ professor.nome_completo }}{% else %}Novo Professor{% endif %} - SIGE{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-4 py-5" style="background-color: #f8fafc; min-height: 100vh;">
@@ -9,26 +9,18 @@
             <!-- Cabeçalho -->
             <div class="mb-4 d-flex align-items-center justify-content-between">
                 <div>
-                    <h1 class="h3 fw-bold text-dark mb-1">Cadastrar Novo Docente</h1>
-                    <p class="text-secondary mb-0 small"><i class="bi bi-info-circle me-1"></i> Preencha as informações para integrar um novo professor à instituição.</p>
+                    <h1 class="h3 fw-bold text-dark mb-1">{% if edit_mode %}Editar Docente{% else %}Cadastrar Novo Docente{% endif %}</h1>
+                    <p class="text-secondary mb-0 small"><i class="bi bi-info-circle me-1"></i> {% if edit_mode %}Atualize as informações do professor no sistema.{% else %}Preencha as informações para integrar um novo professor à instituição.{% endif %}</p>
                 </div>
-                <a href="{% url 'listar_professores' %}" class="btn btn-outline-secondary border-0 rounded-pill px-3 transition-hover">
-                    <i class="bi bi-arrow-left me-1"></i> Voltar à Lista
+                <a href="{% if edit_mode %}{% url 'perfil_professor' professor.id %}{% else %}{% url 'listar_professores' %}{% endif %}" class="btn btn-outline-secondary border-0 rounded-pill px-3 transition-hover">
+                    <i class="bi bi-arrow-left me-1"></i> Voltar
                 </a>
             </div>
 
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 shadow-sm mb-4" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
 
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                 <div class="card-body p-0">
-                    <form method="POST" class="needs-validation" novalidate>
+                    <form method="POST" class="needs-validation" novalidate enctype="multipart/form-data">
                         {% csrf_token %}
                         
                         <div class="row g-0">
@@ -65,32 +57,55 @@
                                             <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3 text-primary">
                                                 <i class="bi bi-shield-lock fs-5"></i>
                                             </div>
-                                            <h5 class="fw-bold mb-0">Acesso ao Sistema</h5>
+                                            <h5 class="fw-bold mb-0">Acesso e Identificação</h5>
                                         </div>
                                         <div class="row g-3">
+                                            <!-- Foto do Professor -->
+                                            <div class="col-12 mb-3">
+                                                <label class="form-label fw-semibold small d-block">Foto de Perfil</label>
+                                                <div class="d-flex align-items-start gap-4">
+                                                    <div class="position-relative">
+                                                        <div class="rounded-4 overflow-hidden shadow-sm border" style="width: 120px; height: 120px; background-color: #f1f5f9;">
+                                                            {% if professor.foto %}
+                                                                <img src="{{ professor.foto.url }}" id="preview-foto" class="w-100 h-100 object-fit-cover">
+                                                            {% else %}
+                                                                <div id="placeholder-foto" class="w-100 h-100 d-flex align-items-center justify-content-center text-secondary">
+                                                                    <i class="bi bi-person-fill fs-1"></i>
+                                                                </div>
+                                                                <img src="" id="preview-foto" class="w-100 h-100 object-fit-cover d-none">
+                                                            {% endif %}
+                                                        </div>
+                                                        <label for="foto-upload" class="btn btn-sm btn-primary rounded-circle position-absolute bottom-0 end-0 shadow-sm" style="transform: translate(25%, 25%); width: 32px; height: 32px; padding: 0; display: flex; align-items: center; justify-content: center;">
+                                                            <i class="bi bi-camera-fill"></i>
+                                                        </label>
+                                                        <input type="file" name="foto" id="foto-upload" class="d-none" accept="image/*" onchange="previewImage(this)">
+                                                    </div>
+                                                    <div class="flex-grow-1 pt-2">
+                                                        <p class="text-muted small mb-2">Clique no ícone da câmera para {% if professor.foto %}alterar{% else %}adicionar{% endif %} a foto.</p>
+                                                        <ul class="text-muted small ps-3 mb-0">
+                                                            <li>Formatos aceitos: JPG, PNG</li>
+                                                            <li>Tamanho máx: 2MB</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             <div class="col-md-4">
                                                 <label class="form-label fw-semibold small">Código do Professor</label>
-                                                <input type="text" class="form-control bg-light border-0 fw-bold text-primary" value="GERADO AUTOMATICAMENTE" readonly>
-                                                <div class="form-text small">Será gerado após salvar.</div>
+                                                <input type="text" class="form-control bg-light border-0 fw-bold text-primary" value="{% if professor %}{{ professor.codigo_professor }}{% else %}GERADO AUTOMATICAMENTE{% endif %}" readonly>
+                                                <div class="form-text small">{% if edit_mode %}Código identificador único.{% else %}Será gerado após salvar.{% endif %}</div>
                                             </div>
                                             <div class="col-md-4">
                                                 <label class="form-label fw-semibold small">Usuário (Username) <span class="text-danger">*</span></label>
                                                 <div class="input-group has-validation">
                                                     <span class="input-group-text bg-light border-end-0"><i class="bi bi-at text-muted"></i></span>
-                                                    <input type="text" name="username" class="form-control bg-light border-start-0 ps-0 {% if messages %}{% for message in messages %}{% if 'usuário já existe' in message.message|lower %}is-invalid{% endif %}{% endfor %}{% endif %}" placeholder="professor.nome" pattern="^[a-zA-Z0-9._]+$" minlength="3" maxlength="30" value="{{ post_data.username|default:'' }}" required>
-                                                    <div class="invalid-feedback">
-                                                        {% if messages %}{% for message in messages %}{% if 'usuário já existe' in message.message|lower %}{{ message }}{% endif %}{% endfor %}{% else %}Mínimo 3 caracteres, letras, números, ponto ou underline.{% endif %}
-                                                    </div>
+                                                    <input type="text" name="username" class="form-control bg-light border-start-0 ps-0" value="{% if professor %}{{ professor.user.username }}{% elif post_data %}{{ post_data.username|default:'' }}{% endif %}" {% if edit_mode %}disabled style="pointer-events: none;"{% endif %} required>
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
-                                                <label class="form-label fw-semibold small">Senha Inicial <span class="text-danger">*</span></label>
+                                                <label class="form-label fw-semibold small">Senha Inicial {% if not edit_mode %}<span class="text-danger">*</span>{% endif %}</label>
                                                 <div class="input-group has-validation">
                                                     <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-muted"></i></span>
-                                                    <input type="password" name="password" class="form-control bg-light border-start-0 ps-0" placeholder="••••••••" minlength="8" required>
-                                                    <div class="invalid-feedback">
-                                                        A senha deve ter no mínimo 8 caracteres.
-                                                    </div>
+                                                    <input type="password" name="password" class="form-control bg-light border-start-0 ps-0" placeholder="{% if edit_mode %}••••••••{% else %}Senha temporária{% endif %}" {% if not edit_mode %}required{% endif %} {% if edit_mode %}disabled style="pointer-events: none;"{% endif %}>
                                                 </div>
                                             </div>
                                         </div>
@@ -109,7 +124,7 @@
                                         <div class="row g-3">
                                             <div class="col-12">
                                                 <label class="form-label fw-semibold small">Nome Completo <span class="text-danger">*</span></label>
-                                                <input type="text" name="nome_completo" class="form-control shadow-none" pattern="^[A-Za-zÀ-ÖØ-öø-ÿ\s']+$" minlength="5" value="{{ post_data.nome_completo|default:'' }}" required>
+                                                <input type="text" name="nome_completo" class="form-control shadow-none" pattern="^[A-Za-zÀ-ÖØ-öø-ÿ\s']+$" minlength="5" value="{% if professor %}{{ professor.nome_completo }}{% elif post_data %}{{ post_data.nome_completo|default:'' }}{% endif %}" required>
                                                 <div class="invalid-feedback">
                                                     Insira o nome completo (apenas letras).
                                                 </div>
@@ -117,25 +132,25 @@
                                             <div class="col-md-4">
                                                 <label class="form-label fw-semibold small">Género <span class="text-danger">*</span></label>
                                                 <select name="genero" class="form-select shadow-none" required>
-                                                    <option value="" disabled {% if not post_data.genero %}selected{% endif %}>Selecionar...</option>
-                                                    <option value="M" {% if post_data.genero == 'M' %}selected{% endif %}>Masculino</option>
-                                                    <option value="F" {% if post_data.genero == 'F' %}selected{% endif %}>Feminino</option>
+                                                    <option value="" disabled {% if not professor.genero and not post_data.genero %}selected{% endif %}>Selecionar...</option>
+                                                    <option value="M" {% if professor.genero == 'M' or post_data.genero == 'M' %}selected{% endif %}>Masculino</option>
+                                                    <option value="F" {% if professor.genero == 'F' or post_data.genero == 'F' %}selected{% endif %}>Feminino</option>
                                                 </select>
                                                 <div class="invalid-feedback">Selecione o género.</div>
                                             </div>
                                             <div class="col-md-4">
                                                 <label class="form-label fw-semibold small">Data de Nascimento <span class="text-danger">*</span></label>
-                                                <input type="date" name="data_nascimento" class="form-control shadow-none" value="{{ post_data.data_nascimento|default:'' }}" required>
+                                                <input type="date" name="data_nascimento" class="form-control shadow-none" value="{% if professor %}{{ professor.data_nascimento|date:'Y-m-d' }}{% elif post_data %}{{ post_data.data_nascimento|default:'' }}{% endif %}" required>
                                                 <div class="invalid-feedback">Data inválida.</div>
                                             </div>
                                             <div class="col-md-4">
                                                 <label class="form-label fw-semibold small">Nacionalidade <span class="text-danger">*</span></label>
-                                                <input type="text" name="nacionalidade" class="form-control shadow-none" value="{{ post_data.nacionalidade|default:'Angolana' }}" required>
+                                                <input type="text" name="nacionalidade" class="form-control shadow-none" value="{% if professor %}{{ professor.nacionalidade }}{% elif post_data %}{{ post_data.nacionalidade|default:'Angolana' }}{% else %}Angolana{% endif %}" required>
                                                 <div class="invalid-feedback">Campo obrigatório.</div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label fw-semibold small">Nº do BI <span class="text-danger">*</span></label>
-                                                <input type="text" name="bi" class="form-control shadow-none" pattern="^[0-9]{9}[A-Z]{2}[0-9]{3}$" placeholder="Ex: 000000000LA000" value="{{ post_data.bi|default:'' }}" required>
+                                                <input type="text" name="bi" class="form-control shadow-none" pattern="^[0-9]{9}[A-Z]{2}[0-9]{3}$" placeholder="Ex: 000000000LA000" value="{% if professor %}{{ professor.bilhete_identidade }}{% elif post_data %}{{ post_data.bi|default:'' }}{% endif %}" required>
                                                 <div class="invalid-feedback">
                                                     Formato inválido (ex: 123456789LA123).
                                                 </div>
@@ -143,10 +158,10 @@
                                             <div class="col-md-6">
                                                 <label class="form-label fw-semibold small">Estado Civil</label>
                                                 <select name="estado_civil" class="form-select shadow-none">
-                                                    <option value="Solteiro(a)" {% if post_data.estado_civil == 'Solteiro(a)' %}selected{% endif %}>Solteiro(a)</option>
-                                                    <option value="Casado(a)" {% if post_data.estado_civil == 'Casado(a)' %}selected{% endif %}>Casado(a)</option>
-                                                    <option value="Divorciado(a)" {% if post_data.estado_civil == 'Divorciado(a)' %}selected{% endif %}>Divorciado(a)</option>
-                                                    <option value="Viúvo(a)" {% if post_data.estado_civil == 'Viúvo(a)' %}selected{% endif %}>Viúvo(a)</option>
+                                                    <option value="Solteiro(a)" {% if professor.estado_civil == 'Solteiro(a)' or post_data.estado_civil == 'Solteiro(a)' %}selected{% endif %}>Solteiro(a)</option>
+                                                    <option value="Casado(a)" {% if professor.estado_civil == 'Casado(a)' or post_data.estado_civil == 'Casado(a)' %}selected{% endif %}>Casado(a)</option>
+                                                    <option value="Divorciado(a)" {% if professor.estado_civil == 'Divorciado(a)' or post_data.estado_civil == 'Divorciado(a)' %}selected{% endif %}>Divorciado(a)</option>
+                                                    <option value="Viúvo(a)" {% if professor.estado_civil == 'Viúvo(a)' or post_data.estado_civil == 'Viúvo(a)' %}selected{% endif %}>Viúvo(a)</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -166,40 +181,44 @@
                                             <div class="col-md-6">
                                                 <label class="form-label fw-semibold small">Grau Académico <span class="text-danger">*</span></label>
                                                 <select name="grau_academico" class="form-select shadow-none" required>
-                                                    <option value="" disabled {% if not post_data.grau_academico %}selected{% endif %}>Selecionar...</option>
-                                                    <option value="licenciado" {% if post_data.grau_academico == 'licenciado' %}selected{% endif %}>Licenciado</option>
-                                                    <option value="mestre" {% if post_data.grau_academico == 'mestre' %}selected{% endif %}>Mestre</option>
-                                                    <option value="doutor" {% if post_data.grau_academico == 'doutor' %}selected{% endif %}>Doutor</option>
+                                                    <option value="" disabled {% if not professor.grau_academico and not post_data.grau_academico %}selected{% endif %}>Selecionar...</option>
+                                                    <option value="licenciado" {% if professor.grau_academico == 'licenciado' or post_data.grau_academico == 'licenciado' %}selected{% endif %}>Licenciado</option>
+                                                    <option value="mestre" {% if professor.grau_academico == 'mestre' or post_data.grau_academico == 'mestre' %}selected{% endif %}>Mestre</option>
+                                                    <option value="doutor" {% if professor.grau_academico == 'doutor' or post_data.grau_academico == 'doutor' %}selected{% endif %}>Doutor</option>
                                                 </select>
                                                 <div class="invalid-feedback">Selecione o grau académico.</div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label fw-semibold small">Área de Formação <span class="text-danger">*</span></label>
-                                                <input type="text" name="area_formacao" class="form-control shadow-none" placeholder="Ex: Engenharia Informática" value="{{ post_data.area_formacao|default:'' }}" required>
+                                                <input type="text" name="area_formacao" class="form-control shadow-none" placeholder="Ex: Engenharia Informática" value="{% if professor %}{{ professor.area_formacao }}{% elif post_data %}{{ post_data.area_formacao|default:'' }}{% endif %}" required>
                                                 <div class="invalid-feedback">Informe a área de formação.</div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label fw-semibold small">Categoria Profissional <span class="text-danger">*</span></label>
                                                 <select name="categoria" class="form-select shadow-none" required>
-                                                    <option value="" disabled {% if not post_data.categoria %}selected{% endif %}>Selecionar...</option>
-                                                    <option value="assistente_estagiario" {% if post_data.categoria == 'assistente_estagiario' %}selected{% endif %}>Assistente Estagiário</option>
-                                                    <option value="assistente" {% if post_data.categoria == 'assistente' %}selected{% endif %}>Assistente</option>
-                                                    <option value="auxiliar" {% if post_data.categoria == 'auxiliar' %}selected{% endif %}>Auxiliar</option>
-                                                    <option value="associado" {% if post_data.categoria == 'associado' %}selected{% endif %}>Associado</option>
-                                                    <option value="professor_catedratico" {% if post_data.categoria == 'professor_catedratico' %}selected{% endif %}>Professor Catedrático</option>
-                                                    <option value="docente_convidado" {% if post_data.categoria == 'docente_convidado' %}selected{% endif %}>Docente Convidado</option>
+                                                    <option value="" disabled {% if not professor.categoria and not post_data.categoria %}selected{% endif %}>Selecionar...</option>
+                                                    <option value="assistente_estagiario" {% if professor.categoria == 'assistente_estagiario' or post_data.categoria == 'assistente_estagiario' %}selected{% endif %}>Assistente Estagiário</option>
+                                                    <option value="assistente" {% if professor.categoria == 'assistente' or post_data.categoria == 'assistente' %}selected{% endif %}>Assistente</option>
+                                                    <option value="auxiliar" {% if professor.categoria == 'auxiliar' or post_data.categoria == 'auxiliar' %}selected{% endif %}>Auxiliar</option>
+                                                    <option value="associado" {% if professor.categoria == 'associado' or post_data.categoria == 'associado' %}selected{% endif %}>Associado</option>
+                                                    <option value="professor_catedratico" {% if professor.categoria == 'professor_catedratico' or post_data.categoria == 'professor_catedratico' %}selected{% endif %}>Professor Catedrático</option>
+                                                    <option value="docente_convidado" {% if professor.categoria == 'docente_convidado' or post_data.categoria == 'docente_convidado' %}selected{% endif %}>Docente Convidado</option>
                                                 </select>
                                                 <div class="invalid-feedback">Selecione a categoria.</div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label fw-semibold small">Tipo de Vínculo <span class="text-danger">*</span></label>
                                                 <select name="tipo_vinculo" class="form-select shadow-none" required>
-                                                    <option value="" disabled {% if not post_data.tipo_vinculo %}selected{% endif %}>Selecionar...</option>
-                                                    <option value="efetivo" {% if post_data.tipo_vinculo == 'efetivo' %}selected{% endif %}>Efetivo</option>
-                                                    <option value="colaborador" {% if post_data.tipo_vinculo == 'colaborador' %}selected{% endif %}>Colaborador</option>
-                                                    <option value="estagiario" {% if post_data.tipo_vinculo == 'estagiario' %}selected{% endif %}>Estagiário</option>
+                                                    <option value="" disabled {% if not professor.tipo_vinculo and not post_data.tipo_vinculo %}selected{% endif %}>Selecionar...</option>
+                                                    <option value="efetivo" {% if professor.tipo_vinculo == 'efetivo' or post_data.tipo_vinculo == 'efetivo' %}selected{% endif %}>Efetivo</option>
+                                                    <option value="colaborador" {% if professor.tipo_vinculo == 'colaborador' or post_data.tipo_vinculo == 'colaborador' %}selected{% endif %}>Colaborador</option>
+                                                    <option value="estagiario" {% if professor.tipo_vinculo == 'estagiario' or post_data.tipo_vinculo == 'estagiario' %}selected{% endif %}>Estagiário</option>
                                                 </select>
                                                 <div class="invalid-feedback">Selecione o tipo de vínculo.</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold small">Especialidade</label>
+                                                <input type="text" name="especialidade" class="form-control shadow-none" placeholder="Ex: Inteligência Artificial" value="{% if professor %}{{ professor.especialidade }}{% elif post_data %}{{ post_data.especialidade|default:'' }}{% endif %}">
                                             </div>
                                         </div>
                                     </section>
@@ -219,7 +238,7 @@
                                                 <label class="form-label fw-semibold small">Telefone <span class="text-danger">*</span></label>
                                                 <div class="input-group has-validation">
                                                     <span class="input-group-text bg-white"><i class="bi bi-phone text-muted"></i></span>
-                                                    <input type="tel" name="telefone" class="form-control border-start-0" pattern="^[9][0-9]{8}$" placeholder="9XXXXXXXX" value="{{ post_data.telefone|default:'' }}" required>
+                                                    <input type="tel" name="telefone" class="form-control border-start-0" pattern="^[9][0-9]{8}$" placeholder="9XXXXXXXX" value="{% if professor %}{{ professor.telefone }}{% elif post_data %}{{ post_data.telefone|default:'' }}{% endif %}" required>
                                                     <div class="invalid-feedback">
                                                         Nº de telefone inválido (deve começar com 9 e ter 9 dígitos).
                                                     </div>
@@ -229,7 +248,7 @@
                                                 <label class="form-label fw-semibold small">Email <span class="text-danger">*</span></label>
                                                 <div class="input-group has-validation">
                                                     <span class="input-group-text bg-white"><i class="bi bi-envelope text-muted"></i></span>
-                                                    <input type="email" name="email" class="form-control border-start-0" value="{{ post_data.email|default:'' }}" required>
+                                                    <input type="email" name="email" class="form-control border-start-0" value="{% if professor %}{{ professor.email }}{% elif post_data %}{{ post_data.email|default:'' }}{% endif %}" required>
                                                     <div class="invalid-feedback">Insira um e-mail válido.</div>
                                                 </div>
                                             </div>
@@ -249,11 +268,11 @@
                                                 <div class="invalid-feedback">Selecione o município.</div>
                                             </div>
                                             
-                                            <input type="hidden" name="municipio_provincia" id="municipio_provincia_hidden" value="{{ post_data.municipio_provincia|default:'' }}">
+                                            <input type="hidden" name="municipio_provincia" id="municipio_provincia_hidden" value="{% if professor %}{{ professor.municipio_provincia }}{% elif post_data %}{{ post_data.municipio_provincia|default:'' }}{% endif %}">
 
                                             <div class="col-12">
                                                 <label class="form-label fw-semibold small">Endereço de Residência</label>
-                                                <textarea name="endereco" class="form-control" rows="2" placeholder="Rua, Bairro, Nº da Casa...">{{ post_data.endereco|default:'' }}</textarea>
+                                                <textarea name="endereco" class="form-control" rows="2" placeholder="Rua, Bairro, Nº da Casa...">{% if professor %}{{ professor.endereco }}{% elif post_data %}{{ post_data.endereco|default:'' }}{% endif %}</textarea>
                                             </div>
                                         </div>
                                     </section>
@@ -271,13 +290,13 @@
                                         <div class="row g-3">
                                             <div class="col-md-6">
                                                 <label class="form-label fw-semibold small">Data de Admissão</label>
-                                                <input type="date" name="data_admissao" class="form-control" value="{{ post_data.data_admissao|default:'' }}">
+                                                <input type="date" name="data_admissao" class="form-control" value="{% if professor %}{{ professor.data_admissao|date:'Y-m-d' }}{% elif post_data %}{{ post_data.data_admissao|default:'' }}{% endif %}">
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label fw-semibold small">Estado do Docente</label>
                                                 <select name="estado" class="form-select">
-                                                    <option value="ativo" {% if post_data.estado == 'ativo' %}selected{% endif %}>Ativo</option>
-                                                    <option value="inativo" {% if post_data.estado == 'inativo' %}selected{% endif %}>Inativo</option>
+                                                    <option value="ativo" {% if professor.estado == 'ativo' or post_data.estado == 'ativo' %}selected{% endif %}>Ativo</option>
+                                                    <option value="inativo" {% if professor.estado == 'inativo' or post_data.estado == 'inativo' %}selected{% endif %}>Inativo</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -286,9 +305,9 @@
                                     <!-- Ações -->
                                     <div class="mt-5 pt-4 border-top d-flex gap-3">
                                         <button type="submit" id="submitBtn" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm transition-hover">
-                                            <i class="bi bi-check2-circle me-2"></i> Finalizar Cadastro
+                                            <i class="bi bi-check2-circle me-2"></i> {% if edit_mode %}Salvar Alterações{% else %}Finalizar Cadastro{% endif %}
                                         </button>
-                                        <a href="{% url 'listar_professores' %}" class="btn btn-light btn-lg rounded-pill px-4 fw-semibold text-muted">
+                                        <a href="{% if edit_mode %}{% url 'perfil_professor' professor.id %}{% else %}{% url 'listar_professores' %}{% endif %}" class="btn btn-light btn-lg rounded-pill px-4 fw-semibold text-muted">
                                             Cancelar
                                         </a>
                                     </div>
@@ -454,5 +473,22 @@
             });
         });
     });
+
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('preview-foto');
+                const placeholder = document.getElementById('placeholder-foto');
+                
+                preview.src = e.target.result;
+                preview.classList.remove('d-none');
+                if (placeholder) {
+                    placeholder.classList.add('d-none');
+                }
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
 </script>
 {% endblock %}
