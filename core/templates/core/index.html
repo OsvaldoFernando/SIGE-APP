@@ -6,259 +6,91 @@
 <div class="container my-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="fw-bold">Módulos do Sistema</h2>
-        <div class="d-flex align-items-center gap-4">
-            <!-- Seletor de Ano Acadêmico -->
-            <div class="d-flex align-items-center">
-                <label class="me-2 text-muted mb-0" style="white-space: nowrap;">
-                    <i class="bi bi-calendar-range"></i> Ano Acadêmico:
-                </label>
-                <select id="ano_academico_selector" class="form-select form-select-sm" style="width: 150px;">
-                    {% if anos_academicos %}
-                        {% for ano in anos_academicos %}
-                            <option value="{{ ano.id }}" {% if ano.id == ano_atual.id %}selected{% endif %}>
-                                {{ ano.ano_inicio }}/{{ ano.ano_fim }}
-                            </option>
-                        {% endfor %}
-                    {% else %}
-                        <option value="">Nenhum ano</option>
-                    {% endif %}
-                </select>
+        <div class="text-muted">
+            <i class="bi bi-calendar"></i> {% now "d/m/Y" %}
+        </div>
+    </div>
+
+    <!-- SEÇÃO RECURSOS HUMANOS (RH) - OBRIGATÓRIA -->
+    <div class="mb-5 p-4 bg-light rounded-4 border shadow-sm" style="display: block !important; visibility: visible !important;">
+        <h4 class="fw-bold mb-4 text-success border-bottom pb-2">
+            <i class="bi bi-people-fill me-2"></i> RECURSOS HUMANOS (RH)
+        </h4>
+        <div class="row g-4">
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="{% url 'rh_novo_registro' %}" class="text-decoration-none">
+                    <div class="card module-card text-center h-100 shadow-sm border-0 rounded-4">
+                        <div class="card-body p-4">
+                            <div class="module-icon mb-4 bg-white p-3 rounded-4 d-inline-block shadow-sm">
+                                <i class="bi bi-person-plus-fill fs-3 text-success"></i>
+                            </div>
+                            <h5 class="card-title fw-bold text-dark mb-2">Novo Registro RH</h5>
+                        </div>
+                    </div>
+                </a>
             </div>
-            <div class="text-muted" id="data_hora_display">
-                <i class="bi bi-calendar"></i> <span id="data_completa"></span>
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="{% url 'registrar_horario' %}" class="text-decoration-none">
+                    <div class="card module-card text-center h-100 shadow-sm border-0 rounded-4">
+                        <div class="card-body p-4">
+                            <div class="module-icon mb-4 bg-white p-3 rounded-4 d-inline-block shadow-sm">
+                                <i class="bi bi-clock-history fs-3 text-primary"></i>
+                            </div>
+                            <h5 class="card-title fw-bold text-dark mb-2">Registrar Horário</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="{% url 'painel_rh_faltas' %}" class="text-decoration-none">
+                    <div class="card module-card text-center h-100 shadow-sm border-0 rounded-4">
+                        <div class="card-body p-4">
+                            <div class="module-icon mb-4 bg-white p-3 rounded-4 d-inline-block shadow-sm">
+                                <i class="bi bi-person-x fs-3 text-danger"></i>
+                            </div>
+                            <h5 class="card-title fw-bold text-dark mb-2">Painel de Faltas</h5>
+                        </div>
+                    </div>
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- Cards de Resumo de Estados -->
-    <div class="row mb-5 g-3">
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 bg-light h-100">
-                <div class="card-body text-center py-3">
-                    <div class="text-primary mb-1"><i class="bi bi-person-badge fs-4"></i></div>
-                    <h5 class="fw-bold mb-0">{{ stats_estudantes.candidatos }}</h5>
-                    <small class="text-muted">Candidatos</small>
-                </div>
+    <!-- GESTÃO ACADÉMICA -->
+    <div class="mb-5">
+        <h4 class="fw-bold mb-4">Gestão Académica</h4>
+        <div class="row g-4">
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="{% url 'listar_professores' %}" class="text-decoration-none">
+                    <div class="card module-card text-center h-100 shadow-sm border-0 rounded-4">
+                        <div class="card-body p-4">
+                            <div class="module-icon mb-4 bg-light p-3 rounded-4 d-inline-block shadow-sm">
+                                <i class="bi bi-person-video3 fs-3 text-primary"></i>
+                            </div>
+                            <h5 class="card-title fw-bold text-dark mb-2">Professores</h5>
+                        </div>
+                    </div>
+                </a>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 bg-light h-100">
-                <div class="card-body text-center py-3">
-                    <div class="text-success mb-1"><i class="bi bi-person-check fs-4"></i></div>
-                    <h5 class="fw-bold mb-0">{{ stats_estudantes.admitidos }}</h5>
-                    <small class="text-muted">Admitido</small>
-                </div>
+            <div class="col-6 col-md-4 col-lg-3">
+                <a href="{% url 'listar_cursos' %}" class="text-decoration-none">
+                    <div class="card module-card text-center h-100 shadow-sm border-0 rounded-4">
+                        <div class="card-body p-4">
+                            <div class="module-icon mb-4 bg-light p-3 rounded-4 d-inline-block shadow-sm">
+                                <i class="bi bi-book fs-3 text-primary"></i>
+                            </div>
+                            <h5 class="card-title fw-bold text-dark mb-2">Cursos</h5>
+                        </div>
+                    </div>
+                </a>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 bg-light h-100">
-                <div class="card-body text-center py-3">
-                    <div class="text-info mb-1"><i class="bi bi-journal-text fs-4"></i></div>
-                    <h5 class="fw-bold mb-0">{{ stats_estudantes.registrados }}</h5>
-                    <small class="text-muted">Registro</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card border-0 shadow-sm rounded-4 bg-light h-100">
-                <div class="card-body text-center py-3">
-                    <div class="text-warning mb-1"><i class="bi bi-person-up fs-4"></i></div>
-                    <h5 class="fw-bold mb-0">{{ stats_estudantes.ativos }}</h5>
-                    <small class="text-muted">Ativos</small>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="row g-4">
-        <!-- Nível Académico -->
-        <div class="col-6 col-md-4 col-lg-3">
-            <a href="{% url 'nivel_academico_lista' %}" class="text-decoration-none">
-                <div class="card module-card text-center h-100 shadow-sm border-0 rounded-4">
-                    <div class="card-body p-4">
-                        <div class="module-icon mb-4 bg-light p-3 rounded-4 d-inline-block shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#0d6efd" class="bi bi-bar-chart-steps" viewBox="0 0 16 16">
-                                <path d="M.5 0a.5.5 0 0 1 .5.5v15a.5.5 0 0 1-1 0V.5A.5.5 0 0 1 .5 0zM2 1.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-4a.5.5 0 0 1-.5-.5v-1zm2 4a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-1zm2 4a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-6a.5.5 0 0 1-.5-.5v-1zm2 4a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-1z"/>
-                            </svg>
-                        </div>
-                        <h5 class="card-title fw-bold text-dark mb-2">Níveis Acadêmicos</h5>
-                        <p class="card-text small text-muted mb-0">Configuração de graus e níveis de ensino.</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <!-- Professores -->
-        <div class="col-6 col-md-4 col-lg-3">
-            <a href="{% url 'listar_professores' %}" class="text-decoration-none">
-                <div class="card module-card text-center h-100 shadow-sm border-0 rounded-4">
-                    <div class="card-body p-4">
-                        <div class="module-icon mb-4 bg-light p-3 rounded-4 d-inline-block shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#0d6efd" class="bi bi-person-video3" viewBox="0 0 16 16">
-                                <path d="M14 9.5a2 2 0 1 1-4 0 2 2 0 0 1 4 0m-6 5.7c0 .8.8.8.8.8h6.4s.8 0 .8-.8-.8-3.2-4-3.2-4 2.4-4 3.2"/>
-                                <path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h5.243c.122-.326.295-.668.526-1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v7.81c.353.23.656.496.91.783Q16 12.312 16 12V4a2 2 0 0 0-2-2z"/>
-                            </svg>
-                        </div>
-                        <h5 class="card-title fw-bold text-dark mb-2">Professores</h5>
-                        <p class="card-text small text-muted mb-0">Gestão do corpo docente e coordenações.</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <!-- Gestão de Cursos -->
-        <div class="col-6 col-md-4 col-lg-3">
-            <a href="{% url 'listar_cursos' %}" class="text-decoration-none">
-                <div class="card module-card text-center h-100 shadow-sm border-0 rounded-4">
-                    <div class="card-body p-4">
-                        <div class="module-icon mb-4 bg-light p-3 rounded-4 d-inline-block shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#0d6efd" class="bi bi-person-workspace" viewBox="0 0 16 16">
-                                <path d="M4 16s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-5.95a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
-                                <path d="M2 1a2 2 0 0 0-2 2v9.5A1.5 1.5 0 0 0 1.5 14h.653a5.4 5.4 0 0 1 1.066-2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v9h-2.219c.554.654.89 1.373 1.066 2h.653a1.5 1.5 0 0 0 1.5-1.5V3a2 2 0 0 0-2-2z"/>
-                            </svg>
-                        </div>
-                        <h5 class="card-title fw-bold text-dark mb-2">Cursos</h5>
-                        <p class="card-text small text-muted mb-0">Cadastro e gestão de unidades curriculares.</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <!-- Admissão Estudantes -->
-        <div class="col-6 col-md-4 col-lg-3">
-            <a href="{% url 'nova_matricula' %}" class="text-decoration-none">
-                <div class="card module-card text-center h-100 shadow-sm border-0 rounded-4">
-                    <div class="card-body p-4">
-                        <div class="module-icon mb-4 bg-light p-3 rounded-4 d-inline-block shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#0d6efd" class="bi bi-person-add" viewBox="0 0 16 16">
-                                <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0M8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
-                                <path d="M8.256 14a4.5 4.5 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10q.39 0 .74.025c.226-.341.496-.65.804-.918Q8.844 9.002 8 9c-5 0-6 3-6 4s1 1 1 1z"/>
-                            </svg>
-                        </div>
-                        <h5 class="card-title fw-bold text-dark mb-2">Admissões</h5>
-                        <p class="card-text small text-muted mb-0">Serviços de admissões e novos alunos.</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <!-- Estudantes -->
-        <div class="col-6 col-md-4 col-lg-3">
-            <a href="{% url 'matricula' %}" class="text-decoration-none">
-                <div class="card module-card text-center h-100 shadow-sm border-0 rounded-4">
-                    <div class="card-body p-4">
-                        <div class="module-icon mb-4 bg-light p-3 rounded-4 d-inline-block shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#0d6efd" class="bi bi-people-fill" viewBox="0 0 16 16">
-                                <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6m-5.784 6A2.24 2.24 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.3 6.3 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1zM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5"/>
-                            </svg>
-                        </div>
-                        <h5 class="card-title fw-bold text-dark mb-2">Estudantes</h5>
-                        <p class="card-text small text-muted mb-0">Gestão de matrículas e dados acadêmicos.</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <!-- Atividades e Recursos -->
-        <div class="col-6 col-md-4 col-lg-3">
-            <a href="/admin/" class="text-decoration-none">
-                <div class="card module-card text-center h-100 shadow-sm border-0 rounded-4">
-                    <div class="card-body p-4">
-                        <div class="module-icon mb-4 bg-light p-3 rounded-4 d-inline-block shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#0d6efd" class="bi bi-collection-fill" viewBox="0 0 16 16">
-                                <path d="M0 13a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 16 13V6a1.5 1.5 0 0 0-1.5-1.5h-13A1.5 1.5 0 0 0 0 6zM2 3a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 0-1h-11A.5.5 0 0 0 2 3m2-2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 0-1h-7A.5.5 0 0 0 4 1"/>
-                            </svg>
-                        </div>
-                        <h5 class="card-title fw-bold text-dark mb-2">Recursos</h5>
-                        <p class="card-text small text-muted mb-0">Gestão de atividades e materiais didáticos.</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <!-- Finanças -->
-        <div class="col-6 col-md-4 col-lg-3">
-            <a href="/admin/" class="text-decoration-none">
-                <div class="card module-card text-center h-100 shadow-sm border-0 rounded-4">
-                    <div class="card-body p-4">
-                        <div class="module-icon mb-4 bg-light p-3 rounded-4 d-inline-block shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#0d6efd" class="bi bi-cash-stack" viewBox="0 0 16 16">
-                                <path d="M1 3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zm7 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4"/>
-                                <path d="M0 5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1zm3 0a2 2 0 0 1-2 2v4a2 2 0 0 1 2 2h10a2 2 0 0 1 2-2V7a2 2 0 0 1-2-2z"/>
-                            </svg>
-                        </div>
-                        <h5 class="card-title fw-bold text-dark mb-2">Finanças</h5>
-                        <p class="card-text small text-muted mb-0">Controle de recebimentos e pagamentos.</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        <!-- Período Letivo -->
-        <div class="col-6 col-md-4 col-lg-3">
-            <a href="/admin/" class="text-decoration-none">
-                <div class="card module-card text-center h-100 shadow-sm border-0 rounded-4">
-                    <div class="card-body p-4">
-                        <div class="module-icon mb-4 bg-light p-3 rounded-4 d-inline-block shadow-sm">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="#0d6efd" class="bi bi-calendar-range-fill" viewBox="0 0 16 16">
-                                <path d="M4 .5a.5.5 0 0 0-1 0V1H2a2 2 0 0 0-2 2v1h16V3a2 2 0 0 0-2-2h-1V.5a.5.5 0 0 0-1 0V1H4zM16 7V5H0v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8h-2zM6 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2m8 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2M7 12a1 1 0 1 1-2 0 1 1 0 0 1 2 0m4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0"/>
-                            </svg>
-                        </div>
-                        <h5 class="card-title fw-bold text-dark mb-2">Calendário</h5>
-                        <p class="card-text small text-muted mb-0">Gestão de períodos e datas letivas.</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <!-- Configurações -->
-        <div class="col-6 col-md-4 col-lg-3">
-            <a href="{% url 'gestao_configuracao_escola' %}" class="text-decoration-none">
-                <div class="card module-card text-center h-100 shadow-sm border-0 rounded-4" style="background: #f8fafc; border: 1px dashed #cbd5e1 !important;">
-                    <div class="card-body p-4">
-                        <div class="module-icon mb-4 bg-white p-3 rounded-4 d-inline-block shadow-sm">
-                            <i class="bi bi-gear-fill fs-3 text-primary"></i>
-                        </div>
-                        <h5 class="card-title fw-bold text-dark mb-2">Configurações</h5>
-                        <p class="card-text small text-muted mb-0">Identidade, logótipo e assinaturas oficiais.</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-        <!-- Configurações Gerais -->
-        <div class="col-6 col-md-4 col-lg-3">
-            <a href="{% url 'gestao_configuracao_escola' %}" class="text-decoration-none">
-                <div class="card module-card text-center h-100 shadow-sm border-0 rounded-4 bg-primary bg-opacity-10">
-                    <div class="card-body p-4">
-                        <div class="module-icon mb-4 bg-white p-3 rounded-4 d-inline-block shadow-sm">
-                            <i class="bi bi-gear-wide-connected fs-2 text-primary"></i>
-                        </div>
-                        <h5 class="card-title fw-bold text-dark mb-2">Configurações Gerais</h5>
-                        <p class="card-text small text-muted mb-0">Identidade, logótipo e assinaturas oficiais.</p>
-                    </div>
-                </div>
-            </a>
         </div>
     </div>
 </div>
 
 <style>
-    .module-card {
-        transition: all 0.3s ease;
-        background: #fff;
-    }
-    .module-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
-    }
-    .module-icon {
-        width: 64px;
-        height: 64px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .card-title {
-        font-size: 1.1rem;
-    }
+    .module-card { transition: all 0.3s ease; background: #fff; border: 1px solid #eee !important; }
+    .module-card:hover { transform: translateY(-5px); box-shadow: 0 1rem 3rem rgba(0,0,0,.1) !important; }
+    .module-icon { width: 64px; height: 64px; display: inline-flex; align-items: center; justify-content: center; }
 </style>
 {% endblock %}

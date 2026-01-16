@@ -28,6 +28,7 @@ urlpatterns = [
     # URLs para Gestão de Utilizadores
     path('horarios/confirmar/<int:horario_id>/', views.confirmar_aula, name='confirmar_aula'),
     path('rh/faltas/', views.painel_rh_faltas, name='painel_rh_faltas'),
+    path('rh/novo/', views.rh_novo_registro, name='rh_novo_registro'),
     path('utilizadores/', views.listar_utilizadores, name='listar_utilizadores'),
     path('utilizadores/novo/', views.criar_utilizador, name='criar_utilizador'),
     path('utilizadores/<int:user_id>/editar/', views.editar_utilizador, name='editar_utilizador'),

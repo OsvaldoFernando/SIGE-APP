@@ -11,6 +11,21 @@ from .models import (
 )
 
 @login_required
+def rh_novo_registro(request):
+    """View para novo registro de RH"""
+    return render(request, 'core/rh/novo_registro.html')
+
+@login_required
+def registrar_horario(request):
+    """View para registro de horário (RH)"""
+    return render(request, 'core/rh/registrar_horario.html')
+
+@login_required
+def painel_rh_faltas(request):
+    """View para painel de faltas (RH)"""
+    return render(request, 'core/rh/painel_faltas.html')
+
+@login_required
 def criar_reclamacao(request):
     if request.method == 'POST':
         tipo = request.POST.get('tipo')
