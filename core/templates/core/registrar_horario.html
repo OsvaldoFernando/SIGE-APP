@@ -69,37 +69,29 @@
                                         <div class="col-md-6">
                                             <label class="form-label small fw-bold text-secondary">Ano Lectivo</label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-calendar-event text-primary"></i></span>
-                                                <select name="ano_lectivo" class="form-select border-start-0 ps-0 shadow-none" required style="border-left: none !important;">
-                                                    <option value="">Selecionar Ano</option>
-                                                    {% for ano in anos %}
-                                                    <option value="{{ ano.id }}">{{ ano.ano }}</option>
-                                                    {% endfor %}
-                                                </select>
+                                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar-check text-primary"></i></span>
+                                                <input type="text" class="form-control bg-light border-start-0 ps-0 fw-bold text-primary shadow-none" value="{{ ano_sessao.codigo }}" readonly style="border-left: none !important;">
+                                                <input type="hidden" name="ano_lectivo" value="{{ ano_sessao.id }}">
                                             </div>
+                                            <div class="form-text smaller text-muted">Definido automaticamente pelo sistema.</div>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label small fw-bold text-secondary">Período</label>
                                             <div class="input-group">
                                                 <span class="input-group-text bg-white border-end-0"><i class="bi bi-clock-history text-primary"></i></span>
                                                 <select name="periodo" class="form-select border-start-0 ps-0 shadow-none" required style="border-left: none !important;">
-                                                    <option value="">Selecionar Período</option>
                                                     {% for p in periodos %}
-                                                    <option value="{{ p.id }}">{{ p.nome }}</option>
+                                                    <option value="{{ p.id }}" {% if p.ativo %}selected{% endif %}>{{ p.nome }} {% if p.ativo %}(ATUAL){% endif %}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-12">
+                                        <div class="col-12" id="container_temporalidade">
                                             <label class="form-label small fw-bold text-secondary mb-3 d-block">Temporalidade do Horário</label>
-                                            <div class="btn-group w-100" role="group">
-                                                <input type="radio" class="btn-check" name="tempo_tipo" id="semestre1" value="1_semestre" checked>
-                                                <label class="btn btn-outline-primary py-3 fw-bold flex-fill" for="semestre1">1º Semestre</label>
-                                                <input type="radio" class="btn-check" name="tempo_tipo" id="semestre2" value="2_semestre">
-                                                <label class="btn btn-outline-primary py-3 fw-bold flex-fill" for="semestre2">2º Semestre</label>
-                                                <input type="radio" class="btn-check" name="tempo_tipo" id="trimestre" value="trimestre">
-                                                <label class="btn btn-outline-primary py-3 fw-bold flex-fill" for="trimestre">Trimestre</label>
+                                            <div class="btn-group w-100" role="group" id="grupo_botoes_periodo">
+                                                <!-- Gerado via JavaScript -->
                                             </div>
+                                            <input type="hidden" name="tempo_tipo" id="tempo_tipo_hidden" value="1_semestre">
                                         </div>
                                     </div>
                                     <div class="mt-5 d-flex justify-content-end">
@@ -173,10 +165,10 @@
                                             <div class="row g-4">
                                                 <div class="col-md-6">
                                                     <label class="form-label small fw-bold text-secondary">Turma</label>
-                                                    <select name="turma" class="form-select shadow-none py-2" required>
+                                                    <select name="turma" id="id_turma" class="form-select shadow-none py-2" required onchange="atualizarInterfacePeriodo(this)">
                                                         <option value="">Selecionar Turma</option>
                                                         {% for t in turmas %}
-                                                        <option value="{{ t.id }}">{{ t.nome }}</option>
+                                                        <option value="{{ t.id }}" data-tipo-periodo="{{ t.curso.grau.tipo_periodo }}">{{ t.nome }} ({{ t.curso.nome }})</option>
                                                         {% endfor %}
                                                     </select>
                                                 </div>
@@ -196,7 +188,7 @@
                                                         <select name="professor" class="form-select border-start-0 ps-0 shadow-none py-2" required style="border-left: none !important;">
                                                             <option value="">Selecionar Professor</option>
                                                             {% for prof in professores %}
-                                                            <option value="{{ prof.id }}">{{ prof.nome_completo }}</option>
+                                                            <option value="{{ prof.id }}">{{ prof.get_full_name|default:prof.username }}</option>
                                                             {% endfor %}
                                                         </select>
                                                     </div>
@@ -208,7 +200,7 @@
                                                         <select name="sala" class="form-select border-start-0 ps-0 shadow-none py-2" required style="border-left: none !important;">
                                                             <option value="">Selecionar Sala</option>
                                                             {% for sala in salas %}
-                                                            <option value="{{ sala }}">{{ sala }}</option>
+                                                            <option value="{{ sala.id }}">{{ sala.nome }} ({{ sala.get_tipo_display }})</option>
                                                             {% endfor %}
                                                         </select>
                                                     </div>
@@ -296,4 +288,56 @@
         font-size: 0.75rem;
     }
 </style>
+
+<script>
+    function atualizarInterfacePeriodo(select) {
+        const option = select.options[select.selectedIndex];
+        if (!option || !option.value) return;
+        
+        const tipoPeriodo = option.getAttribute('data-tipo-periodo');
+        const container = document.getElementById('grupo_botoes_periodo');
+        const hiddenInput = document.getElementById('tempo_tipo_hidden');
+        
+        container.innerHTML = '';
+        
+        if (tipoPeriodo === 'trimestre') {
+            const trimestres = [
+                { id: '1_trimestre', label: '1º Trimestre' },
+                { id: '2_trimestre', label: '2º Trimestre' },
+                { id: '3_trimestre', label: '3º Trimestre' }
+            ];
+            
+            trimestres.forEach((t, index) => {
+                const checked = index === 0 ? 'checked' : '';
+                container.innerHTML += `
+                    <input type="radio" class="btn-check" name="tempo_tipo_radio" id="tri_${t.id}" value="${t.id}" ${checked} onchange="document.getElementById('tempo_tipo_hidden').value=this.value">
+                    <label class="btn btn-outline-primary py-3 fw-bold flex-fill" for="tri_${t.id}">${t.label}</label>
+                `;
+            });
+            hiddenInput.value = '1_trimestre';
+        } else {
+            const semestres = [
+                { id: '1_semestre', label: '1º Semestre' },
+                { id: '2_semestre', label: '2º Semestre' }
+            ];
+            
+            semestres.forEach((s, index) => {
+                const checked = index === 0 ? 'checked' : '';
+                container.innerHTML += `
+                    <input type="radio" class="btn-check" name="tempo_tipo_radio" id="sem_${s.id}" value="${s.id}" ${checked} onchange="document.getElementById('tempo_tipo_hidden').value=this.value">
+                    <label class="btn btn-outline-primary py-3 fw-bold flex-fill" for="sem_${s.id}">${s.label}</label>
+                `;
+            });
+            hiddenInput.value = '1_semestre';
+        }
+    }
+    
+    // Inicializar no carregamento
+    document.addEventListener('DOMContentLoaded', function() {
+        const select = document.getElementById('id_turma');
+        if (select && select.value) {
+            atualizarInterfacePeriodo(select);
+        }
+    });
+</script>
 {% endblock %}

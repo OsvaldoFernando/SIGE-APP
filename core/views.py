@@ -109,6 +109,16 @@ import os
 def handler404(request, exception):
     return render(request, '404.html', status=404)
 
+def mudar_ano_academico(request, ano_id):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
+    ano = get_object_or_404(AnoAcademico, id=ano_id)
+    request.session['ano_academico_id'] = ano.id
+    
+    messages.success(request, f"Ano Académico alterado para {ano.codigo}")
+    return redirect(request.META.get('HTTP_REFERER', 'dashboard'))
+
 def processar_aprovacoes_curso(curso_id):
     curso = Curso.objects.get(id=curso_id)
     inscricoes_com_nota = curso.inscricoes.filter(nota_teste__isnull=False, nota_teste__gte=curso.nota_minima).order_by('-nota_teste')
@@ -281,10 +291,17 @@ def inscricao_create(request, curso_id):
             perfil.telefone = request.POST['telefone']
             perfil.save()
 
+            # Obter ano académico da sessão ou padrão
+            ano_id = request.session.get('ano_academico_id')
+            if ano_id:
+                ano_referencia = get_object_or_404(AnoAcademico, id=ano_id)
+            else:
+                ano_referencia = AnoAcademico.get_atual()
+
             inscricao = Inscricao(
                 user=user,  # Associar a inscrição ao usuário criado
                 curso=curso,
-                ano_academico_id=request.POST.get('ano_academico'),
+                ano_academico=ano_referencia,
                 primeiro_nome=request.POST.get('primeiro_nome'),
                 nomes_meio=request.POST.get('nomes_meio', ''),
                 apelido=request.POST.get('apelido'),
@@ -2605,8 +2622,12 @@ def atribuicao_turmas(request):
             periodo = request.POST.get('periodo')
             nome = request.POST.get('nome')
             
-            curso = Curso.objects.get(id=curso_id)
-            ano_l = AnoAcademico.objects.get(id=ano_lectivo_id)
+            # Obter ano académico da sessão ou padrão
+            ano_id = request.session.get('ano_academico_id')
+            if ano_id:
+                ano_l = get_object_or_404(AnoAcademico, id=ano_id)
+            else:
+                ano_l = AnoAcademico.get_atual()
             
             # 1. Criar a Turma
             turma = Turma.objects.create(
@@ -2745,8 +2766,13 @@ def gestao_eventos(request):
         action = request.POST.get('action')
         if action == 'criar_evento':
             try:
-                ano_id = request.POST.get('ano_lectivo')
-                ano = AnoAcademico.objects.get(id=ano_id)
+                # Obter ano académico da sessão ou padrão
+                ano_id = request.session.get('ano_academico_id')
+                if ano_id:
+                    ano = get_object_or_404(AnoAcademico, id=ano_id)
+                else:
+                    ano = AnoAcademico.get_atual()
+
                 EventoCalendario.objects.create(
                     ano_lectivo=ano,
                     tipo_evento=request.POST.get('tipo_evento'),
@@ -3502,50 +3528,259 @@ def gestao_horarios(request):
 def registrar_horario(request):
     from .models import AnoAcademico, PeriodoLectivo, Turma, Disciplina, Professor
     
-    # Ajustado de is_active para estado='ativo' com base no erro FieldError
-    anos = AnoAcademico.objects.filter(estado='ativo').order_by('-data_inicio')
-    if not anos.exists():
-        anos = AnoAcademico.objects.all().order_by('-data_inicio')
-        
-    periodos = PeriodoLectivo.objects.all()
-    turmas = Turma.objects.all()
+    # Obter ano académico da sessão ou padrão
+    ano_id = request.session.get('ano_academico_id')
+    if ano_id:
+        ano_sessao = get_object_or_404(AnoAcademico, id=ano_id)
+    else:
+        ano_sessao = AnoAcademico.get_atual()
+
+    periodo_ativo = PeriodoLectivo.objects.filter(ano_lectivo=ano_sessao, ativo=True).first()
+    periodos = PeriodoLectivo.objects.filter(ano_lectivo=ano_sessao)
+    turmas = Turma.objects.filter(ano_lectivo=ano_sessao).select_related('curso', 'curso__grau')
+    
+    # Filtrar disciplinas pelo período selecionado no formulário ou pelo período ativo
     disciplinas = Disciplina.objects.all()
     professores = Professor.objects.filter(estado='ativo')
-    # Note: Assuming Sala model might exist or using a CharField for now if not sure, 
-    # but I'll check if Sala exists in models or just use a placeholder list
-    salas = ["Sala 1", "Sala 2", "Sala 3", "Laboratório 1", "Laboratório 2"] 
+    from .models import Sala
+    salas = Sala.objects.filter(ativa=True)
     dias_semana = [
         ('segunda', 'Segunda-feira'),
         ('terca', 'Terça-feira'),
         ('quarta', 'Quarta-feira'),
         ('quinta', 'Quinta-feira'),
         ('sexta', 'Sexta-feira'),
-        ('sabado', 'Sábado'),
     ]
 
-    if request.method == 'POST':
-        # Logic to save will go here in next step
-        messages.success(request, "Horário registrado com sucesso!")
-        return redirect('gestao_horarios')
-
+    from django.contrib.auth.models import User
     context = {
-        'anos': anos,
+        'ano_sessao': ano_sessao,
+        'periodo_ativo': periodo_ativo,
         'periodos': periodos,
         'turmas': turmas,
         'disciplinas': disciplinas,
-        'professores': professores,
+        'professores': User.objects.filter(perfil__nivel_acesso='professor', perfil__ativo=True),
         'salas': salas,
         'dias_semana': dias_semana,
     }
+
+    if request.method == 'POST':
+        try:
+            from .models import TurmaDisciplina, Turma, Disciplina, User, Sala
+            
+            # Dados do formulário
+            turma_id = request.POST.get('turma')
+            disciplina_id = request.POST.get('disciplina')
+            professor_id = request.POST.get('professor')
+            sala_id = request.POST.get('sala')
+            
+            hora_inicio = request.POST.get('hora_inicio')
+            hora_fim = request.POST.get('hora_fim')
+            dia_semana = request.POST.get('dia_semana')
+            tempo_tipo = request.POST.get('tempo_tipo_radio') # Usando o valor do radio dinâmico
+            
+            if not tempo_tipo:
+                tempo_tipo = request.POST.get('tempo_tipo', '1_semestre')
+            
+            turma = get_object_or_404(Turma, id=turma_id)
+            disciplina = get_object_or_404(Disciplina, id=disciplina_id)
+            professor = get_object_or_404(User, id=professor_id)
+            sala = get_object_or_404(Sala, id=sala_id)
+            
+            # Criar novo registro de horário (permitindo múltiplos dias/horas)
+            TurmaDisciplina.objects.create(
+                turma=turma,
+                disciplina=disciplina,
+                professor=professor,
+                sala=sala,
+                dia_semana=dia_semana,
+                hora_inicio=hora_inicio,
+                hora_fim=hora_fim,
+                tempo_tipo=tempo_tipo
+            )
+            
+            messages.success(request, f"Horário para {disciplina.nome} ({turma.nome}) registrado com sucesso!")
+            return redirect('gestao_horarios')
+        except Exception as e:
+            messages.error(request, f"Erro ao registrar horário: {str(e)}")
+            return render(request, 'core/registrar_horario.html', context)
+
     return render(request, 'core/registrar_horario.html', context)
 
 @login_required
-def listar_professores(request):
-    if request.user.perfil.nivel_acesso not in ['admin', 'super_admin', 'pedagogico', 'secretaria']:
+def visualizar_grade(request):
+    from .models import AnoAcademico, TurmaDisciplina, Turma, ConfiguracaoEscola, PeriodoLectivo
+    
+    ano_id = request.session.get('ano_academico_id')
+    if ano_id:
+        ano_sessao = get_object_or_404(AnoAcademico, id=ano_id)
+    else:
+        ano_sessao = AnoAcademico.get_atual()
+        
+    turma_id = request.GET.get('turma')
+    horarios = []
+    turma_selecionada = None
+    periodo_atual = None
+    
+    if turma_id:
+        turma_selecionada = get_object_or_404(Turma, id=turma_id)
+        horarios = TurmaDisciplina.objects.filter(
+            turma=turma_selecionada, 
+            dia_semana__isnull=False
+        ).select_related(
+            'disciplina', 
+            'professor', 
+            'professor__perfil', 
+            'sala'
+        ).order_by('hora_inicio')
+
+        # Tentar carregar dados extras dos professores manualmente para evitar erros de select_related complexos
+        for h in horarios:
+            try:
+                # Se existir um modelo Professor vinculado ao User
+                h.professor_data = getattr(h.professor, 'professor_rel', None)
+                if h.professor_data and hasattr(h.professor_data, 'first'):
+                     h.professor_data = h.professor_data.first()
+            except:
+                h.professor_data = None
+        
+        # Buscar o período letivo ativo para este ano
+        periodo_atual = PeriodoLectivo.objects.filter(ano_lectivo=ano_sessao, ativo=True).first()
+    
+    turmas = Turma.objects.filter(ano_lectivo=ano_sessao)
+    instituicao = ConfiguracaoEscola.objects.first()
+    
+    dias = [
+        ('segunda', 'Segunda'),
+        ('terca', 'Terça'),
+        ('quarta', 'Quarta'),
+        ('quinta', 'Quinta'),
+        ('sexta', 'Sexta'),
+    ]
+    
+    return render(request, 'core/visualizar_grade.html', {
+        'horarios': horarios,
+        'turmas': turmas,
+        'turma_selecionada': turma_selecionada,
+        'dias': dias,
+        'ano_sessao': ano_sessao,
+        'instituicao': instituicao,
+        'periodo_atual': periodo_atual
+    })
+
+@login_required
+def listar_horarios(request):
+    from .models import AnoAcademico, TurmaDisciplina, Turma
+    
+    ano_id = request.session.get('ano_academico_id')
+    if ano_id:
+        ano_sessao = get_object_or_404(AnoAcademico, id=ano_id)
+    else:
+        ano_sessao = AnoAcademico.get_atual()
+        
+    horarios = TurmaDisciplina.objects.filter(
+        turma__ano_lectivo=ano_sessao,
+        dia_semana__isnull=False
+    ).select_related('turma', 'disciplina', 'professor', 'sala').order_by('turma', 'dia_semana', 'hora_inicio')
+    
+    return render(request, 'core/horarios_lista.html', {
+        'horarios': horarios,
+        'ano_sessao': ano_sessao
+    })
+
+@login_required
+def editar_horario(request, pk):
+    from .models import TurmaDisciplina, Turma, Disciplina, Sala, AnoAcademico
+    from django.contrib.auth.models import User
+    
+    horario = get_object_or_404(TurmaDisciplina, pk=pk)
+    
+    ano_id = request.session.get('ano_academico_id')
+    if ano_id:
+        ano_sessao = get_object_or_404(AnoAcademico, id=ano_id)
+    else:
+        ano_sessao = AnoAcademico.get_atual()
+        
+    if request.method == 'POST':
+        try:
+            horario.turma_id = request.POST.get('turma')
+            horario.disciplina_id = request.POST.get('disciplina')
+            horario.professor_id = request.POST.get('professor')
+            horario.sala_id = request.POST.get('sala')
+            horario.dia_semana = request.POST.get('dia_semana')
+            horario.hora_inicio = request.POST.get('hora_inicio')
+            horario.hora_fim = request.POST.get('hora_fim')
+            horario.save()
+            
+            messages.success(request, "Horário atualizado com sucesso!")
+            return redirect('listar_horarios')
+        except Exception as e:
+            messages.error(request, f"Erro ao atualizar horário: {str(e)}")
+
+    context = {
+        'horario': horario,
+        'turmas': Turma.objects.filter(ano_lectivo=ano_sessao),
+        'disciplinas': Disciplina.objects.all(),
+        'professores': User.objects.filter(perfil__nivel_acesso='professor', perfil__ativo=True),
+        'salas': Sala.objects.filter(ativa=True),
+        'dias_semana': [
+            ('segunda', 'Segunda-feira'),
+            ('terca', 'Terça-feira'),
+            ('quarta', 'Quarta-feira'),
+            ('quinta', 'Quinta-feira'),
+            ('sexta', 'Sexta-feira'),
+        ]
+    }
+    return render(request, 'core/editar_horario.html', context)
+
+@login_required
+def deletar_horario(request, pk):
+    from .models import TurmaDisciplina
+    horario = get_object_or_404(TurmaDisciplina, pk=pk)
+    if request.method == 'POST':
+        horario.delete()
+        messages.success(request, "Horário removido com sucesso!")
+        return redirect('listar_horarios')
+    return render(request, 'core/confirm_delete.html', {'object': horario, 'type': 'Horário de Aula'})
+
+@login_required
+def gestao_configuracao_escola(request):
+    if request.user.perfil.nivel_acesso not in ['admin', 'super_admin']:
         messages.error(request, "Acesso negado.")
         return redirect('painel_principal')
+        
+    from .models import ConfiguracaoEscola
+    config = ConfiguracaoEscola.objects.first()
     
-    from .models import Professor
+    if request.method == 'POST':
+        if not config:
+            config = ConfiguracaoEscola()
+        
+        config.nome_escola = request.POST.get('nome_escola')
+        config.endereco = request.POST.get('endereco')
+        config.telefone = request.POST.get('telefone')
+        config.email = request.POST.get('email')
+        config.tipo_ensino = request.POST.get('tipo_ensino')
+        
+        config.nome_responsavel_visto = request.POST.get('nome_responsavel_visto')
+        config.cargo_responsavel_visto = request.POST.get('cargo_responsavel_visto')
+        config.grau_responsavel_visto = request.POST.get('grau_responsavel_visto')
+        
+        config.nome_responsavel_assinatura = request.POST.get('nome_responsavel_assinatura')
+        config.cargo_responsavel_assinatura = request.POST.get('cargo_responsavel_assinatura')
+        config.grau_responsavel_assinatura = request.POST.get('grau_responsavel_assinatura')
+        
+        if request.FILES.get('logo'):
+            config.logo = request.FILES.get('logo')
+            
+        config.save()
+        messages.success(request, "Configurações atualizadas com sucesso!")
+        return redirect('gestao_configuracao_escola')
+        
+    return render(request, 'core/configuracao_escola.html', {'config': config})
+
+@login_required
+def listar_professores(request):
     professores = Professor.objects.select_related('user', 'user__perfil').all()
     total_ativos = professores.filter(estado='ativo').count()
     total_inativos = professores.filter(estado='inativo').count()
@@ -3601,15 +3836,15 @@ def criar_professor(request):
             return render(request, 'core/professor_form.html', {'post_data': request.POST})
             
         if Professor.objects.filter(bilhete_identidade=bi).exists():
-            messages.error(request, "Já existe um professor cadastrado com este Nº de BI.")
+            messages.error(request, f"Já existe um professor cadastrado com este Nº de BI ({bi}).")
             return render(request, 'core/professor_form.html', {'post_data': request.POST})
             
         if Professor.objects.filter(telefone=telefone).exists():
-            messages.error(request, "Já existe um professor cadastrado com este número de telefone.")
+            messages.error(request, f"Já existe um professor cadastrado com este número de telefone ({telefone}).")
             return render(request, 'core/professor_form.html', {'post_data': request.POST})
             
         if Professor.objects.filter(email=email).exists():
-            messages.error(request, "Já existe um professor cadastrado com este e-mail.")
+            messages.error(request, f"Já existe um professor cadastrado com este e-mail ({email}).")
             return render(request, 'core/professor_form.html', {'post_data': request.POST})
 
         try:

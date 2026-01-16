@@ -1,0 +1,250 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Grade Horária - SIGE{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4" style="background-color: #f8fafc; min-height: 100vh;">
+    <!-- Header de Navegação -->
+    <div class="d-flex align-items-center justify-content-between mb-4 no-print">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Grade Horária</h2>
+            <p class="text-muted mb-0">Visualização semanal por turma - Ano {{ ano_sessao.codigo }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button onclick="window.print()" class="btn btn-primary rounded-pill px-4">
+                <i class="bi bi-printer me-2"></i> Imprimir
+            </button>
+            <a href="{% url 'gestao_horarios' %}" class="btn btn-outline-secondary rounded-pill px-4">
+                <i class="bi bi-arrow-left me-2"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtro de Turma -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 no-print">
+        <div class="card-body p-4">
+            <form method="GET" class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label small fw-bold text-secondary">Selecionar Turma</label>
+                    <select name="turma" class="form-select shadow-none" onchange="this.form.submit()">
+                        <option value="">Escolha uma turma...</option>
+                        {% for t in turmas %}
+                        <option value="{{ t.id }}" {% if turma_selecionada.id == t.id %}selected{% endif %}>{{ t.nome }} ({{ t.curso.nome }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if turma_selecionada %}
+    <!-- Cabeçalho Institucional (Visível na Impressão) -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+        <div class="card-body p-4 border-bottom bg-white">
+            <div class="row align-items-center mb-2">
+                <!-- Visto no Topo Esquerdo -->
+                <div class="col-md-4">
+                    <div class="text-start" style="padding: 5px; min-height: 60px; width: 200px;">
+                        <p class="mb-1 fw-bold text-dark" style="font-size: 0.75rem;">VISTO</p>
+                        <div class="border-bottom border-dark mb-1"></div>
+                        <p class="small fw-bold text-dark mb-0 text-uppercase" style="font-size: 0.55rem; line-height: 1.1;">
+                            {{ instituicao.cargo_responsavel_visto|default:"Presidente para Área Académica e Vida Estudantil" }}
+                        </p>
+                        <p class="small text-muted mb-0" style="font-size: 0.55rem;">{{ instituicao.nome_responsavel_visto }}</p>
+                    </div>
+                </div>
+                
+                <!-- Logo ao Centro -->
+                <div class="col-md-4 text-center">
+                    {% if instituicao.logo %}
+                        <img src="{{ instituicao.logo.url }}" alt="Logo" style="height: 90px; width: auto; object-fit: contain;">
+                    {% else %}
+                        <div class="bg-light rounded d-inline-block p-2 border">
+                            <i class="bi bi-building fs-2 text-secondary"></i>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Espaço vazio à direita -->
+                <div class="col-md-4 text-end small text-muted no-print">
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <div class="d-flex justify-content-center flex-wrap gap-3 small text-muted border-top border-bottom py-2">
+                    <span><strong>CURSO:</strong> {{ turma_selecionada.curso.nome }} ({{ turma_selecionada.curso.codigo }})</span>
+                    <span>|</span>
+                    <span><strong>TURMA:</strong> {{ turma_selecionada.nome }}</span>
+                    <span>|</span>
+                    <span><strong>GRAU:</strong> {{ turma_selecionada.curso.grau.nome }}</span>
+                </div>
+                <div class="d-flex justify-content-center flex-wrap gap-3 small text-muted mt-2">
+                    <span><strong>ANO ACADÉMICO:</strong> {{ ano_sessao.codigo }}</span>
+                    <span>|</span>
+                    <span><strong>PERÍODO:</strong> {{ periodo_atual.nome|default:"Não definido" }}</span>
+                    <span>|</span>
+                    <span><strong>SALA:</strong> {{ horarios.0.sala.nome|default:"-" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered mb-0 text-center align-middle border-dark" style="min-width: 900px;">
+                <thead class="bg-light">
+                    <tr>
+                        <th style="width: 120px;" class="py-3 border-dark">Hora / Dia</th>
+                        {% for dia_id, dia_nome in dias %}
+                        <th class="py-3 border-dark">{{ dia_nome|upper }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% regroup horarios by hora_inicio as horarios_por_hora %}
+                    {% for grupo in horarios_por_hora %}
+                    <tr>
+                        <td class="fw-bold bg-light border-dark py-4">
+                            {{ grupo.grouper|time:"H:i" }}
+                        </td>
+                        {% for dia_id, dia_nome in dias %}
+                        <td class="p-2 border-dark" style="height: 120px; width: 18%; vertical-align: top;">
+                            {% for h in grupo.list %}
+                                {% if h.dia_semana == dia_id %}
+                                <div class="p-2 rounded border border-2 mb-2 bg-white text-start shadow-sm h-100 d-flex flex-column justify-content-between" style="border-left: 5px solid #0d6efd !important;">
+                                    <div>
+                                        <div class="fw-bold text-dark border-bottom pb-1 mb-1" style="font-size: 0.85rem; line-height: 1.2;">
+                                            {{ h.disciplina.nome|upper }}
+                                        </div>
+                                        <div class="small text-secondary mb-1" style="font-size: 0.75rem;">
+                                            <i class="bi bi-person-badge-fill me-1"></i>
+                                            <strong>
+                                                {% if h.professor_data.grau_academico %}
+                                                    {{ h.professor_data.grau_academico }} 
+                                                {% endif %}
+                                                {{ h.professor.perfil.nome_completo|default:h.professor.username }}
+                                            </strong>
+                                            <br>
+                                            <span class="badge bg-light text-dark border p-1 mt-1 fw-normal" style="font-size: 0.65rem;">
+                                                {{ h.professor_data.categoria|default:"Professor" }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-auto d-flex justify-content-center border-top pt-1 text-muted" style="font-size: 0.7rem;">
+                                        <span class="fw-bold text-primary">{{ h.hora_inicio|time:"H:i" }}-{{ h.hora_fim|time:"H:i" }}</span>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="py-5 text-muted">
+                            <i class="bi bi-calendar-x fs-1 d-block mb-3"></i>
+                            Não há horários configurados para esta turma no período selecionado.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Área de Assinaturas -->
+        <div class="card-body p-5 bg-white">
+            <div class="row justify-content-center text-center mt-4">
+                <!-- Assinatura Centralizada -->
+                <div class="col-md-8">
+                    <p class="mb-5 fw-bold text-dark">O RESPONSÁVEL</p>
+                    <div class="mt-4 border-bottom border-dark mx-auto" style="width: 350px;"></div>
+                    <p class="mt-2 mb-0 fw-bold text-dark text-uppercase" style="font-size: 0.95rem;">
+                        {{ instituicao.cargo_responsavel_assinatura|default:"DAAC / Secretário Académico" }}
+                    </p>
+                    <p class="mt-1 mb-0 fw-bold text-dark" style="font-size: 1.1rem;">{{ instituicao.nome_responsavel_assinatura }}</p>
+                    <p class="small text-muted italic">{{ instituicao.grau_responsavel_assinatura }}</p>
+                </div>
+            </div>
+            
+            <div class="text-center mt-5 no-print">
+                <div class="alert alert-info d-inline-block small">
+                    <i class="bi bi-gear me-2"></i>
+                    Aceda às <strong>Configurações da Escola</strong> no menu lateral para alterar logótipo, cargos e nomes.
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    @media print {
+        @page {
+            size: landscape;
+            margin: 0.5cm;
+        }
+        
+        /* Ocultar elementos desnecessários */
+        .no-print, 
+        .btn-primary, 
+        .btn-outline-secondary, 
+        nav, 
+        aside, 
+        .navbar, 
+        .sidebar, 
+        footer,
+        header,
+        .bg-white.border-bottom.py-3.px-4.mb-4.shadow-sm { 
+            display: none !important;
+            height: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* Garantir que o conteúdo ocupe 100% */
+        .container-fluid, .container {
+            padding: 0 !important;
+            margin: 0 !important;
+            background-color: white !important;
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .card {
+            box-shadow: none !important;
+            border: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Forçar layout da tabela */
+        .table-responsive {
+            overflow: visible !important;
+            display: block !important;
+        }
+        
+        .table {
+            width: 100% !important;
+            table-layout: fixed !important;
+            border-collapse: collapse !important;
+        }
+
+        /* Estilos de impressão para cores e bordas */
+        body {
+            background-color: white !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            visibility: hidden; /* Esconde tudo por padrão */
+        }
+
+        .card.border-0.shadow-sm.rounded-4.mb-4.overflow-hidden {
+            visibility: visible; /* Mostra apenas o cartão do horário */
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+    }
+    .table td, .table th {
+        vertical-align: middle;
+    }
+</style>
+{% endblock %}

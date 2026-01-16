@@ -1,0 +1,105 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Editar Horário - SIGE{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0" style="background-color: #f1f5f9; min-height: 100vh;">
+    <!-- Top Header Style -->
+    <div class="bg-white border-bottom py-3 px-4 mb-4 shadow-sm">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <a href="{% url 'listar_horarios' %}" class="btn btn-light rounded-circle me-3 shadow-sm border" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                    <i class="bi bi-arrow-left fs-5"></i>
+                </a>
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb small mb-0 text-muted">
+                            <li class="breadcrumb-item">Gestão académica</li>
+                            <li class="breadcrumb-item">Horário</li>
+                            <li class="breadcrumb-item active fw-bold text-primary">Editar</li>
+                        </ol>
+                    </nav>
+                    <h4 class="mb-0 fw-bold text-dark">Editar Registro de Horário</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container pb-5">
+        <div class="row justify-content-center">
+            <div class="col-xl-8">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="card-header bg-warning text-dark py-3 px-4">
+                        <h6 class="mb-0 fw-bold d-flex align-items-center">
+                            <i class="bi bi-pencil-square me-2"></i> Ajustar Detalhes do Horário
+                        </h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-secondary">Turma</label>
+                                    <select name="turma" class="form-select shadow-none py-2" required>
+                                        {% for t in turmas %}
+                                        <option value="{{ t.id }}" {% if t.id == horario.turma.id %}selected{% endif %}>{{ t.nome }} ({{ t.curso.nome }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-secondary">Disciplina</label>
+                                    <select name="disciplina" class="form-select shadow-none py-2" required>
+                                        {% for d in disciplinas %}
+                                        <option value="{{ d.id }}" {% if d.id == horario.disciplina.id %}selected{% endif %}>{{ d.nome }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label small fw-bold text-secondary">Professor Responsável</label>
+                                    <select name="professor" class="form-select shadow-none py-2" required>
+                                        {% for prof in professores %}
+                                        <option value="{{ prof.id }}" {% if prof.id == horario.professor.id %}selected{% endif %}>{{ prof.get_full_name|default:prof.username }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-secondary">Dia da Semana</label>
+                                    <select name="dia_semana" class="form-select shadow-none py-2" required>
+                                        {% for dia_id, dia_nome in dias_semana %}
+                                        <option value="{{ dia_id }}" {% if dia_id == horario.dia_semana %}selected{% endif %}>{{ dia_nome }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-secondary">Hora Início</label>
+                                    <input type="time" name="hora_inicio" class="form-control shadow-none py-2" value="{{ horario.hora_inicio|time:'H:i' }}" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-secondary">Hora Fim</label>
+                                    <input type="time" name="hora_fim" class="form-control shadow-none py-2" value="{{ horario.hora_fim|time:'H:i' }}" required>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="form-label small fw-bold text-secondary">Sala</label>
+                                    <select name="sala" class="form-select shadow-none py-2" required>
+                                        {% for s in salas %}
+                                        <option value="{{ s.id }}" {% if s.id == horario.sala.id %}selected{% endif %}>{{ s.nome }} ({{ s.get_tipo_display }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-5 d-flex gap-2">
+                                <button type="submit" class="btn btn-warning btn-lg rounded-pill px-5 fw-bold shadow-sm">
+                                    <i class="bi bi-save me-2"></i> SALVAR ALTERAÇÕES
+                                </button>
+                                <a href="{% url 'listar_horarios' %}" class="btn btn-light btn-lg rounded-pill px-5 fw-bold border">
+                                    CANCELAR
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

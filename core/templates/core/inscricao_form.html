@@ -221,23 +221,23 @@
                             </div>
                             <div class="row g-4">
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted">NÍVEL PRETENDIDO *</label>
+                                    <label class="form-label small fw-bold text-muted">NÍVEL PRETENDIDO (Ano Académico) *</label>
                                     <select name="nivel_academico" class="form-select bg-light border-0 py-2 shadow-none rounded-3" required>
                                         <option value="Licenciatura" selected>Licenciatura</option>
                                         <option value="Técnico">Técnico</option>
                                         <option value="Pós-graduação">Pós-graduação</option>
                                     </select>
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6 d-none">
                                     <label class="form-label small fw-bold text-muted">CURSO SELECIONADO</label>
                                     <input type="text" class="form-control bg-light border-0 py-2 shadow-none rounded-3 fw-bold" readonly value="{{ curso.nome }}">
                                     <input type="hidden" name="curso" value="{{ curso.id }}">
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-6 d-none">
                                     <label class="form-label small fw-bold text-muted">ANO LECTIVO *</label>
                                     <select name="ano_academico" class="form-select bg-light border-0 py-2 shadow-none rounded-3" required>
                                         {% for ano in anos_academicos %}
-                                            <option value="{{ ano.id }}" {% if ano.ano_atual %}selected{% endif %}>{{ ano.codigo }}</option>
+                                            <option value="{{ ano.id }}" {% if ano.id == ano_atual.id %}selected{% endif %}>{{ ano.codigo }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>

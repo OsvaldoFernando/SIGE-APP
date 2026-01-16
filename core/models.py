@@ -42,6 +42,10 @@ class AnoAcademico(models.Model):
     def __str__(self):
         return self.codigo
     
+    @classmethod
+    def get_atual(cls):
+        return cls.objects.filter(ano_atual=True).first()
+
     def inscricoes_abertas(self):
         """Verifica se as inscrições estão abertas com base no novo modelo de Eventos"""
         evento = EventoCalendario.objects.filter(
@@ -116,6 +120,7 @@ class PeriodoLectivo(models.Model):
     data_inicio = models.DateField(verbose_name="Data de Início")
     data_fim = models.DateField(verbose_name="Data de Fim")
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='ATIVO', verbose_name="Estado")
+    ativo = models.BooleanField(default=False, verbose_name="Período Corrente")
 
     class Meta:
         verbose_name = "Período Lectivo"
@@ -124,6 +129,11 @@ class PeriodoLectivo(models.Model):
 
     def __str__(self):
         return f"{self.nome} - {self.ano_lectivo}"
+
+    def save(self, *args, **kwargs):
+        if self.ativo:
+            PeriodoLectivo.objects.filter(ano_lectivo=self.ano_lectivo).exclude(pk=self.pk).update(ativo=False)
+        super().save(*args, **kwargs)
 
 class PerfilUsuario(models.Model):
     NIVEL_ACESSO_CHOICES = [
@@ -325,6 +335,24 @@ class ConfiguracaoEscola(models.Model):
     logo = models.ImageField(upload_to='escola/', blank=True, null=True, verbose_name="Logo da Escola")
     favicon = models.ImageField(upload_to='escola/', blank=True, null=True, verbose_name="Favicon")
     
+    # Assinaturas Dinâmicas
+    tipo_ensino = models.CharField(
+        max_length=20, 
+        choices=[('superior', 'Ensino Superior'), ('geral', 'Ensino Geral')], 
+        default='superior',
+        verbose_name="Tipo de Instituição"
+    )
+    
+    # Responsável Principal (Visto)
+    nome_responsavel_visto = models.CharField(max_length=255, blank=True, verbose_name="Nome do Responsável (Visto)")
+    cargo_responsavel_visto = models.CharField(max_length=255, blank=True, verbose_name="Cargo do Responsável (Visto)")
+    grau_responsavel_visto = models.CharField(max_length=100, blank=True, verbose_name="Grau Académico (Visto)")
+    
+    # Responsável Administrativo (Assinatura)
+    nome_responsavel_assinatura = models.CharField(max_length=255, blank=True, verbose_name="Nome do Responsável (Assinatura)")
+    cargo_responsavel_assinatura = models.CharField(max_length=255, blank=True, verbose_name="Cargo do Responsável (Assinatura)")
+    grau_responsavel_assinatura = models.CharField(max_length=100, blank=True, verbose_name="Grau Académico (Assinatura)")
+
     template_confirmacao_inscricao = models.TextField(
         default="CONFIRMAÇÃO DE INSCRIÇÃO\n\nNome: {nome}\nCurso: {curso}\nNúmero de Inscrição: {numero}\nData: {data}",
         verbose_name="Template de Confirmação de Inscrição",
@@ -704,8 +732,28 @@ class TurmaDisciplina(models.Model):
     professor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, limit_choices_to={'perfil__nivel_acesso': 'professor'})
     sala = models.ForeignKey('core.Sala', on_delete=models.SET_NULL, null=True, blank=True)
     
+    # Novos campos para Horário
+    dia_semana = models.CharField(max_length=20, choices=[
+        ('segunda', 'Segunda-feira'),
+        ('terca', 'Terça-feira'),
+        ('quarta', 'Quarta-feira'),
+        ('quinta', 'Quinta-feira'),
+        ('sexta', 'Sexta-feira'),
+        ('sabado', 'Sábado'),
+    ], null=True, blank=True)
+    hora_inicio = models.TimeField(null=True, blank=True)
+    hora_fim = models.TimeField(null=True, blank=True)
+    tempo_tipo = models.CharField(max_length=20, choices=[
+        ('1_semestre', '1º Semestre'),
+        ('2_semestre', '2º Semestre'),
+        ('trimestre', 'Trimestre'),
+    ], null=True, blank=True)
+    
     class Meta:
-        unique_together = ['turma', 'disciplina']
+        # Removendo unique_together antigo para permitir múltiplos horários da mesma disciplina/turma em dias diferentes
+        # unique_together = ['turma', 'disciplina']
+        verbose_name = "Horário de Aula"
+        verbose_name_plural = "Horários de Aula"
 
 class Escola(models.Model):
     nome = models.CharField(max_length=300, verbose_name="Nome da Escola", unique=True)

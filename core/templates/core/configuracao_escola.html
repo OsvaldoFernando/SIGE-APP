@@ -1,0 +1,130 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Configurações da Escola - SIGE{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4" style="background-color: #f1f5f9; min-height: 100vh;">
+    <div class="d-flex align-items-center mb-4">
+        <a href="{% url 'painel_principal' %}" class="btn btn-light rounded-circle me-3 border shadow-sm">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <div>
+            <h4 class="mb-0 fw-bold">Configurações da Escola</h4>
+            <p class="text-muted small mb-0">Personalize a identidade e assinaturas oficiais dos documentos.</p>
+        </div>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row g-4">
+            <!-- Dados Básicos -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="mb-0 fw-bold"><i class="bi bi-building me-2 text-primary"></i>Identidade da Instituição</h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Nome da Escola</label>
+                            <input type="text" name="nome_escola" class="form-control" value="{{ config.nome_escola }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Logótipo</label>
+                            {% if config.logo %}
+                            <div class="mb-2">
+                                <img src="{{ config.logo.url }}" alt="Logo" style="height: 60px;">
+                            </div>
+                            {% endif %}
+                            <input type="file" name="logo" class="form-control" accept="image/*">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Tipo de Ensino</label>
+                            <select name="tipo_ensino" class="form-select">
+                                <option value="superior" {% if config.tipo_ensino == 'superior' %}selected{% endif %}>Ensino Superior</option>
+                                <option value="geral" {% if config.tipo_ensino == 'geral' %}selected{% endif %}>Ensino Geral</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contactos -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <h6 class="mb-0 fw-bold"><i class="bi bi-telephone me-2 text-primary"></i>Informações de Contacto</h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Endereço</label>
+                            <textarea name="endereco" class="form-control" rows="2">{{ config.endereco }}</textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label small fw-bold">Telefone</label>
+                                <input type="text" name="telefone" class="form-control" value="{{ config.telefone }}">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label small fw-bold">E-mail</label>
+                                <input type="email" name="email" class="form-control" value="{{ config.email }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Responsável pelo VISTO -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-header bg-warning bg-opacity-10 py-3 border-bottom border-warning border-opacity-25">
+                        <h6 class="mb-0 fw-bold"><i class="bi bi-patch-check me-2 text-warning"></i>Responsável pelo VISTO (Topo)</h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Título do Cargo (ex: Presidente, Director)</label>
+                            <input type="text" name="cargo_responsavel_visto" class="form-control" value="{{ config.cargo_responsavel_visto }}" placeholder="Ex: Presidente para Área Académica">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Nome Completo</label>
+                            <input type="text" name="nome_responsavel_visto" class="form-control" value="{{ config.nome_responsavel_visto }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Grau Académico (ex: Msc, PhD)</label>
+                            <input type="text" name="grau_responsavel_visto" class="form-control" value="{{ config.grau_responsavel_visto }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Responsável pela ASSINATURA -->
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-header bg-info bg-opacity-10 py-3 border-bottom border-info border-opacity-25">
+                        <h6 class="mb-0 fw-bold"><i class="bi bi-pen me-2 text-info"></i>Responsável pela ASSINATURA (Rodapé)</h6>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Título do Cargo (ex: Coordenador, Chefe de Secretaria)</label>
+                            <input type="text" name="cargo_responsavel_assinatura" class="form-control" value="{{ config.cargo_responsavel_assinatura }}" placeholder="Ex: DAAC / Secretário Académico">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Nome Completo</label>
+                            <input type="text" name="nome_responsavel_assinatura" class="form-control" value="{{ config.nome_responsavel_assinatura }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Grau Académico</label>
+                            <input type="text" name="grau_responsavel_assinatura" class="form-control" value="{{ config.grau_responsavel_assinatura }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 text-end">
+            <button type="submit" class="btn btn-primary btn-lg px-5 rounded-pill fw-bold shadow">
+                <i class="bi bi-save me-2"></i> SALVAR CONFIGURAÇÕES
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -57,4 +57,9 @@ urlpatterns = [
     path('professores/novo/', views.criar_professor, name='criar_professor'),
     path('horarios/', views.gestao_horarios, name='gestao_horarios'),
     path('horarios/registrar/', views.registrar_horario, name='registrar_horario'),
+    path('horarios/grade/', views.visualizar_grade, name='visualizar_grade'),
+    path('horarios/lista/', views.listar_horarios, name='listar_horarios'),
+    path('horarios/editar/<int:pk>/', views.editar_horario, name='editar_horario'),
+    path('horarios/deletar/<int:pk>/', views.deletar_horario, name='deletar_horario'),
+    path('configuracao-escola/', views.gestao_configuracao_escola, name='gestao_configuracao_escola'),
 ]

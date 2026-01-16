@@ -200,11 +200,11 @@
                 {% csrf_token %}
                 <input type="hidden" name="action" value="configurar_propina">
                 <div class="modal-body p-4">
-                    <div class="mb-4 bg-light p-3 rounded-4">
+                    <div class="mb-4 bg-light p-3 rounded-4 d-none">
                         <label class="form-label small fw-bold text-muted text-uppercase">Ano Lectivo Alvo</label>
                         <select name="ano_lectivo" class="form-select border-0 bg-transparent fw-bold" required>
                             {% for ano in anos %}
-                            <option value="{{ ano.id }}">{{ ano.codigo }}</option>
+                            <option value="{{ ano.id }}" {% if ano.id == ano_atual.id %}selected{% endif %}>{{ ano.codigo }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -284,11 +284,11 @@
                 {% csrf_token %}
                 <input type="hidden" name="action" value="criar_evento">
                 <div class="modal-body p-4">
-                    <div class="mb-3">
+                    <div class="mb-3 d-none">
                         <label class="form-label small fw-bold text-muted text-uppercase">Ano Lectivo</label>
                         <select name="ano_lectivo" class="form-select rounded-3" required>
                             {% for ano in anos %}
-                            <option value="{{ ano.id }}">{{ ano.codigo }}</option>
+                            <option value="{{ ano.id }}" {% if ano.id == ano_atual.id %}selected{% endif %}>{{ ano.codigo }}</option>
                             {% endfor %}
                         </select>
                     </div>

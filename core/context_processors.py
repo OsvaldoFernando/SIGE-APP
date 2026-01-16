@@ -14,7 +14,15 @@ def global_academic_context(request):
     }
     
     if request.user.is_authenticated:
-        ano_atual = AnoAcademico.objects.filter(ano_atual=True).first()
+        # Tenta obter o ano acadêmico da sessão ou o padrão atual
+        ano_id = request.session.get('ano_academico_id')
+        if ano_id:
+            ano_atual = AnoAcademico.objects.filter(id=ano_id).first()
+        else:
+            ano_atual = AnoAcademico.get_atual()
+            if ano_atual:
+                request.session['ano_academico_id'] = ano_atual.id
+                
         semestre_atual = None
         if ano_atual:
             semestre_atual = ano_atual.semestres.filter(ativo=True).first()

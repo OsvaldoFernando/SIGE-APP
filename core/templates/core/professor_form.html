@@ -68,17 +68,22 @@
                                             <h5 class="fw-bold mb-0">Acesso ao Sistema</h5>
                                         </div>
                                         <div class="row g-3">
-                                            <div class="col-md-6">
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-semibold small">Código do Professor</label>
+                                                <input type="text" class="form-control bg-light border-0 fw-bold text-primary" value="GERADO AUTOMATICAMENTE" readonly>
+                                                <div class="form-text small">Será gerado após salvar.</div>
+                                            </div>
+                                            <div class="col-md-4">
                                                 <label class="form-label fw-semibold small">Usuário (Username) <span class="text-danger">*</span></label>
                                                 <div class="input-group has-validation">
                                                     <span class="input-group-text bg-light border-end-0"><i class="bi bi-at text-muted"></i></span>
-                                                    <input type="text" name="username" class="form-control bg-light border-start-0 ps-0" placeholder="professor.nome" pattern="^[a-zA-Z0-9._]+$" minlength="3" maxlength="30" value="{{ post_data.username|default:'' }}" required>
+                                                    <input type="text" name="username" class="form-control bg-light border-start-0 ps-0 {% if messages %}{% for message in messages %}{% if 'usuário já existe' in message.message|lower %}is-invalid{% endif %}{% endfor %}{% endif %}" placeholder="professor.nome" pattern="^[a-zA-Z0-9._]+$" minlength="3" maxlength="30" value="{{ post_data.username|default:'' }}" required>
                                                     <div class="invalid-feedback">
-                                                        Mínimo 3 caracteres, letras, números, ponto ou underline.
+                                                        {% if messages %}{% for message in messages %}{% if 'usuário já existe' in message.message|lower %}{{ message }}{% endif %}{% endfor %}{% else %}Mínimo 3 caracteres, letras, números, ponto ou underline.{% endif %}
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
+                                            <div class="col-md-4">
                                                 <label class="form-label fw-semibold small">Senha Inicial <span class="text-danger">*</span></label>
                                                 <div class="input-group has-validation">
                                                     <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-muted"></i></span>
