@@ -33,6 +33,34 @@
         </div>
     </div>
 
+    <!-- Photo Preview (Moved Outside Form) -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-lg-4 col-md-6 text-center">
+            <div id="photo_preview_main" class="bg-white border rounded-4 p-3 shadow-sm">
+                <h6 class="fw-bold mb-3">Sua Foto</h6>
+                <div id="image_preview_container" class="bg-light border rounded-4 d-flex align-items-center justify-content-center position-relative overflow-hidden" style="width: 100%; aspect-ratio: 3/4; max-width: 150px; margin: 0 auto;">
+                    <i class="bi bi-person-bounding-box text-muted opacity-25" id="main_placeholder_icon" style="font-size: 4rem;"></i>
+                    <img id="main_image_preview" src="#" alt="Preview" class="d-none w-100 h-100" style="object-fit: cover;">
+                </div>
+                <p class="small text-muted mt-2 mb-0">Aparecerá aqui após selecionar ou capturar</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Photo Preview (Moved Outside Form) -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-lg-4 col-md-6 text-center">
+            <div id="photo_preview_main" class="bg-white border rounded-4 p-3 shadow-sm">
+                <h6 class="fw-bold mb-3">Sua Foto</h6>
+                <div id="image_preview_container" class="bg-light border rounded-4 d-flex align-items-center justify-content-center position-relative overflow-hidden" style="width: 100%; aspect-ratio: 3/4; max-width: 150px; margin: 0 auto;">
+                    <i class="bi bi-person-bounding-box text-muted opacity-25" id="main_placeholder_icon" style="font-size: 4rem;"></i>
+                    <img id="main_image_preview" src="#" alt="Preview" class="d-none w-100 h-100" style="object-fit: cover;">
+                </div>
+                <p class="small text-muted mt-2 mb-0">Aparecerá aqui após selecionar ou capturar</p>
+            </div>
+        </div>
+    </div>
+
     <div class="row justify-content-center">
         <div class="col-lg-11 col-xl-10">
             <!-- Modern Wizard Card -->
@@ -84,13 +112,14 @@
                                     <div class="text-center">
                                         <div id="photo_preview" class="bg-light border rounded-4 mb-3 d-flex align-items-center justify-content-center position-relative overflow-hidden shadow-sm" style="width: 100%; aspect-ratio: 3/4; max-width: 180px; margin: 0 auto;">
                                             <i class="bi bi-person text-muted opacity-25" id="placeholder_icon" style="font-size: 5rem;"></i>
+                                            <img id="image_preview_img" src="#" alt="Preview" class="d-none w-100 h-100" style="object-fit: cover;">
                                             <video id="webcam_video" style="display: none; width: 100%; height: 100%; object-fit: cover;" autoplay playsinline></video>
                                             <canvas id="photo_canvas" style="display: none;"></canvas>
                                         </div>
                                         <div class="d-grid gap-2">
                                             <label class="btn btn-outline-dark btn-sm rounded-3">
                                                 <i class="bi bi-upload me-1"></i> Do PC
-                                                <input type="file" name="foto" id="id_foto" hidden accept="image/*">
+                                                <input type="file" name="foto" id="id_foto" hidden accept="image/*" onchange="previewFile(this)">
                                             </label>
                                             <button type="button" id="btn_webcam" class="btn btn-outline-primary btn-sm rounded-3">
                                                 <i class="bi bi-camera me-1"></i> Webcam
@@ -397,7 +426,118 @@
 </style>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+    function previewFile(input) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        const mainPreview = document.getElementById('main_image_preview');
+        const mainPlaceholder = document.getElementById('main_placeholder_icon');
+        const placeholder = document.getElementById('placeholder_icon');
+        const video = document.getElementById('webcam_video');
+        const smallPreview = document.getElementById('image_preview_small');
+
+        reader.onloadend = function () {
+            // Update Main Preview
+            if (mainPreview) {
+                mainPreview.src = reader.result;
+                mainPreview.classList.remove('d-none');
+            }
+            if (mainPlaceholder) {
+                mainPlaceholder.classList.add('d-none');
+            }
+            
+            // Update Small Preview inside Wizard
+            if (smallPreview) {
+                smallPreview.src = reader.result;
+                smallPreview.classList.remove('d-none');
+            }
+            if (placeholder) {
+                placeholder.classList.add('d-none');
+            }
+            if (video) {
+                video.style.display = 'none';
+            }
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function previewFile(input) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        const mainPreview = document.getElementById('main_image_preview');
+        const mainPlaceholder = document.getElementById('main_placeholder_icon');
+        const placeholder = document.getElementById('placeholder_icon');
+        const video = document.getElementById('webcam_video');
+        const smallPreview = document.getElementById('image_preview_small');
+
+        reader.onloadend = function () {
+            // Update Main Preview
+            if (mainPreview) {
+                mainPreview.src = reader.result;
+                mainPreview.classList.remove('d-none');
+            }
+            if (mainPlaceholder) {
+                mainPlaceholder.classList.add('d-none');
+            }
+            
+            // Update Small Preview inside Wizard
+            if (smallPreview) {
+                smallPreview.src = reader.result;
+                smallPreview.classList.remove('d-none');
+            }
+            if (placeholder) {
+                placeholder.classList.add('d-none');
+            }
+            if (video) {
+                video.style.display = 'none';
+            }
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function previewFile(input) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        const mainPreview = document.getElementById('main_image_preview');
+        const mainPlaceholder = document.getElementById('main_placeholder_icon');
+        const placeholder = document.getElementById('placeholder_icon');
+        const video = document.getElementById('webcam_video');
+        const smallPreview = document.getElementById('image_preview_img');
+
+        reader.onloadend = function () {
+            // Update Main Preview (if it exists)
+            if (mainPreview) {
+                mainPreview.src = reader.result;
+                mainPreview.classList.remove('d-none');
+            }
+            if (mainPlaceholder) {
+                mainPlaceholder.classList.add('d-none');
+            }
+            
+            // Update Small Preview inside Wizard
+            if (smallPreview) {
+                smallPreview.src = reader.result;
+                smallPreview.classList.remove('d-none');
+            }
+            if (placeholder) {
+                placeholder.classList.add('d-none');
+            }
+            if (video) {
+                video.style.display = 'none';
+            }
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
     let currentStep = 1;
     const totalSteps = 5;
     const form = document.getElementById('inscricaoForm');
