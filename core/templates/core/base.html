@@ -41,7 +41,8 @@
         main {
             flex: 1 0 auto;
             width: 100%;
-            padding-bottom: 100px;
+            padding-top: 20px;
+            padding-bottom: 120px; /* Aumentado para garantir espaço antes do rodapé */
         }
 
         footer {
@@ -50,9 +51,9 @@
             color: white;
             padding: 25px 0;
             width: 100%;
-            margin-top: auto;
             border-top: 5px solid var(--secondary-color);
-            position: relative;
+            position: relative; /* Mantém o rodapé no fluxo normal, mas permite que ele seja "empurrado" pelo flex */
+            margin-top: auto;
             z-index: 1000;
         }
 
@@ -130,45 +131,67 @@
 
         .navbar-top {
             flex-shrink: 0;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            height: 70px;
+            background: linear-gradient(90deg, #1e3a8a 0%, #065f46 100%);
+            height: 60px;
             color: white;
             display: flex;
             align-items: center;
-            padding: 0 20px;
-            z-index: 10001; /* Garante que fique acima de tudo */
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 0 15px;
+            z-index: 10001;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        .user-info {
+        .user-logo-container {
+            background: white;
+            padding: 4px 8px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            justify-content: center;
+            height: 40px;
+            margin-right: 15px;
+        }
+        .user-logo-container img {
+            height: 25px;
+            width: auto;
+            object-fit: contain;
+            display: block;
+        }
+        .academic-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255,255,255,0.9);
+            font-weight: 500;
+        }
+        .nav-icon-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transition: all 0.2s;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.2);
         }
         .user-avatar {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.15);
+            background: white;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.2);
-        }
-        .user-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .academic-badge {
-            background: rgba(255,255,255,0.1);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            border: 1px solid rgba(255,255,255,0.2);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            border: 2px solid rgba(255,255,255,0.8);
+            position: relative;
         }
         .user-dropdown-menu {
             border: none;
@@ -304,8 +327,11 @@
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); opacity: 0.7; }
         }
         main {
-            flex: 1;
+            flex: 1 0 auto;
+            width: 100%;
             padding-top: 20px;
+            padding-bottom: 100px; /* Aumentado para garantir espaço */
+            margin-bottom: 0;
         }
         .card {
             transition: transform 0.3s;
@@ -349,40 +375,39 @@
     {% if user.is_authenticated %}
     <div class="navbar-top">
         <div class="navbar-content d-flex justify-content-between align-items-center w-100">
-            <div class="d-flex align-items-center gap-4">
-                <div class="user-info">
-                    <a href="/" class="user-logo" style="height: 48px; display: flex; align-items: center; text-decoration: none;">
+            <div class="d-flex align-items-center">
+                <div class="user-logo-container">
+                    <a href="/" style="text-decoration: none; display: flex; align-items: center;">
                         {% if config.logo %}
-                            <img src="{{ config.logo.url }}" alt="Logo" style="height: 48px; width: auto; max-width: 150px; object-fit: contain; display: block;" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\'fw-bold fs-4 text-white\'>SIGE</span>';">
+                            <img src="{{ config.logo.url }}" alt="Logo" style="height: 25px; width: auto;" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\'fw-bold text-primary\' style=\'font-size: 1.2rem;\'>SIGE</span>';">
                         {% else %}
-                            <span class="fw-bold fs-4 text-white">SIGE</span>
+                            <span class="fw-bold text-primary" style="font-size: 1.2rem;">SIGE</span>
                         {% endif %}
                     </a>
                 </div>
+                
                 {% if ano_atual %}
-                <div class="academic-badge d-none d-lg-flex">
-                    <span><i class="bi bi-calendar3"></i> {{ ano_atual }}</span>
-                    <span class="ms-2 border-start ps-2"><i class="bi bi-clock"></i> <span id="real-time-clock">--:--:--</span></span>
+                <div class="academic-badge">
+                    <span><i class="bi bi-calendar3 me-1"></i> {{ ano_atual }}</span>
+                    <span class="ms-2 border-start ps-2"><i class="bi bi-clock me-1"></i> <span id="real-time-clock">--:--:--</span></span>
                 </div>
                 {% endif %}
             </div>
 
             <div class="d-flex align-items-center gap-3">
-                <div class="d-flex align-items-center gap-2">
-                    <a href="{% url 'notificacoes' %}" class="nav-icon-btn" title="Notificações">
-                        <i class="bi bi-bell fs-5"></i>
-                        {% if nao_lidas_count > 0 %}
-                            <span class="nav-icon-badge"></span>
-                        {% endif %}
-                    </a>
-                </div>
+                <button type="button" class="nav-icon-btn" title="Notificações" data-bs-toggle="modal" data-bs-target="#modalNotificacoesRapidas">
+                    <i class="bi bi-bell fs-5"></i>
+                    {% if nao_lidas_count > 0 %}
+                        <span class="nav-icon-badge"></span>
+                    {% endif %}
+                </button>
 
                 <div class="dropdown">
-                    <div class="user-avatar" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer; background: white; border: 2px solid rgba(255,255,255,0.5); width: 48px; height: 48px; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative;">
+                    <div class="user-avatar" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
                         {% if user_perfil.foto %}
-                            <img src="{{ user_perfil.foto.url }}" alt="{{ user.username }}" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'d-flex align-items-center justify-content-center w-100 h-100 fw-bold text-primary\' style=\'background: #e0f2fe; font-size: 1.2rem;\'>{{ user.username|slice:":2"|upper }}</div><div class=\'online-indicator\'></div>';">
+                            <img src="{{ user_perfil.foto.url }}" alt="{{ user.username }}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'d-flex align-items-center justify-content-center w-100 h-100 fw-bold text-primary\' style=\'background: #e0f2fe; font-size: 1rem;\'>{{ user.username|slice:":2"|upper }}</div>';">
                         {% else %}
-                            <div class="d-flex align-items-center justify-content-center w-100 h-100 fw-bold text-primary" style="background: #e0f2fe; font-size: 1.2rem;">
+                            <div class="d-flex align-items-center justify-content-center w-100 h-100 fw-bold text-primary" style="background: #e0f2fe; font-size: 1rem;">
                                 {{ user.username|slice:":2"|upper }}
                             </div>
                         {% endif %}
@@ -455,6 +480,48 @@
     </div>
 
     <div class="toast-container" id="toast-container"></div>
+
+    <!-- Modal de Notificações Rápidas (Global) -->
+    <div class="modal fade" id="modalNotificacoesRapidas" tabindex="-1" aria-labelledby="modalNotificacoesRapidasLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="modalNotificacoesRapidasLabel">Notificações</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body py-4">
+                    {% if notificacoes_recente %}
+                        <div class="list-group list-group-flush gap-2">
+                            {% for notif in notificacoes_recente %}
+                                <div class="list-group-item rounded-3 border-0 p-3 bg-light bg-opacity-50 mb-2">
+                                    <div class="d-flex gap-3">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-info-circle fs-5"></i>
+                                        </div>
+                                        <div>
+                                            <p class="mb-1 text-dark fw-medium small">{{ notif.mensagem }}</p>
+                                            <span class="text-muted" style="font-size: 0.7rem;">{{ notif.data_criacao|date:"d/m/Y H:i" }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                <i class="bi bi-bell-slash text-muted fs-3"></i>
+                            </div>
+                            <h6 class="fw-bold text-dark">Nenhuma notificação</h6>
+                            <p class="text-muted small">Você está em dia com seus avisos.</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal de Confirmação de Logout -->
     <div class="modal fade" id="logoutConfirmModal" tabindex="-1" aria-labelledby="logoutConfirmModalLabel" aria-hidden="true">

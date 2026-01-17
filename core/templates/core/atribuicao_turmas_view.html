@@ -1,65 +1,154 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Atribuição de Turmas - SIGE{% endblock %}
+{% block title %}Atribuição de Turmas - SIGE ERP{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
+<div class="container-fluid px-4 py-4 mb-5">
+    <!-- ERP Header Section -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6">
+            <h1 class="h3 fw-bold text-dark mb-1" style="letter-spacing: -0.5px;">Gestão de Turmas</h1>
             <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-2">
-                    <li class="breadcrumb-item"><a href="{% url 'painel_principal' %}" class="text-decoration-none">Painel</a></li>
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'painel_principal' %}">Painel</a></li>
                     <li class="breadcrumb-item active">Atribuição de Turmas</li>
                 </ol>
             </nav>
-            <h2 class="fw-bold mb-0">Gestão de <span class="text-primary">Turmas</span></h2>
         </div>
-        <button class="btn btn-primary rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalCriarTurma">
-            <i class="bi bi-plus-lg me-2"></i>Criar Turma
-        </button>
+        <div class="col-md-6 text-md-end mt-3 mt-md-0">
+            <button class="btn btn-primary rounded-3 px-4 shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalCriarTurma">
+                <i class="bi bi-plus-lg me-2"></i>Nova Turma
+            </button>
+        </div>
     </div>
 
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+    <!-- Analytics Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+                <div class="d-flex align-items-center">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-3 me-3">
+                        <i class="bi bi-people fs-4"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted small fw-bold text-uppercase mb-0">Total Turmas</h6>
+                        <h4 class="fw-bold mb-0">{{ turmas.count }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-white h-100">
+                <div class="d-flex align-items-center">
+                    <div class="bg-success bg-opacity-10 text-success rounded-circle p-3 me-3">
+                        <i class="bi bi-check-circle fs-4"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-muted small fw-bold text-uppercase mb-0">Ativas</h6>
+                        <h4 class="fw-bold mb-0">{{ turmas.count }}</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Card -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
+        <div class="card-header bg-white py-3 border-bottom">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h5 class="fw-bold mb-0 text-dark">Lista de Turmas e Atribuições</h5>
+                </div>
+                <div class="col-auto">
+                    <div class="input-group input-group-sm" style="width: 250px;">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control bg-light border-start-0" placeholder="Pesquisar turma...">
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light">
                     <tr>
-                        <th class="ps-4">Turma</th>
-                        <th>Curso</th>
-                        <th>Sala</th>
-                        <th>Ano Lectivo</th>
-                        <th>Ano Académico</th>
-                        <th>Período</th>
-                        <th>Disciplinas</th>
-                        <th class="text-end pe-4">Ações</th>
+                        <th class="ps-4 text-muted small fw-bold text-uppercase">Turma</th>
+                        <th class="text-muted small fw-bold text-uppercase">Curso / Ano</th>
+                        <th class="text-muted small fw-bold text-uppercase">Localização</th>
+                        <th class="text-muted small fw-bold text-uppercase">Ano Lectivo</th>
+                        <th class="text-muted small fw-bold text-uppercase text-center">Disciplinas</th>
+                        <th class="text-end pe-4 text-muted small fw-bold text-uppercase">Ações</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="border-top-0">
                     {% for turma in turmas %}
                     <tr>
-                        <td class="ps-4 fw-bold text-dark">{{ turma.nome }}</td>
-                        <td>{{ turma.curso.nome }}</td>
-                        <td>{{ turma.sala.nome|default:"-" }}</td>
-                        <td><span class="badge bg-info bg-opacity-10 text-info">{{ turma.ano_lectivo.codigo }}</span></td>
-                        <td>{{ turma.ano_academico }}º Ano</td>
-                        <td>{{ turma.periodo_curricular }}º Período</td>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="bg-light rounded-circle p-2 me-3 text-primary">
+                                    <i class="bi bi-door-closed fs-5"></i>
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-dark">{{ turma.nome }}</div>
+                                    <div class="text-muted small">ID: #{{ turma.id|stringformat:"04d" }}</div>
+                                </div>
+                            </div>
+                        </td>
                         <td>
-                            <span class="badge bg-secondary rounded-pill">{{ turma.turmadisciplina_set.count }}</span>
+                            <div class="fw-medium text-dark">{{ turma.curso.nome }}</div>
+                            <div class="text-muted small">{{ turma.ano_academico }}º Ano | {{ turma.periodo_curricular }}º Período</div>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-geo-alt me-2 text-primary opacity-50"></i>
+                                <span>{{ turma.sala.nome|default:"Não definida" }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-10 rounded-pill px-3">
+                                {{ turma.ano_lectivo.codigo }}
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary border rounded-pill px-3">
+                                {{ turma.turmadisciplina_set.count }} Disciplinas
+                            </span>
                         </td>
                         <td class="text-end pe-4">
-                            <a href="{% url 'detalhe_turma' turma.id %}" class="btn btn-sm btn-outline-primary rounded-pill">Ver Detalhes</a>
+                            <div class="btn-group">
+                                <a href="{% url 'detalhe_turma' turma.id %}" class="btn btn-sm btn-light border rounded-3 px-3 me-2">
+                                    <i class="bi bi-eye me-1"></i> Detalhes
+                                </a>
+                                <button class="btn btn-sm btn-light border rounded-3 text-danger" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="text-center py-5">
-                            <i class="bi bi-people display-4 text-muted opacity-25 d-block mb-3"></i>
-                            <p class="text-muted">Nenhuma turma cadastrada.</p>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="opacity-25 mb-3">
+                                <i class="bi bi-people" style="font-size: 4rem;"></i>
+                            </div>
+                            <h5 class="text-muted fw-light">Nenhuma turma cadastrada no sistema.</h5>
+                            <button class="btn btn-primary btn-sm mt-2 rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#modalCriarTurma">Criar Primeira Turma</button>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
+        <div class="card-footer bg-white py-3 border-top-0">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-muted small">Mostrando {{ turmas.count }} turmas</span>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item disabled"><a class="page-link border-0 bg-transparent" href="#"><i class="bi bi-chevron-left"></i></a></li>
+                        <li class="page-item active"><a class="page-link rounded-circle mx-1 border-0 shadow-sm" href="#">1</a></li>
+                        <li class="page-item disabled"><a class="page-link border-0 bg-transparent" href="#"><i class="bi bi-chevron-right"></i></a></li>
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
 </div>

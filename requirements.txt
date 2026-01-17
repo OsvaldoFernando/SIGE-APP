@@ -19,3 +19,9 @@ docx
 gunicorn
 qrcode
 reportlab
+Django
+gunicorn
+pillow
+python-docx
+qrcode
+reportlab

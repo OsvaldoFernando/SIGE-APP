@@ -79,7 +79,7 @@
     </div>
 
     <!-- ERP Action Grid -->
-    <div class="row g-4 mb-5 pb-5">
+    <div class="row g-4 mb-3">
         <!-- Main Actions -->
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
@@ -131,27 +131,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Configurações -->
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
-                <div class="card-header bg-white py-2 border-bottom">
-                    <h6 class="fw-bold mb-0" style="font-size: 0.85rem;"><i class="bi bi-list-task me-2 text-info"></i>Configurações Académicas</h6>
-                </div>
-                <div class="card-body p-3">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <a href="{% url 'cursos_disciplinas' %}" class="erp-action-link py-2" style="font-size: 0.8rem;">
-                                <i class="bi bi-book-half me-2"></i> Matriz de Cursos
-                            </a>
-                        </div>
-                        <div class="col-md-6">
-                            <a href="{% url 'ano_academico_lista' %}" class="erp-action-link py-2" style="font-size: 0.8rem;">
-                                <i class="bi bi-calendar-event me-2"></i> Anos Lectivos
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Sidebar Info -->
@@ -185,11 +164,6 @@
                     </div>
                     {% endif %}
                 </div>
-            </div>
-
-            <div class="alert alert-primary border-0 rounded-4 p-4 shadow-sm mb-0">
-                <h6 class="fw-bold mb-2"><i class="bi bi-shield-lock-fill me-2"></i>Segurança Académica</h6>
-                <p class="small mb-0 opacity-75">Todas as admissões requerem validação documental de acordo com o regulamento interno da instituição.</p>
             </div>
         </div>
     </div>
