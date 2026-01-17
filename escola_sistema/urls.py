@@ -62,8 +62,7 @@ urlpatterns = [
     path('assiduidade-docentes/', views.assiduidade_docentes, name='assiduidade_docentes'),
     path('gestao-licencas/', views.gestao_licencas, name='gestao_licencas'),
     path('avaliacao-desempenho/', views.avaliacao_desempenho, name='avaliacao_desempenho'),
-    path('gestao-administrativa/', views.gestao_administrativa, name='gestao_administrativa'),
-    path('painel-admin/', views.painel_admin, name='painel_admin'),
+    path('documentos/', views.painel_admin, name='painel_admin'),
     path('recursos-humanos/', views.recursos_humanos, name='recursos_humanos'),
     path('departamentos/', views.departamentos, name='departamentos'),
     path('recrutamento/', views.recrutamento, name='recrutamento'),
@@ -101,7 +100,7 @@ urlpatterns = [
     path('niveis-academicos/novo/', views.nivel_academico_create, name='nivel_academico_create'),
     path('niveis-academicos/<int:pk>/editar/', views.nivel_academico_edit, name='nivel_academico_edit'),
     path('niveis-academicos/<int:pk>/deletar/', views.nivel_academico_delete, name='nivel_academico_delete'),
-    
+
     path('login/', views.login_view, name='login'),
     path('registro/', views.registro_view, name='registro'),
     path('logout/', views.logout_view, name='logout'),
@@ -116,7 +115,7 @@ urlpatterns = [
     path('redefinir-senha/<str:token>/', views.redefinir_senha_email_view, name='redefinir_senha_email'),
     # path('perfis-pendentes/', views.perfis_pendentes_view, name='perfis_pendentes'),
     # path('atribuir-perfil/<int:perfil_id>/', views.atribuir_perfil_view, name='atribuir_perfil'),
-    path('documentos/', views.gestao_documentos, name='gestao_documentos'),
+    path('documentos-config/', views.gestao_documentos, name='gestao_documentos'),
     path('documentos/novo/', views.documento_criar, name='documento_criar'),
     path('documentos/<int:documento_id>/editar/', views.documento_editar, name='documento_editar'),
     path('documentos/<int:documento_id>/deletar/', views.documento_deletar, name='documento_deletar'),

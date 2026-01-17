@@ -2880,11 +2880,15 @@ def detalhe_turma(request, turma_id):
             messages.success(request, f"Vínculo da disciplina {td.disciplina.nome} atualizado.")
             return redirect('detalhe_turma', turma_id=turma.id)
 
+    from .models import ConfiguracaoEscola
+    config = ConfiguracaoEscola.objects.first()
+
     context = {
         'turma': turma,
         'disciplinas_turma': disciplinas_turma,
         'professores': professores,
         'salas': salas,
+        'config': config,
     }
     return render(request, 'core/detalhe_turma_view.html', context)
 
@@ -2905,11 +2909,6 @@ def avaliacao_desempenho(request):
     """View para avaliação de desempenho"""
     context = {}
     return render(request, 'core/avaliacao_desempenho_view.html', context)
-
-@login_required
-def gestao_administrativa(request):
-    """View para página principal de gestão administrativa"""
-    return render(request, 'core/gestao_administrativa.html')
 
 @login_required
 def painel_admin(request):
@@ -3183,23 +3182,44 @@ def gerar_pdf_documento(request, documento_id, inscricao_id=None):
         inscricao = get_object_or_404(Inscricao, id=inscricao_id)
         config = ConfiguracaoEscola.objects.first()
         
-        # Preparar dados da inscrição para o documento
+        # Preparar dados abrangentes ERP
         dados = {
-            'nome': inscricao.nome_completo,
-            'bilhete_identidade': inscricao.bilhete_identidade,
-            'email': inscricao.email,
-            'telefone': inscricao.telefone,
-            'data_nascimento': inscricao.data_nascimento.strftime('%d/%m/%Y'),
-            'curso': inscricao.curso.nome,
+            # Geral
+            'escola_nome': config.nome_escola if config else 'SIGA',
+            'escola_decreto': config.decreto_legalidade if config else '',
+            'escola_endereco': config.endereco if config else '',
+            'escola_telefone': config.telefone if config else '',
+            'escola_email': config.email if config else '',
+            'data_atual': date.today().strftime('%d/%m/%Y'),
+            'usuario_logado': request.user.get_full_name() or request.user.username,
+            
+            # Estudante
+            'nome_completo': inscricao.nome_completo,
+            'primeiro_nome': inscricao.primeiro_nome,
+            'apelido': inscricao.apelido,
             'numero_inscricao': inscricao.numero_inscricao,
-            'data_inscricao': inscricao.data_inscricao.strftime('%d/%m/%Y'),
-            'data_hoje': date.today().strftime('%d/%m/%Y'),
-            'nome_escola': config.nome_escola if config else 'SIGE',
-            'endereco': inscricao.endereco,
-            'sexo': dict(Inscricao._meta.get_field('sexo').choices).get(inscricao.sexo, ''),
-            'estado_civil': dict(Inscricao._meta.get_field('estado_civil').choices).get(inscricao.estado_civil, ''),
+            'numero_processo': getattr(inscricao, 'numero_processo', '---'),
+            'bilhete_identidade': inscricao.bilhete_identidade,
             'nacionalidade': inscricao.nacionalidade,
-            'local_nascimento': inscricao.local_nascimento,
+            'naturalidade': inscricao.local_nascimento,
+            'data_nascimento': inscricao.data_nascimento.strftime('%d/%m/%Y') if inscricao.data_nascimento else '',
+            'sexo': inscricao.get_sexo_display() if hasattr(inscricao, 'get_sexo_display') else '',
+            'endereco_estudante': inscricao.endereco,
+            'telefone_estudante': inscricao.telefone,
+            'email_estudante': inscricao.email,
+            
+            # Académico
+            'curso_nome': inscricao.curso.nome,
+            'curso_codigo': inscricao.curso.codigo,
+            'grau_academico': inscricao.curso.grau.nome,
+            'turma_nome': getattr(inscricao, 'turma_nome', '---'),
+            'ano_academico': str(inscricao.ano_academico),
+            'semestre_atual': '---',
+            'status_academico': 'Ativo' if inscricao.aprovado else 'Pendente',
+            
+            # Assinaturas
+            'diretor_geral': config.nome_responsavel_visto if config else '',
+            'diretor_academico': config.nome_responsavel_assinatura if config else '',
         }
     else:
         # Dados de exemplo se não houver inscrição

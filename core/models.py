@@ -314,10 +314,33 @@ class Documento(models.Model):
     @classmethod
     def obter_variaveis_disponiveis(cls, *args, **kwargs):
         return {
-            'Geral': ['{escola_nome}', '{data_atual}'],
-            'Inscrição': ['{nome_candidato}', '{numero_inscricao}', '{curso_nome}', '{data_inscricao}'],
-            'Financeiro': ['{valor_pagamento}', '{data_pagamento}', '{numero_comprovante}'],
-            'Académico': ['{nome_estudante}', '{curso_nome}', '{semestre_atual}'],
+            'Geral': [
+                '{escola_nome}', '{escola_decreto}', '{escola_endereco}', 
+                '{escola_telefone}', '{escola_email}', '{data_atual}', 
+                '{usuario_logado}', '{nif_escola}'
+            ],
+            'Candidato / Estudante': [
+                '{nome_completo}', '{primeiro_nome}', '{apelido}', '{numero_inscricao}', 
+                '{numero_processo}', '{bilhete_identidade}', '{nacionalidade}', 
+                '{naturalidade}', '{data_nascimento}', '{sexo}', '{estado_civil}',
+                '{endereco_estudante}', '{telefone_estudante}', '{email_estudante}'
+            ],
+            'Académico': [
+                '{curso_nome}', '{curso_codigo}', '{grau_academico}', '{turma_nome}', 
+                '{ano_academico}', '{semestre_atual}', '{media_final}', 
+                '{status_academico}', '{data_inicio_curso}', '{data_fim_curso}'
+            ],
+            'Financeiro': [
+                '{valor_pagamento}', '{data_pagamento}', '{numero_comprovante}', 
+                '{tipo_pagamento}', '{status_pagamento}', '{valor_extenso}'
+            ],
+            'Responsáveis': [
+                '{pai_nome}', '{mae_nome}', '{encarregado_nome}', 
+                '{encarregado_telefone}', '{encarregado_parentesco}'
+            ],
+            'Assinaturas': [
+                '{diretor_geral}', '{diretor_academico}', '{secretario_geral}'
+            ]
         }
 
     class Meta:

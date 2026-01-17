@@ -64,35 +64,31 @@
 
                             <h6 class="fw-bold text-uppercase small text-muted mb-3">Dica de Variáveis</h6>
                             <p class="x-small text-muted mb-0">Use as chaves para dados dinâmicos:</p>
-                            <div class="d-flex flex-wrap gap-2 mt-2">
-                                <span class="badge bg-white text-dark shadow-sm py-2 px-3">{nome}</span>
-                                <span class="badge bg-white text-dark shadow-sm py-2 px-3">{bi}</span>
-                                <span class="badge bg-white text-dark shadow-sm py-2 px-3">{curso}</span>
-                                <span class="badge bg-white text-dark shadow-sm py-2 px-3">{data}</span>
+                            <div class="d-flex flex-wrap gap-2 mt-2" style="max-height: 400px; overflow-y: auto;">
+                                {% for categoria, chaves in variaveis.items %}
+                                    <div class="w-100 mt-3 mb-1">
+                                        <small class="text-primary fw-bold text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ categoria }}</small>
+                                    </div>
+                                    {% for chave in chaves %}
+                                        <span class="badge bg-white text-dark shadow-sm py-2 px-3 border variable-badge" 
+                                              style="cursor: pointer; transition: all 0.2s;" 
+                                              onclick="insertVar('{{ chave }}')"
+                                              onmouseover="this.classList.add('bg-primary', 'text-white')"
+                                              onmouseout="this.classList.remove('bg-primary', 'text-white')">
+                                            {{ chave }}
+                                        </span>
+                                    {% endfor %}
+                                {% empty %}
+                                    <div class="text-muted small">Nenhuma variável disponível.</div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
 
-                    <!-- Editor "Word" -->
+                            <!-- Editor "Word" -->
                     <div class="col-lg-8">
-                        <div class="word-editor-container shadow-sm">
-                            <div class="word-toolbar bg-light border-bottom p-2 d-flex flex-wrap gap-1">
-                                <button type="button" class="btn btn-sm btn-white border shadow-sm" title="Negrito"><i class="bi bi-type-bold"></i></button>
-                                <button type="button" class="btn btn-sm btn-white border shadow-sm" title="Itálico"><i class="bi bi-type-italic"></i></button>
-                                <button type="button" class="btn btn-sm btn-white border shadow-sm" title="Sublinhado"><i class="bi bi-type-underline"></i></button>
-                                <div class="vr mx-1"></div>
-                                <button type="button" class="btn btn-sm btn-white border shadow-sm" title="Alinhar à Esquerda"><i class="bi bi-text-left"></i></button>
-                                <button type="button" class="btn btn-sm btn-white border shadow-sm" title="Centralizar"><i class="bi bi-text-center"></i></button>
-                                <button type="button" class="btn btn-sm btn-white border shadow-sm" title="Alinhar à Direita"><i class="bi bi-text-right"></i></button>
-                                <div class="vr mx-1"></div>
-                                <button type="button" class="btn btn-sm btn-white border shadow-sm" title="Inserir Variável"><i class="bi bi-braces"></i></button>
-                            </div>
-                            <div class="word-page-container p-5 bg-secondary bg-opacity-10">
-                                <div class="word-page bg-white shadow mx-auto p-5" style="min-height: 842px; width: 100%; max-width: 595px;">
-                                    <textarea name="conteudo" class="word-textarea w-100 border-0" rows="30" 
-                                              placeholder="Comece a digitar o conteúdo do seu documento aqui..." required>{{ documento.conteudo|default:'' }}</textarea>
-                                </div>
-                            </div>
+                        <div class="word-editor-container shadow-sm border-0">
+                            <textarea name="conteudo" id="editor" class="w-100">{{ documento.conteudo|default:'' }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -101,23 +97,66 @@
     </div>
 </div>
 
+<!-- CKEditor 5 Classic Build -->
+<script src="https://cdn.ckeditor.com/ckeditor5/40.0.0/classic/ckeditor.js"></script>
+
 <style>
+    .ck-editor__editable {
+        min-height: 842px;
+        width: 100%;
+        max-width: 595px;
+        margin: 20px auto;
+        padding: 50px !important;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 12pt;
+        line-height: 1.5;
+        border: 1px solid #ddd !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .ck-toolbar {
+        border-radius: 12px 12px 0 0 !important;
+        border: 1px solid #e2e8f0 !important;
+        background-color: #f8fafc !important;
+        padding: 8px !important;
+    }
+    .ck-content { border-radius: 0 0 12px 12px !important; }
     .btn-white { background-color: white; color: #444; }
     .btn-white:hover { background-color: #f8f9fa; }
-    .word-editor-container { background-color: white; border-radius: 12px; overflow: hidden; border: 1px solid #e0e0e0; }
-    .word-page { border: 1px solid #ddd; }
-    .word-textarea { 
-        resize: none; 
-        outline: none; 
-        font-family: 'Times New Roman', Times, serif; 
-        font-size: 14pt; 
-        line-height: 1.5;
-        color: #333;
-    }
+    .word-editor-container { background-color: #f1f5f9; border-radius: 12px; padding: 20px; }
     .x-small { font-size: 0.75rem; }
-    .form-control:focus, .form-select:focus { 
-        background-color: white; 
-        box-shadow: 0 0 0 0.25rem rgba(30, 58, 138, 0.1); 
-    }
+    .variable-badge:hover { transform: scale(1.05); }
 </style>
+
+<script>
+    let editorInstance;
+
+    ClassicEditor
+        .create(document.querySelector('#editor'), {
+            toolbar: [
+                'heading', '|', 
+                'bold', 'italic', 'underline', 'strikethrough', '|',
+                'fontSize', 'fontColor', 'fontBackgroundColor', '|',
+                'alignment', 'bulletedList', 'numberedList', '|',
+                'outdent', 'indent', '|',
+                'insertTable', 'link', 'blockQuote', '|',
+                'undo', 'redo'
+            ],
+            language: 'pt'
+        })
+        .then(editor => {
+            editorInstance = editor;
+        })
+        .catch(error => {
+            console.error(error);
+        });
+
+    function insertVar(key) {
+        if (editorInstance) {
+            editorInstance.model.change(writer => {
+                const insertPosition = editorInstance.model.document.selection.getFirstPosition();
+                writer.insertText(key, insertPosition);
+            });
+        }
+    }
+</script>
 {% endblock %}

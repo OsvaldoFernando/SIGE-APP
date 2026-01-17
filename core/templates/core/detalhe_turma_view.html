@@ -7,6 +7,22 @@
     <!-- ERP Header Section -->
     <div class="row align-items-center mb-4">
         <div class="col-md-8">
+            <div class="print-only mb-5">
+                <div class="row">
+                    <div class="col-4 text-start">
+                        <div style="border-bottom: 1px solid #000; width: 100%; margin-bottom: 5px;">
+                            <p class="small fw-bold mb-0 text-uppercase">Visto</p>
+                        </div>
+                        <p class="mb-0 fw-bold small">{{ config.nome_responsavel_visto|default:"Isaias F. M. Queta" }}</p>
+                        <p class="smaller text-muted mb-0" style="font-size: 0.7rem;">{{ config.cargo_responsavel_visto|default:"Presidente" }}</p>
+                    </div>
+                </div>
+                <div class="text-center mt-2">
+                    <h2 class="fw-bold mb-1" style="font-size: 1.6rem; width: 100%;">{{ config.nome_escola|default:"INSTITUTO SUPERIOR POLITÉCNICO DA CATEPA"|upper }}</h2>
+                    <p class="text-dark small fw-bold mb-0" style="width: 100%;">{{ config.decreto_legalidade|default:"Aprovado por Decreto Presidencial Nº 132/17 de 19 de Julho" }}</p>
+                </div>
+                <hr class="my-3 border-dark">
+            </div>
             <h1 class="h3 fw-bold text-dark mb-1" style="letter-spacing: -0.5px;">{{ turma.nome }}</h1>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
@@ -19,13 +35,10 @@
         <div class="col-md-4 text-md-end mt-3 mt-md-0">
             <div class="d-flex gap-2 justify-content-md-end">
                 <a href="{% url 'atribuicao_turmas' %}" class="btn btn-white border rounded-3 px-3 shadow-sm">
-                    <i class="bi bi-arrow-left me-2"></i>Voltar à Lista
+                    <i class="bi bi-arrow-left me-2"></i>Voltar
                 </a>
                 <button class="btn btn-white border rounded-3 px-3 shadow-sm" onclick="window.print()">
                     <i class="bi bi-printer me-2"></i>Imprimir
-                </button>
-                <button class="btn btn-primary rounded-3 px-4 shadow-sm fw-bold">
-                    <i class="bi bi-gear me-2"></i>Configurações
                 </button>
             </div>
         </div>
@@ -147,65 +160,59 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-end pe-4">
-                                    <button class="btn btn-sm btn-light border rounded-3 px-3" data-bs-toggle="modal" data-bs-target="#modalEdit{{ td.id }}">
+                                    <button class="btn btn-sm btn-light border rounded-3 px-3" type="button" data-bs-toggle="collapse" data-bs-target="#editForm{{ td.id }}">
                                         <i class="bi bi-pencil me-1"></i> Atribuir
                                     </button>
-
-                                    <!-- Modal Atribuição -->
-                                    <div class="modal fade" id="modalEdit{{ td.id }}" tabindex="-1" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered">
-                                            <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                                                <div class="modal-header border-0 bg-primary py-4 px-4">
-                                                    <div>
-                                                        <h5 class="modal-title fw-bold text-white mb-0">Gestão Académica</h5>
-                                                        <p class="text-white text-opacity-75 small mb-0">{{ td.disciplina.nome }}</p>
-                                                    </div>
-                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <form method="POST">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="action" value="atualizar_professor">
-                                                    <input type="hidden" name="td_id" value="{{ td.id }}">
-                                                    <div class="modal-body p-4 bg-white">
-                                                        <div class="mb-4 text-start">
-                                                            <label class="form-label small fw-bold text-muted text-uppercase mb-2">Professor Responsável</label>
-                                                            <div class="input-group">
-                                                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-person-badge text-primary"></i></span>
-                                                                <select name="professor_id" class="form-select bg-light border-start-0 ps-0">
-                                                                    <option value="">Selecione o docente...</option>
-                                                                    {% for prof in professores %}
-                                                                    <option value="{{ prof.id }}" {% if td.professor_id == prof.id %}selected{% endif %}>
-                                                                        {{ prof.get_full_name|default:prof.username }}
-                                                                    </option>
-                                                                    {% endfor %}
-                                                                </select>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="mb-0 text-start">
-                                                            <label class="form-label small fw-bold text-muted text-uppercase mb-2">Espaço / Sala</label>
-                                                            <div class="input-group">
-                                                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-geo-alt text-primary"></i></span>
-                                                                <select name="sala_id" class="form-select bg-light border-start-0 ps-0">
-                                                                    <option value="">Selecione a sala...</option>
-                                                                    {% for sala in salas %}
-                                                                    <option value="{{ sala.id }}" {% if td.sala_id == sala.id %}selected{% endif %}>
-                                                                        {{ sala.nome }}
-                                                                    </option>
-                                                                    {% endfor %}
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer border-0 bg-light p-4">
-                                                        <button type="button" class="btn btn-link text-muted text-decoration-none fw-bold me-auto" data-bs-dismiss="modal">CANCELAR</button>
-                                                        <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-bold shadow-sm">SALVAR</button>
-                                                    </div>
-                                                </form>
+                                </td>
+                            </tr>
+                            <tr class="collapse bg-light bg-opacity-50" id="editForm{{ td.id }}">
+                                <td colspan="4" class="p-4 border-bottom shadow-inner">
+                                    <form method="POST" class="row g-3 align-items-end">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="atualizar_professor">
+                                        <input type="hidden" name="td_id" value="{{ td.id }}">
+                                        
+                                        <div class="col-md-5">
+                                            <label class="form-label small fw-bold text-muted text-uppercase mb-2">Professor Responsável</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white"><i class="bi bi-person-badge text-primary"></i></span>
+                                                <select name="professor_id" class="form-select border-start-0">
+                                                    <option value="">Selecione o docente...</option>
+                                                    {% for prof in professores %}
+                                                    <option value="{{ prof.id }}" {% if td.professor_id == prof.id %}selected{% endif %}>
+                                                        {{ prof.get_full_name|default:prof.username }}
+                                                    </option>
+                                                    {% endfor %}
+                                                </select>
                                             </div>
                                         </div>
-                                    </div>
+
+                                        <div class="col-md-4">
+                                            <label class="form-label small fw-bold text-muted text-uppercase mb-2">Espaço / Sala</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white"><i class="bi bi-geo-alt text-primary"></i></span>
+                                                <select name="sala_id" class="form-select border-start-0">
+                                                    <option value="">Selecione a sala...</option>
+                                                    {% for sala in salas %}
+                                                    <option value="{{ sala.id }}" {% if td.sala_id == sala.id %}selected{% endif %}>
+                                                        {{ sala.nome }}
+                                                    </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-3 d-flex gap-2">
+                                            <button type="submit" class="btn btn-primary flex-grow-1 rounded-3 fw-bold">
+                                                <i class="bi bi-check-lg me-1"></i> SALVAR
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary rounded-3" data-bs-toggle="collapse" data-bs-target="#editForm{{ td.id }}">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
+                                        </div>
+                                    </form>
                                 </td>
+                            </tr>
                             </tr>
                             {% empty %}
                             <tr>
@@ -221,22 +228,151 @@
                     </table>
                 </div>
             </div>
+            
+            <!-- Assinaturas para Impressão -->
+            <div class="print-only mt-5 pt-5">
+                <div class="d-flex flex-column align-items-center text-center mt-5" style="width: 100%;">
+                    <div style="border-top: 1px solid #000; width: 40%; padding-top: 10px;">
+                        <p class="mb-0 fw-bold">{{ request.user.get_full_name|default:request.user.username }}</p>
+                        <p class="small text-muted">A Secretaria Académica</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <style>
+    /* Estilo para visualização na web */
+    @media screen {
+        .print-only { display: none !important; }
+    }
+
+    /* Estilo para impressão */
     @media print {
-        .navbar-top, footer, .btn, .breadcrumb {
+        @page {
+            size: landscape !important;
+            margin: 0 !important;
+        }
+        
+        html, body {
+            width: 297mm !important;
+            height: 210mm !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+            overflow: visible !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            font-family: "Times New Roman", Times, serif !important;
+        }
+
+        /* Ocultar elementos desnecessários */
+        .navbar-top, footer, .btn, .breadcrumb, .col-lg-3, 
+        .card-header .badge, .modal, .modal-backdrop,
+        .pe-4:has(button), th.text-end.pe-4 {
             display: none !important;
         }
+
+        /* Ocultar a última coluna (Gestão) explicitamente */
+        td:last-child, th:last-child {
+            display: none !important;
+        }
+
         .container-fluid {
+            width: 297mm !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 10mm !important;
+            display: block !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+        }
+
+        .row, .col-lg-9 {
+            display: block !important;
+            width: 100% !important;
+            margin: 0 !important;
             padding: 0 !important;
         }
+
         .card {
+            border: 1.5px solid #000 !important;
             box-shadow: none !important;
-            border: 1px solid #eee !important;
+            width: 100% !important;
+            display: block !important;
+            border-radius: 0 !important;
         }
+
+        .card-header {
+            background-color: #f0f0f0 !important;
+            border-bottom: 1.5px solid #000 !important;
+            padding: 10px !important;
+        }
+
+        .table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            table-layout: fixed !important;
+        }
+
+        th, td {
+            border: 1px solid #000 !important;
+            padding: 12px 8px !important;
+            word-wrap: break-word !important;
+            text-align: left !important;
+            vertical-align: middle !important;
+        }
+
+        th {
+            background-color: #f8f8f8 !important;
+            font-weight: bold !important;
+            text-transform: uppercase !important;
+            font-size: 11pt !important;
+        }
+
+        /* Proporções para Paisagem */
+        th:nth-child(1), td:nth-child(1) { width: 40% !important; }
+        th:nth-child(2), td:nth-child(2) { width: 40% !important; }
+        th:nth-child(3), td:nth-child(3) { width: 20% !important; }
+
+        h1, .h3 {
+            font-size: 22pt !important;
+            margin-top: 30px !important;
+            margin-bottom: 20px !important;
+            text-align: center !important;
+            font-weight: bold !important;
+            display: block !important;
+            width: 100% !important;
+            text-transform: uppercase !important;
+        }
+
+        .card-header h5 {
+            font-size: 14pt !important;
+            text-align: center !important;
+            font-weight: bold !important;
+            margin: 0 !important;
+            text-transform: uppercase !important;
+        }
+
+        /* Avatar e Ícones na impressão */
+        .avatar-sm, .bg-light.rounded-circle {
+            display: none !important;
+        }
+    }
+    /* Correção para o tremor da modal do Bootstrap */
+    body.modal-open {
+        overflow: hidden !important;
+        padding-right: 0 !important;
+    }
+
+    .modal-backdrop {
+        opacity: 0.5 !important;
+    }
+
+    .modal.fade .modal-dialog {
+        transition: transform 0.2s ease-out !important;
     }
 </style>
 {% endblock %}
