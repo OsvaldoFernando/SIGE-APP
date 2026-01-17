@@ -2572,33 +2572,26 @@ def grelha_curricular(request):
 
 @login_required
 def cronograma_academico(request):
-    """View para exibir cronograma acadêmico"""
-    from .models import AnoAcademico, EventoCalendario, PerfilUsuario, Inscricao
-    anos = AnoAcademico.objects.all().order_by('-data_inicio')
+    """View para exibir cronograma acadêmico estratégico (ERP)"""
+    from .models import AnoAcademico, EventoCalendario, PerfilUsuario
+    from django.utils import timezone
+    
+    hoje = timezone.now()
+    
+    # ERP: Exibir apenas o ciclo atual ou o mais recente para foco estratégico
+    ano_atual = AnoAcademico.objects.filter(ano_atual=True).first()
+    if ano_atual:
+        anos = [ano_atual]
+    else:
+        anos = AnoAcademico.objects.all().order_by('-data_inicio')[:1]
+    
     eventos_recentes = EventoCalendario.objects.filter(estado='ATIVO').order_by('data_inicio')[:5]
     
-    # Obter data atual para cálculos de prazo
-    hoje = timezone.now()
-    dia_hoje = int(hoje.strftime("%d"))
-    dia_hoje_neg = -dia_hoje
-
-    # Lógica básica de bloqueio automático para o ano atual
-    ano_atual = AnoAcademico.objects.filter(ano_atual=True).first()
-    if ano_atual and ano_atual.cobrar_propinas and ano_atual.bloquear_estudante_atrasado:
-        if dia_hoje >= ano_atual.dia_bloqueio_estudante:
-            # Filtra estudantes que ainda não pagaram (exemplo simplificado: sem inscrição ativa ou pendente)
-            estudantes_com_divida = PerfilUsuario.objects.filter(user__groups__name='Estudantes')
-            # Aqui entraria a lógica real de verificar faturas em aberto
-            # Por agora, marcamos como bloqueado se passar do dia e for estudante
-            # estudantes_com_divida.update(bloqueado=True)
-            pass
-
     context = {
         'active': 'cronograma',
         'anos': anos,
         'eventos_recentes': eventos_recentes,
         'hoje': hoje,
-        'dia_hoje_neg': dia_hoje_neg
     }
     return render(request, 'core/cronograma_academico.html', context)
 
@@ -3087,9 +3080,28 @@ def infraestrutura(request):
 
 @login_required
 def gestao_documentos(request):
-    """View principal de gestão de documentos"""
+    """View principal de gestão de documentos com filtros ERP"""
+    secao = request.GET.get('secao')
+    status = request.GET.get('status')
+    busca = request.GET.get('q')
+    
     documentos = Documento.objects.all().order_by('-data_criacao')
-    return render(request, 'core/gestao_documentos.html', {'documentos': documentos})
+    
+    if secao:
+        documentos = documentos.filter(secao=secao)
+    if status:
+        documentos = documentos.filter(status=status)
+    if busca:
+        documentos = documentos.filter(titulo__icontains=busca)
+        
+    return render(request, 'core/gestao_documentos.html', {
+        'documentos': documentos,
+        'secoes': Documento.SECAO_CHOICES,
+        'status_choices': Documento.STATUS_CHOICES,
+        'secao_atual': secao,
+        'status_atual': status,
+        'busca': busca
+    })
 
 @login_required
 def documento_criar(request):
@@ -3098,6 +3110,8 @@ def documento_criar(request):
         documento = Documento(
             titulo=request.POST.get('titulo'),
             secao=request.POST.get('secao'),
+            status=request.POST.get('status', 'ativo'),
+            versao=request.POST.get('versao', '1.0'),
             conteudo=request.POST.get('conteudo'),
             descricao=request.POST.get('descricao', ''),
             ativo='ativo' in request.POST,
@@ -3109,17 +3123,20 @@ def documento_criar(request):
     
     return render(request, 'core/documento_form.html', {
         'secoes': Documento.SECAO_CHOICES,
+        'status_choices': Documento.STATUS_CHOICES,
         'variaveis': Documento.obter_variaveis_disponiveis(None)
     })
 
 @login_required
 def documento_editar(request, documento_id):
-    """Editar documento existente"""
+    """Editar documento existente com campos ERP"""
     documento = get_object_or_404(Documento, id=documento_id)
     
     if request.method == 'POST':
         documento.titulo = request.POST.get('titulo')
         documento.secao = request.POST.get('secao')
+        documento.status = request.POST.get('status', 'ativo')
+        documento.versao = request.POST.get('versao', '1.0')
         documento.conteudo = request.POST.get('conteudo')
         documento.descricao = request.POST.get('descricao', '')
         documento.ativo = 'ativo' in request.POST
@@ -3130,6 +3147,7 @@ def documento_editar(request, documento_id):
     return render(request, 'core/documento_form.html', {
         'documento': documento,
         'secoes': Documento.SECAO_CHOICES,
+        'status_choices': Documento.STATUS_CHOICES,
         'variaveis': documento.obter_variaveis_disponiveis()
     })
 
@@ -3738,7 +3756,16 @@ def horarios(request):
 
 @login_required
 def gestao_horarios(request):
-    return render(request, 'core/horarios_gestao.html')
+    """View principal de gestão de horários com estatísticas ERP"""
+    from .models import HorarioAula, Professor, Sala, Turma
+    
+    context = {
+        'total_aulas': HorarioAula.objects.filter(status='ativo').count(),
+        'total_professores': Professor.objects.filter(estado='ativo').count(),
+        'salas_disponiveis': Sala.objects.filter(ativa=True).count(),
+        'turmas_ativas': Turma.objects.filter(ativa=True).count(),
+    }
+    return render(request, 'core/horarios_gestao.html', context)
 
 @login_required
 def registrar_horario(request):
@@ -3757,32 +3784,27 @@ def registrar_horario(request):
     
     # Filtrar disciplinas pelo período selecionado no formulário ou pelo período ativo
     disciplinas = Disciplina.objects.all()
-    professores = Professor.objects.filter(estado='ativo')
-    from .models import Sala
+    
+    from .models import Sala, HorarioAula
+    professores = User.objects.filter(perfil__nivel_acesso='professor', perfil__ativo=True)
     salas = Sala.objects.filter(ativa=True)
-    dias_semana = [
-        ('segunda', 'Segunda-feira'),
-        ('terca', 'Terça-feira'),
-        ('quarta', 'Quarta-feira'),
-        ('quinta', 'Quinta-feira'),
-        ('sexta', 'Sexta-feira'),
-    ]
-
-    from django.contrib.auth.models import User
+    
     context = {
         'ano_sessao': ano_sessao,
         'periodo_ativo': periodo_ativo,
         'periodos': periodos,
         'turmas': turmas,
         'disciplinas': disciplinas,
-        'professores': User.objects.filter(perfil__nivel_acesso='professor', perfil__ativo=True),
+        'professores': professores,
         'salas': salas,
-        'dias_semana': dias_semana,
+        'dias_semana': HorarioAula.DIAS_SEMANA,
+        'tipos_aula': HorarioAula.TIPO_AULA_CHOICES,
+        'status_choices': HorarioAula.STATUS_CHOICES,
     }
 
     if request.method == 'POST':
         try:
-            from .models import TurmaDisciplina, Turma, Disciplina, User, Sala
+            from .models import TurmaDisciplina, Turma, Disciplina, User, Sala, HorarioAula
             
             # Dados do formulário
             turma_id = request.POST.get('turma')
@@ -3793,6 +3815,8 @@ def registrar_horario(request):
             hora_inicio = request.POST.get('hora_inicio')
             hora_fim = request.POST.get('hora_fim')
             dia_semana = request.POST.get('dia_semana')
+            tipo_aula = request.POST.get('tipo_aula', 'teorica')
+            status = request.POST.get('status', 'ativo')
             tempo_tipo = request.POST.get('tempo_tipo_radio') # Usando o valor do radio dinâmico
             
             if not tempo_tipo:
@@ -3803,8 +3827,8 @@ def registrar_horario(request):
             professor = get_object_or_404(User, id=professor_id)
             sala = get_object_or_404(Sala, id=sala_id)
             
-            # Criar novo registro de horário (permitindo múltiplos dias/horas)
-            TurmaDisciplina.objects.create(
+            # Criar novo registro no modelo ERP HorarioAula
+            HorarioAula.objects.create(
                 turma=turma,
                 disciplina=disciplina,
                 professor=professor,
@@ -3812,7 +3836,23 @@ def registrar_horario(request):
                 dia_semana=dia_semana,
                 hora_inicio=hora_inicio,
                 hora_fim=hora_fim,
-                tempo_tipo=tempo_tipo
+                tempo_tipo=tempo_tipo,
+                tipo_aula=tipo_aula,
+                status=status,
+                ano_lectivo=ano_sessao
+            )
+            
+            # Manter compatibilidade com TurmaDisciplina se necessário
+            TurmaDisciplina.objects.get_or_create(
+                turma=turma,
+                disciplina=disciplina,
+                professor=professor,
+                defaults={
+                    'sala': sala,
+                    'dia_semana': dia_semana,
+                    'hora_inicio': hora_inicio,
+                    'hora_fim': hora_fim
+                }
             )
             
             messages.success(request, f"Horário para {disciplina.nome} ({turma.nome}) registrado com sucesso!")
@@ -3867,11 +3907,12 @@ def visualizar_grade(request):
     instituicao = ConfiguracaoEscola.objects.first()
     
     dias = [
-        ('segunda', 'Segunda'),
-        ('terca', 'Terça'),
-        ('quarta', 'Quarta'),
-        ('quinta', 'Quinta'),
-        ('sexta', 'Sexta'),
+        (1, 'Segunda'),
+        (2, 'Terça'),
+        (3, 'Quarta'),
+        (4, 'Quinta'),
+        (5, 'Sexta'),
+        (6, 'Sábado'),
     ]
     
     return render(request, 'core/visualizar_grade.html', {
@@ -3881,7 +3922,9 @@ def visualizar_grade(request):
         'dias': dias,
         'ano_sessao': ano_sessao,
         'instituicao': instituicao,
-        'periodo_atual': periodo_atual
+        'periodo_atual': periodo_atual,
+        'tipos_aula': HorarioAula.TIPO_AULA_CHOICES,
+        'status_choices': HorarioAula.STATUS_CHOICES
     })
 
 @login_required

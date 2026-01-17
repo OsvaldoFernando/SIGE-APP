@@ -300,16 +300,34 @@ class Documento(models.Model):
         ('inscricao', 'Inscrição'),
         ('financeiro', 'Financeiro'),
         ('academico', 'Académico'),
+        ('rh', 'Recursos Humanos'),
+        ('biblioteca', 'Biblioteca'),
+        ('inventario', 'Inventário'),
     ]
     
+    STATUS_CHOICES = [
+        ('rascunho', 'Rascunho'),
+        ('ativo', 'Ativo'),
+        ('arquivado', 'Arquivado'),
+        ('obsoleto', 'Obsoleto'),
+    ]
+
     titulo = models.CharField(max_length=200)
+    versao = models.CharField(max_length=10, default='1.0')
     descricao = models.TextField(blank=True)
     conteudo = models.TextField(help_text="Template do documento (HTML/Text)")
     secao = models.CharField(max_length=20, choices=SECAO_CHOICES, default='geral')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ativo')
+    metadata = models.JSONField(default=dict, blank=True, help_text="Metadados ERP (JSON)")
     ativo = models.BooleanField(default=True)
     criado_por = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True)
+    
+    @property
+    def historico_versoes(self):
+        # Implementação futura para controle de versões
+        return []
     
     @classmethod
     def obter_variaveis_disponiveis(cls, *args, **kwargs):
@@ -1083,14 +1101,34 @@ class HorarioAula(models.Model):
         (3, 'Quarta-feira'),
         (4, 'Quinta-feira'),
         (5, 'Sexta-feira'),
+        (6, 'Sábado'),
     ]
     
+    TIPO_AULA_CHOICES = [
+        ('teorica', 'Teórica'),
+        ('pratica', 'Prática'),
+        ('laboratorio', 'Laboratório'),
+        ('seminario', 'Seminário'),
+    ]
+
+    STATUS_CHOICES = [
+        ('ativo', 'Ativo'),
+        ('cancelado', 'Cancelado'),
+        ('suspenso', 'Suspenso'),
+    ]
+    
+    turma = models.ForeignKey('Turma', on_delete=models.CASCADE, related_name='horarios_aula', null=True)
     professor = models.ForeignKey('Professor', on_delete=models.CASCADE, related_name='horarios')
     disciplina = models.ForeignKey('Disciplina', on_delete=models.CASCADE)
+    sala = models.ForeignKey('Sala', on_delete=models.SET_NULL, null=True, blank=True)
     dia_semana = models.IntegerField(choices=DIAS_SEMANA)
     hora_inicio = models.TimeField()
     hora_fim = models.TimeField()
+    tipo_aula = models.CharField(max_length=20, choices=TIPO_AULA_CHOICES, default='teorica')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ativo')
     tempos_aula = models.PositiveIntegerField(default=2, help_text="Número de tempos/horas aula nesta sessão")
+    data_criacao = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    data_atualizacao = models.DateTimeField(auto_now=True, null=True, blank=True)
     
     class Meta:
         verbose_name = "Horário de Aula"

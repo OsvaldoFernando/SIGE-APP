@@ -49,18 +49,14 @@
                             <h6 class="fw-bold text-dark mb-0">Categorias</h6>
                         </div>
                         <div class="list-group list-group-flush rounded-3 overflow-hidden gap-1">
-                            <a href="#" class="list-group-item list-group-item-action border-0 py-2 px-3 active rounded-3">
+                            <a href="{% url 'gestao_documentos' %}" class="list-group-item list-group-item-action border-0 py-2 px-3 {% if not secao_atual %}active{% endif %} rounded-3">
                                 <i class="bi bi-files me-2"></i> Todos os Documentos
                             </a>
-                            <a href="#" class="list-group-item list-group-item-action border-0 py-2 px-3 rounded-3">
-                                <i class="bi bi-folder me-2"></i> Matrículas
+                            {% for id, nome in secoes %}
+                            <a href="?secao={{ id }}" class="list-group-item list-group-item-action border-0 py-2 px-3 {% if secao_atual == id %}active{% endif %} rounded-3 text-capitalize">
+                                <i class="bi bi-folder me-2"></i> {{ nome }}
                             </a>
-                            <a href="#" class="list-group-item list-group-item-action border-0 py-2 px-3 rounded-3">
-                                <i class="bi bi-folder me-2"></i> Certificados
-                            </a>
-                            <a href="#" class="list-group-item list-group-item-action border-0 py-2 px-3 rounded-3">
-                                <i class="bi bi-folder me-2"></i> Administrativos
-                            </a>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -74,12 +70,13 @@
                             <div class="bg-light p-2 rounded-3 me-3">
                                 <i class="bi bi-clock-history text-muted"></i>
                             </div>
-                            <h5 class="fw-bold mb-0">Documentos Recentes</h5>
+                            <h5 class="fw-bold mb-0">{% if secao_atual %}{{ secao_atual|title }}{% else %}Documentos Recentes{% endif %}</h5>
                         </div>
-                        <div class="input-group input-group-sm w-auto shadow-sm" style="border-radius: 8px; overflow: hidden;">
+                        <form method="GET" class="input-group input-group-sm w-auto shadow-sm" style="border-radius: 8px; overflow: hidden;">
+                            {% if secao_atual %}<input type="hidden" name="secao" value="{{ secao_atual }}">{% endif %}
                             <span class="input-group-text bg-white border-0"><i class="bi bi-search text-muted"></i></span>
-                            <input type="text" class="form-control border-0" placeholder="Pesquisar documentos..." style="min-width: 200px;">
-                        </div>
+                            <input type="text" name="q" class="form-control border-0" placeholder="Pesquisar..." value="{{ busca|default:'' }}" style="min-width: 200px;">
+                        </form>
                     </div>
                     <div class="card-body p-4">
                         {% if documentos %}

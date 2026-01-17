@@ -1,167 +1,327 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Calendário Acadêmico - SIGE{% endblock %}
+{% block title %}Calendário Académico - SIGE{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-2">
-                    <li class="breadcrumb-item"><a href="{% url 'painel_principal' %}" class="text-decoration-none">Painel</a></li>
-                    <li class="breadcrumb-item active">Calendário Acadêmico</li>
-                </ol>
-            </nav>
-            <div class="mb-3">
-                <a href="{% url 'painel_principal' %}" class="btn btn-sm btn-light border rounded-pill px-3">
-                    <i class="bi bi-arrow-left me-1"></i>Voltar
+<div class="container-fluid px-0" style="background-color: #f8fafc; min-height: 100vh;">
+    <!-- Top Header Style -->
+    <div class="bg-white border-bottom py-4 px-5 mb-5 shadow-sm">
+        <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+                <a href="{% url 'painel_principal' %}" class="btn btn-light rounded-circle me-4 shadow-sm border d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
+                    <i class="bi bi-arrow-left fs-5"></i>
                 </a>
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb small mb-1 text-muted">
+                            <li class="breadcrumb-item">Gestão académica</li>
+                            <li class="breadcrumb-item active fw-bold text-primary">Calendário Académico</li>
+                        </ol>
+                    </nav>
+                    <h3 class="mb-0 fw-bold text-dark">Cronograma Académico Estratégico</h3>
+                </div>
             </div>
-            <h2 class="fw-bold"><i class="bi bi-calendar3 me-2"></i>Calendário Acadêmico</h2>
+            <div class="d-none d-md-block">
+                <button class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm transition-hover" onclick="window.print()">
+                    <i class="bi bi-printer me-2"></i> Exportar Calendário
+                </button>
+            </div>
         </div>
     </div>
 
-    <div class="row g-4 overflow-auto flex-nowrap pb-3" style="scrollbar-width: thin; -webkit-overflow-scrolling: touch;">
-        {% for ano in anos %}
-        <div class="col-md-6" style="min-width: 450px; flex: 0 0 auto;">
-            <div class="card border-0 shadow-sm h-100" style="border-radius: 15px;">
-                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="fw-bold mb-0 text-primary">{{ ano.codigo }}</h5>
-                        {% if ano.inscricoes_abertas %}
-                        <span class="badge bg-success bg-opacity-10 text-success border border-success mt-1" style="font-size: 0.6rem;">
-                            <i class="bi bi-unlock-fill me-1"></i>SISTEMA ABERTO PARA INSCRIÇÕES
-                        </span>
-                        {% else %}
-                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger mt-1" style="font-size: 0.6rem;">
-                            <i class="bi bi-lock-fill me-1"></i>SISTEMA FECHADO PARA INSCRIÇÕES
-                        </span>
-                        {% endif %}
-                    </div>
-                    {% if ano.ano_atual %}
-                    <span class="badge bg-primary rounded-pill">Ano Atual</span>
-                    {% endif %}
-                </div>
-                <div class="card-body px-4 pb-4">
-                    <div class="mb-4">
-                        <h6 class="text-muted small fw-bold text-uppercase mb-3"><i class="bi bi-calendar-event-fill me-2"></i>Marcos do Calendário</h6>
-                        <div class="d-flex overflow-auto pb-2 flex-nowrap g-3" style="scrollbar-width: thin; -webkit-overflow-scrolling: touch;">
-                            {% for evento in ano.eventos.all %}
-                            <div class="border rounded-3 p-3 me-3 {% if evento.esta_ocorrendo %}bg-primary bg-opacity-10{% endif %}" style="min-width: 250px; flex: 0 0 auto;">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <span class="badge {% if evento.tipo_evento == 'INSCRICAO' %}bg-info{% elif evento.tipo_evento == 'MATRICULA' %}bg-success{% elif evento.tipo_evento == 'TESTE' %}bg-warning{% else %}bg-secondary{% endif %} rounded-pill" style="font-size: 0.6rem;">
-                                        {{ evento.get_tipo_evento_display }}
-                                    </span>
-                                    {% if evento.esta_ocorrendo %}
-                                    <span class="badge bg-primary rounded-pill" style="font-size: 0.6rem;"><i class="bi bi-play-fill me-1"></i>EM CURSO</span>
-                                    {% endif %}
-                                </div>
-                                <span class="d-block fw-bold mb-1" style="font-size: 0.85rem;">{{ evento.descricao }}</span>
-                                <small class="text-muted d-block">{{ evento.data_inicio|date:"d/m" }} até {{ evento.data_fim|date:"d/m" }}</small>
+    <div class="container pb-5">
+        <div class="row g-4 justify-content-center">
+            {% for ano in anos %}
+            <div class="col-xl-10">
+                <div class="card border-0 shadow-lg h-100" style="border-radius: 24px; background: #fff; overflow: hidden;">
+                    <div class="card-header bg-white border-0 pt-5 px-5 d-flex justify-content-between align-items-start flex-wrap gap-4">
+                        <div>
+                            <div class="d-flex align-items-center gap-3 mb-2 flex-wrap">
+                                <h2 class="fw-bold mb-0 text-dark" style="font-size: 2.8rem; letter-spacing: -1px;">Ciclo {{ ano.codigo }}</h2>
+                                {% if ano.ano_atual %}
+                                <span class="badge bg-primary px-3 py-2 rounded-pill fw-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">ANO ACTUAL</span>
+                                {% endif %}
                             </div>
-                            {% empty %}
-                            <div class="p-3 text-center text-muted small w-100">Nenhum evento registrado.</div>
-                            {% endfor %}
+                            <p class="text-muted mb-0 fs-5"><i class="bi bi-info-circle me-1 text-primary"></i> Governança e Planeamento do Ano Lectivo</p>
                         </div>
-                    </div>
-
-                    {% if ano.cobrar_propinas %}
-                    <div class="mb-0">
-                        <h6 class="text-muted small fw-bold text-uppercase mb-3"><i class="bi bi-cash-coin me-2"></i>Regras de Mensalidade / Propina</h6>
-                        
-                        <!-- Novo Alerta de Prazo -->
-                        {% with dia_hoje=hoje|date:"j"|add:"0" %}
-                        <div class="mb-3">
-                            {% if dia_hoje <= ano.dia_pagamento_limite %}
-                                <div class="alert alert-success border-0 shadow-sm p-3 mb-2" style="border-radius: 12px;">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="bi bi-info-circle-fill me-2"></i>
-                                        <span class="small fw-bold">Prazo de Pagamento</span>
-                                    </div>
-                                    <div class="progress" style="height: 8px; border-radius: 4px; background-color: rgba(25, 135, 84, 0.1);">
-                                        <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio dia_hoje ano.dia_pagamento_limite 100 %}%"></div>
-                                    </div>
-                                    <p class="small text-muted mb-0 mt-2">
-                                        Faltam <strong>{{ ano.dia_pagamento_limite|add:dia_hoje_neg }}</strong> dias para o fim do prazo sem multa.
-                                    </p>
-                                </div>
-                            {% elif dia_hoje <= ano.dia_limite_multa %}
-                                <div class="alert alert-warning border-0 shadow-sm p-3 mb-2" style="border-radius: 12px;">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                        <span class="small fw-bold">Período de Multa</span>
-                                    </div>
-                                    <div class="progress" style="height: 8px; border-radius: 4px; background-color: rgba(255, 193, 7, 0.1);">
-                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 100%"></div>
-                                    </div>
-                                    <p class="small text-muted mb-0 mt-2">
-                                        Estamos no período de multa. Faltam <strong>{{ ano.dia_limite_multa|add:dia_hoje_neg }}</strong> dias para o bloqueio.
-                                    </p>
-                                </div>
+                        <div class="text-end flex-grow-1 flex-md-grow-0">
+                            {% if ano.inscricoes_abertas %}
+                            <div class="d-inline-flex align-items-center bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-4 py-3 rounded-4 shadow-sm w-100 justify-content-center">
+                                <span class="position-relative d-flex h-3 w-3 me-3">
+                                    <span class="animate-ping position-absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-success"></span>
+                                </span>
+                                <span class="fw-bold text-uppercase small" style="letter-spacing: 1px;">Inscrições Abertas</span>
+                            </div>
                             {% else %}
-                                <div class="alert alert-danger border-0 shadow-sm p-3 mb-2" style="border-radius: 12px;">
-                                    <div class="d-flex align-items-center">
-                                        <i class="bi bi-x-circle-fill me-2"></i>
-                                        <span class="small fw-bold">Prazo Excedido</span>
-                                    </div>
-                                </div>
+                            <div class="d-inline-flex align-items-center bg-danger bg-opacity-10 text-danger border border-danger border-opacity-25 px-4 py-3 rounded-4 shadow-sm w-100 justify-content-center">
+                                <i class="bi bi-lock-fill me-3 fs-5"></i>
+                                <span class="fw-bold text-uppercase small" style="letter-spacing: 1px;">Inscrições Encerradas</span>
+                            </div>
                             {% endif %}
                         </div>
-                        {% endwith %}
+                    </div>
 
-                        <div class="p-3 border rounded-3 bg-light bg-opacity-50">
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted small">Dia limite (sem multa):</span>
-                                <span class="fw-bold text-success">Dia {{ ano.dia_pagamento_limite }}</span>
+                    <div class="card-body p-5">
+                        <!-- Dashboard de Status ERP -->
+                        <div class="row g-4 mb-5">
+                            <div class="col-md-4">
+                                <div class="p-4 rounded-4 border bg-light bg-opacity-25 h-100 transition-hover border-2 text-center">
+                                    <label class="text-muted smaller fw-bold text-uppercase d-block mb-3" style="letter-spacing: 1px;">Estado Operacional</label>
+                                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 p-3 mb-3" style="width: 65px; height: 65px;">
+                                        <i class="bi bi-activity text-primary fs-3"></i>
+                                    </div>
+                                    <h4 class="fw-bold text-dark mb-0">{{ ano.get_estado_display }}</h4>
+                                </div>
                             </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted small">Início da multa:</span>
-                                <span class="fw-bold text-warning">Dia {{ ano.dia_inicio_multa }}</span>
+                            <div class="col-md-4">
+                                <div class="p-4 rounded-4 border bg-light bg-opacity-25 h-100 transition-hover border-2 text-center">
+                                    <label class="text-muted smaller fw-bold text-uppercase d-block mb-3" style="letter-spacing: 1px;">Início do Ciclo</label>
+                                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success bg-opacity-10 p-3 mb-3" style="width: 65px; height: 65px;">
+                                        <i class="bi bi-calendar-check text-success fs-3"></i>
+                                    </div>
+                                    <h4 class="fw-bold text-dark mb-0">{{ ano.data_inicio|date:"d M Y" }}</h4>
+                                </div>
                             </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span class="text-muted small">Multa inicial:</span>
-                                <span class="fw-bold text-danger">{{ ano.percentagem_multa_inicial }}%</span>
+                            <div class="col-md-4">
+                                <div class="p-4 rounded-4 border bg-light bg-opacity-25 h-100 transition-hover border-2 text-center">
+                                    <label class="text-muted smaller fw-bold text-uppercase d-block mb-3" style="letter-spacing: 1px;">Encerramento</label>
+                                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10 p-3 mb-3" style="width: 65px; height: 65px;">
+                                        <i class="bi bi-calendar-x text-danger fs-3"></i>
+                                    </div>
+                                    <h4 class="fw-bold text-dark mb-0">{{ ano.data_fim|date:"d M Y" }}</h4>
+                                </div>
                             </div>
-                            <div class="d-flex justify-content-between">
-                                <span class="text-muted small">Dia limite de multa:</span>
-                                <span class="fw-bold">Dia {{ ano.dia_limite_multa }}</span>
+                        </div>
+
+                        <div class="row g-5">
+                            <!-- Lado Esquerdo: Timeline Profissional -->
+                            <div class="col-lg-7">
+                                <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+                                    <h5 class="fw-bold mb-0 d-flex align-items-center">
+                                        <i class="bi bi-clock-history text-primary me-2"></i> Marcos Temporais
+                                    </h5>
+                                    <span class="badge bg-light text-dark border rounded-pill px-3">{{ ano.eventos.count }} Acções</span>
+                                </div>
+                                
+                                <div class="timeline-erp pt-2 ps-2">
+                                    {% for evento in ano.eventos.all %}
+                                    <div class="timeline-item-erp mb-4 {% if evento.esta_ocorrendo %}active{% endif %}">
+                                        <div class="d-flex">
+                                            <div class="timeline-marker me-4">
+                                                <div class="marker-line"></div>
+                                                <div class="marker-dot shadow-sm"></div>
+                                            </div>
+                                            <div class="timeline-content-erp flex-fill p-4 border rounded-4 bg-white shadow-sm transition-hover {% if evento.esta_ocorrendo %}border-primary border-2{% endif %}">
+                                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                                    <h6 class="fw-bold text-dark mb-0 fs-5">{{ evento.descricao }}</h6>
+                                                    <span class="badge {% if evento.tipo_evento == 'INSCRICAO' %}bg-info{% elif evento.tipo_evento == 'MATRICULA' %}bg-success{% elif evento.tipo_evento == 'TESTE' %}bg-warning{% else %}bg-secondary{% endif %} rounded-pill px-3 py-2">
+                                                        {{ evento.get_tipo_evento_display }}
+                                                    </span>
+                                                </div>
+                                                <div class="d-flex align-items-center text-muted fs-6">
+                                                    <i class="bi bi-calendar3 me-2 text-primary"></i>
+                                                    <span class="fw-medium text-dark">{{ evento.data_inicio|date:"d/m/Y" }}</span>
+                                                    <i class="bi bi-arrow-right mx-2 opacity-50"></i>
+                                                    <span class="fw-medium text-dark">{{ evento.data_fim|date:"d/m/Y" }}</span>
+                                                    
+                                                    {% if evento.esta_ocorrendo %}
+                                                    <div class="ms-auto d-flex align-items-center text-primary fw-bold">
+                                                        <span class="pulse-dot me-2"></span>
+                                                        <small class="text-uppercase" style="letter-spacing: 1px;">Em Curso</small>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% empty %}
+                                    <div class="text-center py-5 bg-light rounded-5 border-dashed">
+                                        <i class="bi bi-calendar-event text-muted display-4 mb-3 d-block"></i>
+                                        <p class="text-muted fw-bold">Sem marcos temporais definidos.</p>
+                                        <a href="/admin/core/eventocalendario/add/" class="btn btn-sm btn-primary rounded-pill px-4 mt-2">Configurar Agora</a>
+                                    </div>
+                                    {% endfor %}
+                                </div>
                             </div>
-                            <div class="d-flex justify-content-between mt-2 pt-2 border-top">
-                                <span class="text-muted small">Bloqueio do Estudante:</span>
-                                <span class="fw-bold text-danger">Dia {{ ano.dia_bloqueio_estudante }}</span>
+
+                            <!-- Lado Direito: Regras de Negócio e Facturação -->
+                            <div class="col-lg-5">
+                                {% if ano.cobrar_propinas %}
+                                <div class="d-flex align-items-center mb-4 pb-2 border-bottom">
+                                    <h5 class="fw-bold mb-0 d-flex align-items-center text-success">
+                                        <i class="bi bi-shield-check me-2"></i> Regras de Facturação
+                                    </h5>
+                                </div>
+
+                                <div class="card border-0 bg-dark text-white rounded-4 p-4 mb-4 shadow-lg overflow-hidden position-relative">
+                                    <div class="position-absolute top-0 end-0 p-3 opacity-10">
+                                        <i class="bi bi-currency-dollar" style="font-size: 6rem;"></i>
+                                    </div>
+                                    
+                                    <div class="position-relative z-1">
+                                        {% with dia_hoje=hoje|date:"j"|add:"0" %}
+                                        <div class="mb-4">
+                                            {% if dia_hoje <= ano.dia_pagamento_limite %}
+                                                <div class="bg-success bg-opacity-25 border border-success border-opacity-50 p-3 rounded-3 mb-0 text-center">
+                                                    <p class="small fw-bold mb-1 text-uppercase">Janela Regular Activa</p>
+                                                    <div class="progress mb-2" style="height: 4px; background: rgba(255,255,255,0.1);">
+                                                        <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio dia_hoje ano.dia_pagamento_limite 100 %}%"></div>
+                                                    </div>
+                                                    <small class="opacity-75">Status: Em conformidade operacional.</small>
+                                                </div>
+                                            {% elif dia_hoje <= ano.dia_limite_multa %}
+                                                <div class="bg-warning bg-opacity-25 border border-warning border-opacity-50 p-3 rounded-3 mb-0 text-center text-warning">
+                                                    <p class="small fw-bold mb-1 text-uppercase text-white">Fase de Mora</p>
+                                                    <div class="progress mb-2" style="height: 4px; background: rgba(255,255,255,0.1);">
+                                                        <div class="progress-bar bg-warning" role="progressbar" style="width: 100%"></div>
+                                                    </div>
+                                                    <small class="text-white opacity-75">Atenção: Sobrecargas de multa activas.</small>
+                                                </div>
+                                            {% else %}
+                                                <div class="bg-danger bg-opacity-25 border border-danger border-opacity-50 p-3 rounded-3 mb-0 text-center">
+                                                    <p class="small fw-bold mb-0 text-uppercase">Ciclo de Bloqueio Activo</p>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        {% endwith %}
+
+                                        <div class="space-y-4">
+                                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-50">
+                                                <span class="opacity-75 small">Limite Regular</span>
+                                                <span class="fw-bold">Dia {{ ano.dia_pagamento_limite }}</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-50">
+                                                <span class="opacity-75 small">Início Mora</span>
+                                                <span class="fw-bold text-warning">Dia {{ ano.dia_inicio_multa }}</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-50">
+                                                <span class="opacity-75 small">Taxa de Mora</span>
+                                                <span class="fw-bold text-danger">{{ ano.percentagem_multa_inicial }}%</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between align-items-center py-2">
+                                                <span class="opacity-75 small">Bloqueio Operacional</span>
+                                                <span class="fw-bold text-danger">Dia {{ ano.dia_bloqueio_estudante }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="card border-0 bg-white shadow-sm p-4 rounded-4 mb-4 border-start border-primary border-4">
+                                    <h6 class="fw-bold mb-3"><i class="bi bi-lightning-charge-fill me-2 text-primary"></i>Gestão Rápida</h6>
+                                    <div class="d-grid gap-3">
+                                        <a href="{% url 'ano_academico_lista' %}" class="btn btn-outline-dark rounded-pill py-2 fw-bold">
+                                            <i class="bi bi-gear me-2"></i> Configurar Ciclos
+                                        </a>
+                                        <a href="{% url 'periodo_lectivo_lista' ano.id %}" class="btn btn-outline-primary rounded-pill py-2 fw-bold">
+                                            <i class="bi bi-layers me-2"></i> Períodos Lectivos
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    {% endif %}
-
-                    <div class="mb-0 mt-4">
-                        <h6 class="text-muted small fw-bold text-uppercase mb-3"><i class="bi bi-calendar-range me-2"></i>Período Lectivo Base</h6>
-                        <div class="d-flex justify-content-between align-items-center p-3 border rounded-3">
-                            <div>
-                                <span class="d-block text-muted small">Início</span>
-                                <span class="fw-bold">{{ ano.data_inicio|date:"d/m/Y" }}</span>
-                            </div>
-                            <i class="bi bi-arrow-right text-muted"></i>
-                            <div class="text-end">
-                                <span class="d-block text-muted small">Fim</span>
-                                <span class="fw-bold">{{ ano.data_fim|date:"d/m/Y" }}</span>
-                            </div>
+                    
+                    <div class="card-footer bg-light border-0 px-5 py-4 d-flex justify-content-between align-items-center" style="border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;">
+                        <span class="text-muted small"><i class="bi bi-shield-lock me-1"></i> Auditado pelo Sistema em: {{ ano.data_criacao|date:"d/m/Y H:i" }}</span>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-light border px-4 rounded-pill fw-bold">Histórico</button>
+                            <button class="btn btn-sm btn-primary px-4 rounded-pill fw-bold">Verificar Integridade</button>
                         </div>
                     </div>
-                </div>
-                <div class="card-footer bg-light border-0 px-4 py-3 text-end" style="border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;">
-                    <a href="{% url 'gestao_eventos' %}" class="btn btn-sm btn-outline-primary">
-                        <i class="bi bi-calendar-event me-1"></i>Gerir Eventos
-                    </a>
                 </div>
             </div>
+            {% empty %}
+            <div class="col-12 text-center py-5 mt-5">
+                <div class="display-1 text-muted opacity-10 mb-4">
+                    <i class="bi bi-calendar-x"></i>
+                </div>
+                <h3 class="fw-bold text-muted">Sem Ciclo Académico Activo</h3>
+                <p class="text-muted fs-5">Configure o ano académico actual para activar o cronograma.</p>
+                <a href="{% url 'ano_academico_create' %}" class="btn btn-primary px-5 py-3 rounded-pill fw-bold shadow mt-4">Criar Novo Ciclo</a>
+            </div>
+            {% endfor %}
         </div>
-        {% empty %}
-        <div class="col-12 text-center py-5">
-            <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
-            <p class="mt-3 text-muted">Nenhum ano acadêmico configurado.</p>
-        </div>
-        {% endfor %}
     </div>
 </div>
+
+<style>
+    .transition-hover {
+        transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+    .transition-hover:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 1.5rem 4rem rgba(0,0,0,.1) !important;
+    }
+    .timeline-erp {
+        position: relative;
+    }
+    .timeline-marker {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .marker-line {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: #f1f5f9;
+        border-radius: 3px;
+    }
+    .timeline-item-erp:last-child .marker-line {
+        bottom: auto;
+        height: 25px;
+    }
+    .marker-dot {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #fff;
+        border: 5px solid #e2e8f0;
+        z-index: 1;
+        margin-top: 15px;
+        transition: all 0.3s ease;
+    }
+    .timeline-item-erp.active .marker-dot {
+        border-color: #3b82f6;
+        background: #3b82f6;
+        box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.15);
+    }
+    .timeline-item-erp.active .marker-line {
+        background: #3b82f6;
+        opacity: 0.25;
+    }
+    .pulse-dot {
+        width: 10px;
+        height: 10px;
+        background-color: #3b82f6;
+        border-radius: 50%;
+        display: inline-block;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 12px rgba(59, 130, 246, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+    }
+    .smaller {
+        font-size: 0.8rem;
+    }
+    .border-dashed {
+        border: 2.5px dashed #e2e8f0 !important;
+    }
+    .space-y-4 > * + * {
+        margin-top: 1rem;
+    }
+    @media print {
+        .btn, .card-footer, .breadcrumb, .alert, .badge { display: none !important; }
+        .card { border: none !important; box-shadow: none !important; margin: 0 !important; }
+        body { background: white !important; }
+        .container-fluid { padding: 0 !important; }
+        .card-header { padding-top: 2rem !important; }
+    }
+</style>
 {% endblock %}

@@ -39,6 +39,22 @@
                                        placeholder="Ex: Certificado de Matrícula" value="{{ documento.titulo|default:'' }}" required>
                             </div>
 
+                            <div class="row g-2 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-dark">Versão</label>
+                                    <input type="text" name="versao" class="form-control border-0 shadow-sm rounded-3" 
+                                           placeholder="1.0" value="{{ documento.versao|default:'1.0' }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-dark">Status</label>
+                                    <select name="status" class="form-select border-0 shadow-sm rounded-3">
+                                        {% for val, label in status_choices %}
+                                            <option value="{{ val }}" {% if documento.status == val %}selected{% endif %}>{{ label }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
                             <div class="mb-4">
                                 <label class="form-label small fw-bold text-dark">Seção/Módulo</label>
                                 <select name="secao" class="form-select border-0 shadow-sm rounded-3" required>
