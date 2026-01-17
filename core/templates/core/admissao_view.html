@@ -1,17 +1,88 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Admissão - SIGE{% endblock %}
+{% block title %}Módulo de Admissão - SIGA{% endblock %}
 
 {% block content %}
-<div class="container my-5">
-    <a href="{% url 'matricula' %}" style="text-decoration: none; color: #666; margin-bottom: 15px; display: inline-block;">← Voltar</a>
-    <h2>Admissão</h2>
-    <hr>
+<div class="container-fluid px-4 my-4">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb mb-4" style="font-size: 14px; color: #666; background: transparent; padding: 0;">
+        <i class="bi bi-mortarboard me-1"></i> Execução Académica <span class="mx-2">&gt;</span> <span class="text-dark fw-bold">Admissão</span>
+    </div>
 
-    <div class="card">
-        <div class="card-body">
-            <p class="text-muted">Gerenciar admissões, inscrições e candidaturas de novos estudantes.</p>
+    <div class="row g-4 mb-5">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2 class="fw-bold text-dark mb-0">🎯 Módulo de <span class="text-primary">Admissão</span></h2>
+            <div class="badge bg-success p-2 px-3 rounded-pill">
+                <i class="bi bi-calendar-check me-2"></i>Inscrições Abertas ({{ ano_atual.codigo }})
+            </div>
         </div>
     </div>
+
+    <div class="row g-4">
+        <!-- Candidatos -->
+        <div class="col-md-6 col-lg-3">
+            <a href="{% url 'lista_inscritos' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 p-3 text-center" style="transition: transform 0.2s; border-top: 5px solid #0d6efd;">
+                    <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-people-fill text-primary fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Candidatos</h5>
+                    <p class="text-muted small mb-0">Gestão de pré-inscrições e perfis de candidatos.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Teste de Admissão -->
+        <div class="col-md-6 col-lg-3">
+            <a href="{% url 'gestao_eventos' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 p-3 text-center" style="transition: transform 0.2s; border-top: 5px solid #fd7e14;">
+                    <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-file-earmark-check-fill text-warning fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Teste de Admissão</h5>
+                    <p class="text-muted small mb-0">Configuração de exames e provas de entrada.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Resultados -->
+        <div class="col-md-6 col-lg-3">
+            <a href="{% url 'lancamento_notas' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 p-3 text-center" style="transition: transform 0.2s; border-top: 5px solid #6f42c1;">
+                    <div class="bg-purple bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; background-color: rgba(111, 66, 193, 0.1);">
+                        <i class="bi bi-bar-chart-fill text-purple fs-3" style="color: #6f42c1;"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Resultados</h5>
+                    <p class="text-muted small mb-0">Publicação e consulta de notas de admissão.</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Admitidos -->
+        <div class="col-md-6 col-lg-3">
+            <a href="{% url 'matricula' %}" class="text-decoration-none">
+                <div class="card border-0 shadow-sm h-100 p-3 text-center" style="transition: transform 0.2s; border-top: 5px solid #198754;">
+                    <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="bi bi-person-check-fill text-success fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-2">Admitidos</h5>
+                    <p class="text-muted small mb-0">Lista de candidatos aprovados para matrícula.</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <a href="{% url 'gestao_academica' %}" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="bi bi-arrow-left me-2"></i>Voltar para Área de Trabalho
+        </a>
+    </div>
 </div>
+
+<style>
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+    }
+</style>
 {% endblock %}

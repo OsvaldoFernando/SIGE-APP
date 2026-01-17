@@ -110,7 +110,7 @@
                     <div class="row g-3 mb-4">
                         <div class="col-md-4">
                             <div class="card border-0 bg-light shadow-none rounded-4 p-4 text-center h-100 hover-card">
-                                <div class="display-5 fw-bold text-primary mb-1">08</div>
+                                <div class="display-5 fw-bold text-primary mb-1">{{ turmas_atuais.count|stringformat:"02d"|default:"00" }}</div>
                                 <div class="small text-muted text-uppercase fw-bold">Turmas Ativas</div>
                             </div>
                         </div>
@@ -139,324 +139,226 @@
                                     <button class="nav-link rounded-pill fw-bold py-2" id="carreira-tab" data-bs-toggle="tab" data-bs-target="#carreira" type="button">Carreira</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link rounded-pill fw-bold py-2" id="horario-tab" data-bs-toggle="tab" data-bs-target="#horario" type="button">Horários (Agenda)</button>
+                                    <button class="nav-link rounded-pill fw-bold py-2" id="horario-tab" data-bs-toggle="tab" data-bs-target="#horario" type="button">Horários</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link rounded-pill fw-bold py-2" id="turmas-tab" data-bs-toggle="tab" data-bs-target="#turmas" type="button">Turmas Atuais</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link rounded-pill fw-bold py-2" id="historico-tab" data-bs-toggle="tab" data-bs-target="#historico" type="button">Histórico de Aulas</button>
+                                    <button class="nav-link rounded-pill fw-bold py-2" id="disciplinas-tab" data-bs-toggle="tab" data-bs-target="#disciplinas" type="button">Disciplinas</button>
                                 </li>
                                 <li class="nav-item" role="presentation">
-                                    <button class="nav-link rounded-pill fw-bold py-2" id="disciplinas-tab" data-bs-toggle="tab" data-bs-target="#disciplinas" type="button">Disciplinas</button>
+                                    <button class="nav-link rounded-pill fw-bold py-2" id="notas-tab" data-bs-toggle="tab" data-bs-target="#notas" type="button">Histórico de Notas</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link rounded-pill fw-bold py-2" id="historico-tab" data-bs-toggle="tab" data-bs-target="#historico" type="button">Histórico</button>
                                 </li>
                             </ul>
                         </div>
                         <div class="card-body px-0 pt-4">
                             <div class="tab-content" id="profTabContent">
-                                <div class="tab-pane fade" id="historico">
+                                <!-- Aba Geral -->
+                                <div class="tab-pane fade show active" id="geral">
                                     <div class="row g-4">
-                                        <div class="col-12">
-                                            <h6 class="fw-bold text-muted mb-3 border-start border-3 border-primary ps-2">Registro Histórico de Docência</h6>
-                                            <div class="table-responsive shadow-sm rounded-4 overflow-hidden border">
-                                                <table class="table table-hover align-middle mb-0 bg-white">
-                                                    <thead class="bg-light">
-                                                        <tr>
-                                                            <th class="border-0 px-4 py-3 small text-uppercase fw-bold text-muted">Ano Lectivo</th>
-                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Turma</th>
-                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Disciplina</th>
-                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Status</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {% for h in historico_aulas %}
-                                                            <tr>
-                                                                <td class="px-4 py-3">
-                                                                    <span class="fw-bold text-dark">{{ h.ano_lectivo }}</span>
-                                                                </td>
-                                                                <td class="py-3">
-                                                                    <div class="fw-medium">{{ h.turma_nome }}</div>
-                                                                    <div class="text-muted smaller">{{ h.curso_nome }}</div>
-                                                                </td>
-                                                                <td class="py-3">
-                                                                    <div class="fw-bold text-primary">{{ h.disciplina_nome }}</div>
-                                                                </td>
-                                                                <td class="py-3">
-                                                                    <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3">Concluído</span>
-                                                                </td>
-                                                            </tr>
-                                                        {% empty %}
-                                                            <tr>
-                                                                <td colspan="4" class="p-5 text-center bg-light text-muted">
-                                                                    <i class="bi bi-clock-history display-4 opacity-25"></i>
-                                                                    <p class="mt-3 mb-0">Nenhum registro histórico encontrado em anos anteriores.</p>
-                                                                </td>
-                                                            </tr>
-                                                        {% endfor %}
-                                                    </tbody>
-                                                </table>
-                                            </div>
+                                        <div class="col-md-6">
+                                            <h6 class="fw-bold text-muted mb-3 border-start border-3 border-primary ps-2">Informações Pessoais</h6>
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                                    <span class="text-muted">Gênero</span>
+                                                    <span class="fw-bold">{{ professor.get_genero_display|default:professor.genero|default:"-" }}</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                                    <span class="text-muted">Data de Nascimento</span>
+                                                    <span class="fw-bold">{{ professor.data_nascimento|date:"d/m/Y"|default:"-" }}</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                                    <span class="text-muted">Nacionalidade</span>
+                                                    <span class="fw-bold">{{ professor.nacionalidade|default:"Angolana" }}</span>
+                                                </li>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                                    <span class="text-muted">BI nº</span>
+                                                    <span class="fw-bold">{{ professor.bilhete_identidade|default:"-" }}</span>
+                                                </li>
+                                            </ul>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="tab-pane fade show active" id="horario">
-                                    <div class="row g-4">
-                                        <div class="col-12">
-                                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                                <h6 class="fw-bold text-muted mb-0 border-start border-3 border-primary ps-2">Agenda Acadêmica Completa</h6>
-                                                <a href="{% url 'registrar_horario' %}?professor={{ professor.id }}" class="btn btn-sm btn-success rounded-pill px-3">
-                                                    <i class="bi bi-calendar-plus me-1"></i> Novo Horário
-                                                </a>
-                                            </div>
-                                            <div class="table-responsive shadow-sm rounded-4 overflow-hidden border">
-                                                <table class="table table-hover align-middle mb-0 bg-white">
-                                                    <thead class="bg-light">
-                                                        <tr>
-                                                            <th class="border-0 px-4 py-3 small text-uppercase fw-bold text-muted" style="width: 150px;">Dia</th>
-                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted" style="width: 150px;">Hora</th>
-                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Sala</th>
-                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Turma</th>
-                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Disciplina</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {% for h in professor.horarios.all|dictsort:"dia_semana" %}
-                                                            <tr>
-                                                                <td class="px-4 py-3">
-                                                                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fw-bold w-100">
-                                                                        {{ h.get_dia_semana_display }}
-                                                                    </span>
-                                                                </td>
-                                                                <td class="py-3 fw-bold text-dark">
-                                                                    <i class="bi bi-clock me-2 text-primary opacity-50"></i>
-                                                                    {{ h.hora_inicio|time:"H:i" }} - {{ h.hora_fim|time:"H:i" }}
-                                                                </td>
-                                                                <td class="py-3">
-                                                                    <span class="text-muted small fw-bold">Sala:</span>
-                                                                    <span class="fw-bold text-dark">{{ h.sala.nome|default:"-" }}</span>
-                                                                </td>
-                                                                <td class="py-3">
-                                                                    <span class="text-muted small fw-bold">Turma:</span>
-                                                                    <span class="fw-bold text-dark">{{ h.turmadisciplina_set.first.turma.nome|default:"-" }}</span>
-                                                                </td>
-                                                                <td class="py-3">
-                                                                    <div class="fw-bold text-primary">{{ h.disciplina.nome }}</div>
-                                                                    <div class="text-muted smaller">{{ h.tempos_aula }} tempos</div>
-                                                                </td>
-                                                            </tr>
-                                                        {% empty %}
-                                                            <tr>
-                                                                <td colspan="5" class="p-5 text-center bg-light text-muted">
-                                                                    <i class="bi bi-calendar-x display-4 opacity-25"></i>
-                                                                    <p class="mt-3 mb-0">Nenhuma aula agendada na grade horária.</p>
-                                                                </td>
-                                                            </tr>
-                                                        {% endfor %}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-pane fade" id="turmas">
-                                    <div class="row g-4">
-                                        <div class="col-12">
-                                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                                <h6 class="fw-bold text-muted mb-0 border-start border-3 border-primary ps-2">Disciplinas Associadas</h6>
-                                                {% if user.perfil.nivel_acesso in 'admin,super_admin,pedagogico' %}
-                                                <button class="btn btn-sm btn-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#modalAtribuirDisciplina">
-                                                    <i class="bi bi-plus-lg me-1"></i> Associar
-                                                </button>
-                                                {% endif %}
-                                            </div>
-                                            <div class="list-group shadow-sm rounded-4 overflow-hidden">
-                                                {% for relacao in professor.professor_disciplinas.all %}
-                                                    <div class="list-group-item d-flex justify-content-between align-items-center p-4">
-                                                        <div>
-                                                            <div class="fw-bold fs-5 text-dark">{{ relacao.disciplina.nome }}</div>
-                                                            <div class="text-muted small">
-                                                                Código: {{ relacao.disciplina.codigo|default:"N/A" }} | Atribuído em: {{ relacao.data_atribuicao|date:"d/m/Y" }}
-                                                            </div>
-                                                        </div>
-                                                        {% if user.perfil.nivel_acesso in 'admin,super_admin,pedagogico' %}
-                                                        <form method="POST" action="{% url 'remover_disciplina_professor' relacao.id %}" onsubmit="return confirm('Tem certeza que deseja remover esta disciplina?')">
-                                                            {% csrf_token %}
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger border-0 rounded-circle">
-                                                                <i class="bi bi-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                        {% endif %}
-                                                    </div>
-                                                {% empty %}
-                                                    <div class="p-5 text-center bg-light">
-                                                        <i class="bi bi-book display-4 text-muted opacity-50"></i>
-                                                        <p class="text-muted mt-3 mb-0">Nenhuma disciplina associada diretamente.</p>
-                                                    </div>
-                                                {% endfor %}
+                                        <div class="col-md-6">
+                                            <h6 class="fw-bold text-muted mb-3 border-start border-3 border-primary ps-2">Endereço & Localização</h6>
+                                            <div class="p-3 bg-light rounded-4">
+                                                <p class="text-dark mb-1 fw-medium">{{ professor.endereco|default:"Não informado" }}</p>
+                                                <p class="text-muted small mb-0"><i class="bi bi-geo-alt me-1"></i> {{ professor.municipio_provincia|default:"-" }}</p>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Modal Atribuir Disciplina -->
-                                <div class="modal fade" id="modalAtribuirDisciplina" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content rounded-4 border-0 shadow">
-                                            <form method="POST" action="{% url 'associar_disciplina_professor' professor.id %}">
-                                                {% csrf_token %}
-                                                <div class="modal-header border-0 p-4 pb-0">
-                                                    <h5 class="modal-title fw-bold">Associar Disciplina</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body p-4">
-                                                    <div class="mb-3">
-                                                        <label class="form-label small fw-bold">Selecione a Disciplina</label>
-                                                        <select name="disciplina" class="form-select rounded-3" required>
-                                                            <option value="">---</option>
-                                                            {% for d in todas_disciplinas %}
-                                                                <option value="{{ d.id }}">{{ d.nome }} ({{ d.codigo|default:"Sem código" }})</option>
-                                                            {% endfor %}
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer border-0 p-4 pt-0">
-                                                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Fechar</button>
-                                                    <button type="submit" class="btn btn-primary rounded-pill px-4">Confirmar</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-pane fade show active" id="geral">
+                                <!-- Aba Carreira -->
+                                <div class="tab-pane fade" id="carreira">
                                     <div class="row g-4">
                                         <div class="col-md-6">
-                                            <h6 class="fw-bold text-muted mb-3 border-start border-3 border-primary ps-2">Informações Gerais</h6>
-                                            <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
-                                                <li class="d-flex justify-content-between py-1 border-bottom">
-                                                    <span class="text-muted small">Código:</span> 
-                                                    <span class="fw-medium text-dark">{{ professor.codigo_professor }}</span>
+                                            <h6 class="fw-bold text-muted mb-3 border-start border-3 border-primary ps-2">Dados Profissionais</h6>
+                                            <ul class="list-group list-group-flush">
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                                    <span class="text-muted">Tipo de Vínculo</span>
+                                                    <span class="fw-bold text-primary">{{ professor.tipo_vinculo|default:"Efetivo" }}</span>
                                                 </li>
-                                                <li class="d-flex justify-content-between py-1 border-bottom">
-                                                    <span class="text-muted small">Grau Académico:</span> 
-                                                    <span class="fw-medium text-dark">{{ professor.get_grau_academico_display|default:professor.grau_academico|title }}</span>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                                    <span class="text-muted">Data de Admissão</span>
+                                                    <span class="fw-bold">{{ professor.data_admissao|date:"d/m/Y"|default:"-" }}</span>
                                                 </li>
-                                                <li class="d-flex justify-content-between py-1 border-bottom">
-                                                    <span class="text-muted small">Área de Formação:</span> 
-                                                    <span class="fw-medium text-dark text-end ms-2">{{ professor.area_formacao }}</span>
-                                                </li>
-                                                <li class="d-flex justify-content-between py-1 border-bottom">
-                                                    <span class="text-muted small">Categoria:</span> 
-                                                    <span class="fw-medium text-dark text-primary fw-bold">{{ professor.get_categoria_display|default:professor.categoria }}</span>
-                                                </li>
-                                                <li class="d-flex justify-content-between py-1 border-bottom">
-                                                    <span class="text-muted small">Vínculo:</span> 
-                                                    <span class="fw-medium text-dark">{{ professor.get_tipo_vinculo_display|default:professor.tipo_vinculo|title }}</span>
-                                                </li>
-                                                <li class="d-flex justify-content-between py-1">
-                                                    <span class="text-muted small">Estado:</span> 
-                                                    {% if professor.estado == 'ativo' %}
-                                                    <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2">Ativo</span>
-                                                    {% else %}
-                                                    <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-2">Inativo</span>
-                                                    {% endif %}
+                                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                                    <span class="text-muted">Estado Atual</span>
+                                                    <span class="badge {% if professor.estado == 'ativo' %}bg-success{% else %}bg-danger{% endif %} rounded-pill px-3">
+                                                        {{ professor.get_estado_display|default:professor.estado|upper }}
+                                                    </span>
                                                 </li>
                                             </ul>
                                         </div>
-                                        <div class="col-md-6">
-                                            <h6 class="fw-bold text-muted mb-3 border-start border-3 border-primary ps-2">Contatos e Localização</h6>
-                                            <div class="bg-light p-3 rounded-3 h-100">
-                                                <div class="mb-3">
-                                                    <p class="text-muted small mb-1"><i class="bi bi-envelope-fill text-primary me-2"></i>Email:</p>
-                                                    <p class="text-dark fw-medium text-break mb-0">{{ professor.email }}</p>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <p class="text-muted small mb-1"><i class="bi bi-telephone-fill text-primary me-2"></i>Telefone:</p>
-                                                    <p class="text-dark fw-medium mb-0">{{ professor.telefone }}</p>
-                                                </div>
-                                                <div>
-                                                    <p class="text-muted small mb-1"><i class="bi bi-geo-alt-fill text-primary me-2"></i>Endereço:</p>
-                                                    <p class="text-dark small mb-1 lh-sm">{{ professor.endereco }}</p>
-                                                    <p class="text-muted smaller mb-0"><i class="bi bi-pin-map-fill text-primary me-2"></i>{{ professor.municipio_provincia }}</p>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
-                                <div class="tab-pane fade" id="carreira">
-                                    <div class="timeline-modern py-2">
-                                        <div class="d-flex gap-4">
-                                            <div class="timeline-date fw-bold text-primary text-center" style="min-width: 60px;">
-                                                {{ professor.data_admissao|date:"Y" }}
-                                                <div class="small opacity-50">{{ professor.data_admissao|date:"M" }}</div>
-                                            </div>
-                                            <div class="timeline-content border-start border-2 ps-4 pb-4 position-relative">
-                                                <div class="position-absolute top-0 start-0 bg-primary rounded-circle" style="width: 14px; height: 14px; transform: translateX(-8px); margin-top: 5px; border: 3px solid #fff;"></div>
-                                                <h6 class="fw-bold mb-1 text-dark">Admissão Institucional</h6>
-                                                <p class="text-muted small mb-3">Ingresso como {{ professor.get_categoria_display|default:professor.categoria }} sob regime {{ professor.tipo_vinculo }}.</p>
-                                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2 rounded-pill">
-                                                    <i class="bi bi-calendar-event me-2"></i>{{ professor.data_admissao|date:"d/m/Y" }}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="tab-pane fade show active" id="horario">
+
+                                <!-- Aba Horário -->
+                                <div class="tab-pane fade" id="horario">
                                     <div class="row g-4">
                                         <div class="col-12">
                                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                                <h6 class="fw-bold text-muted mb-0 border-start border-3 border-primary ps-2">Agenda Acadêmica Completa</h6>
+                                                <h6 class="fw-bold text-muted mb-0 border-start border-3 border-primary ps-2">Agenda Acadêmica</h6>
                                                 <a href="{% url 'registrar_horario' %}?professor={{ professor.id }}" class="btn btn-sm btn-success rounded-pill px-3">
-                                                    <i class="bi bi-calendar-plus me-1"></i> Novo Horário
+                                                    <i class="bi bi-calendar-plus me-1"></i> Novo
                                                 </a>
                                             </div>
-                                            <div class="table-responsive shadow-sm rounded-4 overflow-hidden border">
+                                            <div class="table-responsive shadow-sm rounded-4 border overflow-hidden">
                                                 <table class="table table-hover align-middle mb-0 bg-white">
                                                     <thead class="bg-light">
                                                         <tr>
-                                                            <th class="border-0 px-4 py-3 small text-uppercase fw-bold text-muted" style="width: 150px;">Dia</th>
-                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted" style="width: 150px;">Hora</th>
-                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Sala</th>
-                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Turma</th>
-                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Disciplina</th>
+                                                            <th class="border-0 px-4 py-3 small text-uppercase fw-bold text-muted">Dia</th>
+                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Hora</th>
+                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Turma/Disciplina</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         {% for h in professor.horarios.all|dictsort:"dia_semana" %}
                                                             <tr>
-                                                                <td class="px-4 py-3">
-                                                                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 fw-bold w-100">
-                                                                        {{ h.get_dia_semana_display }}
-                                                                    </span>
-                                                                </td>
-                                                                <td class="py-3 fw-bold text-dark">
-                                                                    <i class="bi bi-clock me-2 text-primary opacity-50"></i>
-                                                                    {{ h.hora_inicio|time:"H:i" }} - {{ h.hora_fim|time:"H:i" }}
-                                                                </td>
+                                                                <td class="px-4 py-3"><span class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3">{{ h.get_dia_semana_display }}</span></td>
+                                                                <td class="py-3 fw-bold">{{ h.hora_inicio|time:"H:i" }} - {{ h.hora_fim|time:"H:i" }}</td>
                                                                 <td class="py-3">
-                                                                    <span class="text-muted small fw-bold">Sala:</span>
-                                                                    <span class="fw-bold text-dark">{{ h.sala.nome|default:"-" }}</span>
-                                                                </td>
-                                                                <td class="py-3">
-                                                                    <span class="text-muted small fw-bold">Turma:</span>
-                                                                    <span class="fw-bold text-dark">{{ h.turmadisciplina_set.first.turma.nome|default:"-" }}</span>
-                                                                </td>
-                                                                <td class="py-3">
-                                                                    <div class="fw-bold text-primary">{{ h.disciplina.nome }}</div>
-                                                                    <div class="text-muted smaller">{{ h.tempos_aula }} tempos</div>
+                                                                    <div class="fw-bold text-dark">{{ h.disciplina.nome }}</div>
+                                                                    <div class="text-muted smaller">Sala: {{ h.sala.nome|default:"-" }}</div>
                                                                 </td>
                                                             </tr>
                                                         {% empty %}
-                                                            <tr>
-                                                                <td colspan="5" class="p-5 text-center bg-light text-muted">
-                                                                    <i class="bi bi-calendar-x display-4 opacity-25"></i>
-                                                                    <p class="mt-3 mb-0">Nenhuma aula agendada na grade horária.</p>
-                                                                </td>
-                                                            </tr>
+                                                            <tr><td colspan="3" class="p-5 text-center text-muted italic">Nenhuma aula agendada.</td></tr>
                                                         {% endfor %}
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+
+                                <!-- Aba Turmas Atuais -->
+                                <div class="tab-pane fade" id="turmas">
+                                    <div class="row g-3">
+                                        {% for turma in turmas_atuais %}
+                                        <div class="col-md-6 col-lg-4">
+                                            <div class="card border shadow-sm rounded-4 h-100">
+                                                <div class="card-body">
+                                                    <span class="badge bg-primary bg-opacity-10 text-primary rounded-pill mb-2">{{ turma.ano_lectivo.codigo }}</span>
+                                                    <h6 class="fw-bold mb-1">{{ turma.nome }}</h6>
+                                                    <p class="text-muted smaller mb-0">{{ turma.curso.nome }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% empty %}
+                                        <div class="col-12 text-center p-5 text-muted italic">Nenhuma turma ativa encontrada.</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <!-- Aba Disciplinas -->
+                                <div class="tab-pane fade" id="disciplinas">
+                                    <div class="list-group shadow-sm rounded-4 border overflow-hidden">
+                                        {% for rel in professor.professor_disciplinas.all %}
+                                        <div class="list-group-item d-flex justify-content-between align-items-center p-3">
+                                            <div>
+                                                <div class="fw-bold">{{ rel.disciplina.nome }}</div>
+                                                <div class="text-muted smaller">Código: {{ rel.disciplina.codigo|default:"N/A" }}</div>
+                                            </div>
+                                            {% if user.perfil.nivel_acesso in 'admin,super_admin,pedagogico' %}
+                                            <form method="POST" action="{% url 'remover_disciplina_professor' rel.id %}" onsubmit="return confirm('Excluir?')">
+                                                {% csrf_token %}<button class="btn btn-sm btn-link text-danger p-0"><i class="bi bi-trash"></i></button>
+                                            </form>
+                                            {% endif %}
+                                        </div>
+                                        {% empty %}
+                                        <div class="p-5 text-center text-muted italic">Nenhuma disciplina associada.</div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <!-- Aba Histórico de Notas -->
+                                <div class="tab-pane fade" id="notas">
+                                    <div class="row g-4">
+                                        <div class="col-12">
+                                            <h6 class="fw-bold text-muted mb-3 border-start border-3 border-primary ps-2">Últimas Notas Lançadas</h6>
+                                            <div class="table-responsive shadow-sm rounded-4 border overflow-hidden">
+                                                <table class="table table-hover align-middle mb-0 bg-white">
+                                                    <thead class="bg-light">
+                                                        <tr>
+                                                            <th class="border-0 px-4 py-3 small text-uppercase fw-bold text-muted">Data</th>
+                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Aluno</th>
+                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Turma/Disciplina</th>
+                                                            <th class="border-0 py-3 small text-uppercase fw-bold text-muted text-center">Nota</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for nota in historico_notas %}
+                                                        <tr>
+                                                            <td class="px-4 py-3 small text-muted">{{ nota.data_lancamento|date:"d/m/Y H:i" }}</td>
+                                                            <td class="py-3 fw-bold">{{ nota.aluno.nome_completo }}</td>
+                                                            <td class="py-3">
+                                                                <div class="fw-bold text-dark">{{ nota.disciplina.nome }}</div>
+                                                                <div class="text-muted smaller">{{ nota.turma.nome }} ({{ nota.ano_academico.codigo }})</div>
+                                                            </td>
+                                                            <td class="py-3 text-center">
+                                                                <span class="badge {% if nota.nota >= 10 %}bg-success{% else %}bg-danger{% endif %} rounded-pill fs-6 px-3">
+                                                                    {{ nota.nota|floatformat:1 }}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                        {% empty %}
+                                                        <tr><td colspan="4" class="p-5 text-center text-muted italic">Nenhuma nota lançada recentemente.</td></tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Aba Histórico -->
+                                <div class="tab-pane fade" id="historico">
+                                    <div class="table-responsive shadow-sm rounded-4 border overflow-hidden">
+                                        <table class="table table-hover align-middle mb-0 bg-white">
+                                            <thead class="bg-light">
+                                                <tr>
+                                                    <th class="border-0 px-4 py-3 small text-uppercase fw-bold text-muted">Ano</th>
+                                                    <th class="border-0 py-3 small text-uppercase fw-bold text-muted">Turma/Disciplina</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for h in historico_aulas %}
+                                                <tr>
+                                                    <td class="px-4 py-3 fw-bold">{{ h.ano_lectivo }}</td>
+                                                    <td class="py-3">
+                                                        <div class="fw-bold text-dark">{{ h.disciplina_nome }}</div>
+                                                        <div class="text-muted smaller">{{ h.turma_nome }}</div>
+                                                    </td>
+                                                </tr>
+                                                {% empty %}
+                                                <tr><td colspan="2" class="p-5 text-center text-muted italic">Sem histórico.</td></tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
@@ -467,33 +369,4 @@
         </div>
     </div>
 </div>
-</div>
-
-<style>
-    .hover-card {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .hover-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 1rem 3rem rgba(0,0,0,.08) !important;
-    }
-    .nav-pills .nav-link {
-        color: #64748b;
-        transition: all 0.3s ease;
-    }
-    .nav-pills .nav-link.active {
-        background-color: #fff;
-        color: #1e3a8a;
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,.1);
-    }
-    .btn-white:hover {
-        background-color: #f8fafc;
-    }
-    .timeline-modern .timeline-content {
-        min-height: 100px;
-    }
-    .object-fit-cover {
-        object-fit: cover;
-    }
-</style>
 {% endblock %}

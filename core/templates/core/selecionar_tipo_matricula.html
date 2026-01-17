@@ -42,7 +42,13 @@
 
         <!-- Nova Inscrição (Blue) -->
         <div class="col-md-6 col-lg-4">
-            <a href="{% url 'inscricao_create' 1 %}" class="text-decoration-none">
+            {% if cursos %}
+                {% with primeiro_curso=cursos.first %}
+                <a href="{% url 'inscricao_create' primeiro_curso.id %}" class="text-decoration-none">
+                {% endwith %}
+            {% else %}
+                <a href="#" class="text-decoration-none" onclick="alert('Nenhum curso ativo disponível para inscrição no momento.'); return false;">
+            {% endif %}
                 <div class="card border-0 h-100" style="background-color: #3498DB; color: white; border-radius: 2px; overflow: hidden; min-height: 120px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <div class="card-body p-3 d-flex">
                         <div class="flex-shrink-0 me-3">
@@ -71,11 +77,11 @@
                         </div>
                         <div class="flex-grow-1 text-end">
                             <h2 style="font-weight: 300; font-size: 24px; margin-bottom: 5px; letter-spacing: -1px;">Aprovação</h2>
-                            <p style="font-size: 12px; opacity: 0.9; margin: 0; line-height: 1.2;">Lançamento de Notas e Resultados.</p>
+                            <p style="font-size: 12px; opacity: 0.9; margin: 0; line-height: 1.2;">Notas e Resultados.</p>
                         </div>
                     </div>
                     <div class="card-footer border-0 py-2 px-3 d-flex justify-content-between align-items-center" style="background-color: rgba(0,0,0,0.15);">
-                        <span style="font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Lançar Notas</span>
+                        <span style="font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Notas</span>
                         <i class="bi bi-arrow-right-circle" style="font-size: 16px;"></i>
                     </div>
                 </div>

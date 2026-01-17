@@ -48,6 +48,7 @@ urlpatterns = [
     path('candidatos/painel/', views.painel_candidato, name='painel_candidato'),
     path('candidatos/lista/', views.lista_inscritos, name='lista_inscritos'),
     path('candidatos/lancamento-notas/', views.lancamento_notas, name='lancamento_notas'),
+    path('notas-matriculados/', views.notas_matriculados, name='notas_matriculados'),
     path('candidatos/processar-aprovacao/', views.processar_aprovacao_vagas, name='processar_aprovacao_vagas'),
     path('consultar-aprovacao/', views.consultar_aprovacao, name='consultar_aprovacao'),
     path('admissao-estudantes/', views.admissao_estudantes, name='admissao_estudantes'),
@@ -70,4 +71,5 @@ urlpatterns = [
     path('configuracao-escola/', views.gestao_configuracao_escola, name='gestao_configuracao_escola'),
     path('professores/<int:professor_id>/associar-disciplina/', views.associar_disciplina_professor, name='associar_disciplina_professor'),
     path('professores/remover-disciplina/<int:relacao_id>/', views.remover_disciplina_professor, name='remover_disciplina_professor'),
+    path('utilizadores/<int:perfil_id>/acessos/', views.gestao_acessos, name='gestao_acessos'),
 ]

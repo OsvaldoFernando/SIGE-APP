@@ -178,6 +178,98 @@ def mudar_ano_academico(request, ano_id):
     messages.success(request, f"Ano Académico alterado para {ano.codigo}")
     return redirect(request.META.get('HTTP_REFERER', 'dashboard'))
 
+@login_required
+def notas_matriculados(request):
+    from .models import AnoAcademico, Turma, Disciplina, Professor, Aluno, NotaEstudante
+    
+    anos = AnoAcademico.objects.all()
+    
+    # Busca o ano acadêmico ativo se não for passado via GET
+    ano_sel = request.GET.get('ano')
+    if not ano_sel or ano_sel == '':
+        ano_ativo = AnoAcademico.get_atual()
+        if ano_ativo:
+            ano_sel = str(ano_ativo.id)
+    
+    # Garantir que ano_sel seja um inteiro se existir
+    try:
+        if ano_sel:
+            ano_id_int = int(ano_sel)
+        else:
+            ano_id_int = None
+    except ValueError:
+        ano_id_int = None
+
+    turma_sel = request.GET.get('turma')
+    disciplina_sel = request.GET.get('disciplina')
+    
+    # O professor é o usuário logado se ele for professor
+    professor_logado = None
+    if request.user.perfil.nivel_acesso == 'professor':
+        try:
+            professor_logado = Professor.objects.get(user=request.user)
+            professor_sel = str(professor_logado.id)
+        except Professor.DoesNotExist:
+            pass
+    else:
+        professor_sel = request.GET.get('professor')
+    
+    turmas = Turma.objects.filter(ano_lectivo_id=ano_id_int) if ano_id_int else []
+    
+    # Filtrar disciplinas com base na turma selecionada
+    disciplinas = []
+    if turma_sel:
+        turma_obj = get_object_or_404(Turma, id=turma_sel)
+        disciplinas = Disciplina.objects.filter(curso=turma_obj.curso).distinct()
+    
+    professores = Professor.objects.all()
+    alunos = Aluno.objects.filter(turma_id=turma_sel) if turma_sel else []
+    
+    if request.method == 'POST':
+        if not all([ano_sel, turma_sel, disciplina_sel, professor_sel]):
+            messages.error(request, "Selecione todos os filtros antes de salvar.")
+        else:
+            for key, value in request.POST.items():
+                if key.startswith('nota_'):
+                    aluno_id = key.split('_')[1]
+                    try:
+                        nota_val = float(value.replace(',', '.')) if value else None
+                        NotaEstudante.objects.update_or_create(
+                            ano_academico_id=ano_id_int,
+                            turma_id=turma_sel,
+                            disciplina_id=disciplina_sel,
+                            aluno_id=aluno_id,
+                            defaults={'professor_id': professor_sel, 'nota': nota_val}
+                        )
+                    except ValueError:
+                        pass
+            messages.success(request, "Notas salvas com sucesso!")
+            
+    # Carregar notas existentes
+    notas_existentes = {}
+    if all([ano_id_int, turma_sel, disciplina_sel]):
+        notas_objs = NotaEstudante.objects.filter(
+            ano_academico_id=ano_id_int,
+            turma_id=turma_sel,
+            disciplina_id=disciplina_sel
+        )
+        for n in notas_objs:
+            notas_existentes[n.aluno_id] = n.nota
+
+    return render(request, 'core/rh/lancamento_notas_matriculados.html', {
+        'anos': anos,
+        'turmas': turmas,
+        'disciplinas': disciplinas,
+        'professores': professores,
+        'alunos': alunos,
+        'ano_sel': ano_sel,
+        'turma_sel': turma_sel,
+        'disciplina_sel': disciplina_sel,
+        'professor_sel': professor_sel,
+        'professor_logado': professor_logado,
+        'notas_existentes': notas_existentes
+    })
+
 def processar_aprovacoes_curso(curso_id):
     curso = Curso.objects.get(id=curso_id)
     inscricoes_com_nota = curso.inscricoes.filter(nota_teste__isnull=False, nota_teste__gte=curso.nota_minima).order_by('-nota_teste')
@@ -2522,13 +2614,15 @@ def admissao(request):
         messages.error(request, "O sistema de inscrições está fechado no momento conforme o calendário acadêmico.")
         return redirect('painel_principal')
         
-    context = {'ano_atual': ano_atual}
+    context = {'ano_atual': ano_atual, 'active': 'admissao'}
     return render(request, 'core/admissao_view.html', context)
 
 @login_required
 def selecionar_tipo_matricula(request):
     """View para selecionar tipo de matrícula"""
-    return render(request, 'core/selecionar_tipo_matricula.html')
+    from .models import Curso
+    cursos = Curso.objects.filter(ativo=True)
+    return render(request, 'core/selecionar_tipo_matricula.html', {'cursos': cursos})
 
 @login_required
 def matricula(request):
@@ -2680,6 +2774,7 @@ def atribuicao_turmas(request):
             ano_academico = request.POST.get('ano_academico')
             periodo = request.POST.get('periodo')
             nome = request.POST.get('nome')
+            sala_id = request.POST.get('sala')
             
             # Obter ano académico da sessão ou padrão
             ano_id = request.session.get('ano_academico_id')
@@ -2691,10 +2786,11 @@ def atribuicao_turmas(request):
             # 1. Criar a Turma
             turma = Turma.objects.create(
                 nome=nome,
-                curso=curso,
+                curso=get_object_or_404(Curso, id=curso_id),
                 ano_lectivo=ano_l,
                 ano_academico=ano_academico,
-                periodo_curricular=periodo
+                periodo_curricular=periodo,
+                sala_id=sala_id
             )
             
             # 2. Buscar disciplinas da grelha automaticamente
@@ -2715,12 +2811,15 @@ def atribuicao_turmas(request):
 
     cursos = Curso.objects.filter(ativo=True)
     anos_lectivos = AnoAcademico.objects.filter(estado='ATIVO')
-    turmas = Turma.objects.all().select_related('curso', 'ano_lectivo')
+    turmas = Turma.objects.all().select_related('curso', 'ano_lectivo', 'sala')
+    from .models import Sala
+    salas = Sala.objects.filter(ativa=True)
     
     context = {
         'cursos': cursos,
         'anos_lectivos': anos_lectivos,
         'turmas': turmas,
+        'salas': salas,
         'active': 'turmas'
     }
     return render(request, 'core/atribuicao_turmas_view.html', context)
@@ -3288,13 +3387,14 @@ def deletar_curso(request, curso_id):
 @login_required
 def listar_utilizadores(request):
     """Lista todos os utilizadores do sistema"""
+    from .models import PerfilUsuario, Privilegio
     # Verificar se é admin ou super_admin
-    perfil = getattr(request.user, 'perfil', None)
-    if not request.user.is_staff and not (perfil and perfil.nivel_acesso in ['admin', 'super_admin']):
+    perfil_req = getattr(request.user, 'perfil', None)
+    if not request.user.is_staff and not (perfil_req and perfil_req.nivel_acesso in ['admin', 'super_admin']):
         messages.error(request, 'Acesso negado. Apenas administradores podem acessar esta página.')
         return redirect('painel_principal')
     
-    utilizadores = User.objects.all().prefetch_related('perfil').order_by('-date_joined')
+    utilizadores = User.objects.all().select_related('perfil').prefetch_related('perfil__privilegios').order_by('-date_joined')
     
     # Filtro por nível de acesso
     nivel_filtro = request.GET.get('nivel', '')
@@ -3309,12 +3409,21 @@ def listar_utilizadores(request):
         utilizadores = utilizadores.filter(is_active=False)
     elif ativo_filtro == 'pendente':
         utilizadores = utilizadores.filter(perfil__nivel_acesso='pendente')
+        
+    # Filtro por privilégio
+    privilegio_filtro = request.GET.get('privilegio', '')
+    if privilegio_filtro:
+        utilizadores = utilizadores.filter(perfil__privilegios__codigo=privilegio_filtro)
+    
+    todos_privilegios = Privilegio.objects.all().order_by('nome')
     
     contexto = {
         'utilizadores': utilizadores,
         'niveis_acesso': PerfilUsuario.NIVEL_ACESSO_CHOICES,
+        'todos_privilegios': todos_privilegios,
         'nivel_filtro': nivel_filtro,
         'ativo_filtro': ativo_filtro,
+        'privilegio_filtro': privilegio_filtro,
     }
     return render(request, 'core/utilizadores/listar.html', contexto)
 
@@ -4054,20 +4163,65 @@ def perfil_professor(request, professor_id):
         disciplina_nome=F('disciplina__nome')
     ).values('ano_lectivo', 'turma_nome', 'curso_nome', 'disciplina_nome').distinct().order_by('-ano_lectivo')
     
+    # Histórico de avaliações lançadas
+    historico_notas = NotaEstudante.objects.filter(professor=professor).select_related('aluno', 'turma', 'disciplina', 'ano_academico').order_by('-data_lancamento')[:50]
+    
     return render(request, 'core/professor_perfil.html', {
         'professor': professor,
         'todas_disciplinas': todas_disciplinas,
         'turmas_atuais': turmas_atuais,
-        'historico_aulas': historico_aulas
+        'historico_aulas': historico_aulas,
+        'historico_notas': historico_notas
     })
 
 @login_required
+def gestao_acessos(request, perfil_id):
+    from .models import PerfilUsuario, Privilegio
+    perfil = get_object_or_404(PerfilUsuario, id=perfil_id)
+    
+    if request.user.perfil.nivel_acesso not in ['admin', 'super_admin']:
+        messages.error(request, "Acesso negado.")
+        return redirect('painel_principal')
+        
+    todos_privilegios = Privilegio.objects.all()
+    
+    if request.method == 'POST':
+        privilegios_ids = request.POST.getlist('privilegios')
+        perfil.privilegios.set(privilegios_ids)
+        messages.success(request, f"Privilégios de {perfil.user.username} atualizados com sucesso!")
+        return redirect('gestao_acessos', perfil_id=perfil.id)
+        
+    return render(request, 'core/gestao_acessos.html', {
+        'perfil': perfil,
+        'todos_privilegios': todos_privilegios,
+    })
+
+def criar_privilegios_iniciais():
+    from .models import Privilegio
+    privs = [
+        ('Visualizar estudante', 'visualizar_estudante', 'Permite visualizar o perfil do estudante', 'SA'),
+        ('Visualizar histórico', 'visualizar_historico', 'Permite visualizar o histórico no perfil do estudante', 'SA'),
+        ('Re-aberturar Pautas', 'reabrir_pautas', 'Permite re-abertura de pautas', 'SA'),
+        ('Lançar notas', 'lancar_notas', 'Permite lançar notas', 'SA'),
+        ('Alterar notas', 'alterar_notas', 'Permite Alterar notas', 'SA'),
+        ('Visualizar Pauta', 'visualizar_pauta', 'Permite visualizar e imprimir pautas', 'SA'),
+        ('Visualizar Ficha', 'visualizar_ficha', 'Permite visualizar e imprimir Ficha Individual', 'SA'),
+        ('Editar histórico', 'editar_historico', 'Permite editar eliminar ou apagar histórico do estudante', 'SA'),
+        ('Eliminar Pauta', 'eliminar_pauta', 'Permite eliminar pautas', 'SA'),
+        ('Adicionar Pauta', 'adicionar_pauta', 'Permite adicionar pautas vinculada a um docente', 'SA'),
+        ('Visualizar Inscrições', 'visualizar_inscricoes', 'Permite visualizar inscrições no perfil do estudante', 'SA'),
+        ('Inscrever estudante a prova', 'inscrever_prova', 'Permite inscrever ou anular estudante à época de recurso', 'SA'),
+    ]
+    for nome, codigo, desc, mod in privs:
+        Privilegio.objects.get_or_create(codigo=codigo, defaults={'nome': nome, 'descricao': desc, 'modulo': mod})
+
+@login_required
 def associar_disciplina_professor(request, professor_id):
+    from .models import Professor, Disciplina, ProfessorDisciplina
     if request.user.perfil.nivel_acesso not in ['admin', 'super_admin', 'pedagogico']:
         messages.error(request, "Acesso negado. Apenas administradores podem vincular disciplinas.")
         return redirect('perfil_professor', professor_id=professor_id)
         
-    from .models import Professor, Disciplina, ProfessorDisciplina
     if request.method == 'POST':
         professor = get_object_or_404(Professor, id=professor_id)
         disciplina_id = request.POST.get('disciplina')

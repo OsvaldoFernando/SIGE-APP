@@ -13,7 +13,18 @@
                 <li><a href="{% url 'periodo_letivo' %}" class="nav-link {% if active == 'periodo' %}active{% endif %}" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">⏱️ Período Letivo</a></li>
                 <li><a href="{% url 'horarios' %}" class="nav-link {% if active == 'horarios' %}active{% endif %}" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">⏰ Horários</a></li>
                 <li><a href="{% url 'titulos_academicos' %}" class="nav-link {% if active == 'titulos' %}active{% endif %}" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">🎓 Títulos Acadêmicos</a></li>
-                <li><a href="{% url 'modelo_avaliacao' %}" class="nav-link {% if active == 'modelo' %}active{% endif %}" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📊 Modelo de Avaliação</a></li>
+                
+                <li style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                    <span style="color: #fff; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">ADMISSÃO</span>
+                    <ul style="list-style: none; padding-left: 15px; margin-top: 5px;">
+                        <li><a href="{% url 'lista_inscritos' %}" style="color: rgba(255,255,255,0.7); padding: 5px 0; display: block; text-decoration: none; font-size: 14px;">👥 Candidatos</a></li>
+                        <li><a href="{% url 'gestao_eventos' %}" style="color: rgba(255,255,255,0.7); padding: 5px 0; display: block; text-decoration: none; font-size: 14px;">📝 Teste de Admissão</a></li>
+                        <li><a href="{% url 'lancamento_notas' %}" style="color: rgba(255,255,255,0.7); padding: 5px 0; display: block; text-decoration: none; font-size: 14px;">📊 Resultados</a></li>
+                        <li><a href="{% url 'matricula' %}" style="color: rgba(255,255,255,0.7); padding: 5px 0; display: block; text-decoration: none; font-size: 14px;">✅ Admitidos</a></li>
+                    </ul>
+                </li>
+
+                <li style="margin-top: 15px;"><a href="{% url 'modelo_avaliacao' %}" class="nav-link {% if active == 'modelo' %}active{% endif %}" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📈 Modelo de Avaliação</a></li>
                 <li><a href="{% url 'syllabus' %}" class="nav-link {% if active == 'syllabus' %}active{% endif %}" style="color: rgba(255,255,255,0.8); padding: 10px 0; display: block; text-decoration: none;">📖 Syllabus Acadêmico</a></li>
             </ul>
         </div>
@@ -23,10 +34,48 @@
             <h1 style="color: #1e3c72; margin-bottom: 30px; text-align: center;">Área de Trabalho</h1>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <!-- Módulo Admissão Agrupado -->
+                <div style="grid-column: 1 / -1; margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+                    <h4 style="color: #1e3c72; font-weight: bold;">🎯 Módulo ADMISSÃO</h4>
+                </div>
+
+                <a href="{% url 'lista_inscritos' %}" style="text-decoration: none;">
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #007bff; transition: all 0.3s; cursor: pointer;">
+                        <h5 style="color: #007bff; margin-bottom: 10px;">👥 Candidatos</h5>
+                        <p style="color: #666; margin: 0;">Gestão de inscritos e perfis de candidatos.</p>
+                    </div>
+                </a>
+
+                <a href="{% url 'gestao_eventos' %}" style="text-decoration: none;">
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #fd7e14; transition: all 0.3s; cursor: pointer;">
+                        <h5 style="color: #fd7e14; margin-bottom: 10px;">📝 Teste de Admissão</h5>
+                        <p style="color: #666; margin: 0;">Configuração de exames e provas de entrada.</p>
+                    </div>
+                </a>
+
+                <a href="{% url 'lancamento_notas' %}" style="text-decoration: none;">
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #6f42c1; transition: all 0.3s; cursor: pointer;">
+                        <h5 style="color: #6f42c1; margin-bottom: 10px;">📊 Resultados</h5>
+                        <p style="color: #666; margin: 0;">Publicação de notas e listas de aprovados.</p>
+                    </div>
+                </a>
+
+                <a href="{% url 'matricula' %}" style="text-decoration: none;">
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #28a745; transition: all 0.3s; cursor: pointer;">
+                        <h5 style="color: #28a745; margin-bottom: 10px;">✅ Admitidos</h5>
+                        <p style="color: #666; margin: 0;">Gestão de candidatos aptos para matrícula.</p>
+                    </div>
+                </a>
+
+                <!-- Outros Módulos -->
+                <div style="grid-column: 1 / -1; margin: 20px 0 10px; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+                    <h4 style="color: #1e3c72; font-weight: bold;">⚙️ Configurações Acadêmicas</h4>
+                </div>
+
                 <a href="{% url 'grelha_curricular' %}" style="text-decoration: none;">
-                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #17a2b8; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #17a2b8; transition: all 0.3s; cursor: pointer;">
                         <h5 style="color: #17a2b8; margin-bottom: 10px;">📋 Grelha Curricular</h5>
-                        <p style="color: #666; margin: 0;">Visualizar e configurar a estrutura curricular dos cursos.</p>
+                        <p style="color: #666; margin: 0;">Estrutura curricular dos cursos.</p>
                     </div>
                 </a>
 
@@ -62,6 +111,13 @@
                     <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #20c997; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
                         <h5 style="color: #20c997; margin-bottom: 10px;">📊 Modelo de Avaliação</h5>
                         <p style="color: #666; margin: 0;">Definir critérios e modelos de avaliação acadêmica.</p>
+                    </div>
+                </a>
+
+                <a href="{% url 'admissao' %}" style="text-decoration: none;">
+                    <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-left: 4px solid #fd7e14; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)'">
+                        <h5 style="color: #fd7e14; margin-bottom: 10px;">🎯 Admissão</h5>
+                        <p style="color: #666; margin: 0;">Gerenciar processos de admissão e inscrições.</p>
                     </div>
                 </a>
 

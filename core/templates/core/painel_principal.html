@@ -380,13 +380,13 @@
                 </div>
                 <!-- NOVO CARD: LANÇAMENTO DE NOTAS -->
                 <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.4s;">
-                    <a href="{% url 'lancamento_notas' %}" class="text-decoration-none h-100 d-block">
+                    <a href="{% url 'notas_matriculados' %}" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">
                                 <div class="icon-wrapper" style="background: rgba(255, 193, 7, 0.1); color: #ffc107;">
                                     <i class="bi bi-journal-check fs-2"></i>
                                 </div>
-                                <h6 class="card-title">Lançamento de Notas</h6>
+                                <h6 class="card-title">Notas</h6>
                                 <p class="card-text mb-0">Registro e gestão de avaliações acadêmicas.</p>
                             </div>
                         </div>
@@ -405,7 +405,34 @@
                 <h3 class="mb-0 fw-bold">Configurações Académicas</h3>
             </div>
             <div class="row g-4 menu-items">
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.4s;">
+                <!-- SEGURANÇA E ACESSOS (INTEGRADO) -->
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn">
+                    <a href="{% url 'listar_utilizadores' %}" class="text-decoration-none h-100 d-block">
+                        <div class="card shadow-sm card-menu p-4">
+                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
+                                <div class="icon-wrapper" style="background: rgba(13, 110, 253, 0.1); color: #0d6efd;">
+                                    <i class="bi bi-shield-lock-fill fs-2"></i>
+                                </div>
+                                <h6 class="card-title">Gestão de Acessos</h6>
+                                <p class="card-text mb-0">Controle de utilizadores e privilégios do sistema.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.1s;">
+                    <a href="{% url 'perfis_pendentes' %}" class="text-decoration-none h-100 d-block">
+                        <div class="card shadow-sm card-menu p-4">
+                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
+                                <div class="icon-wrapper" style="background: rgba(25, 135, 84, 0.1); color: #198754;">
+                                    <i class="bi bi-person-check-fill fs-2"></i>
+                                </div>
+                                <h6 class="card-title">Aprovações</h6>
+                                <p class="card-text mb-0">Validar novos utilizadores e solicitações.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.2s;">
                     <a href="{% url 'grelha_curricular' %}" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">

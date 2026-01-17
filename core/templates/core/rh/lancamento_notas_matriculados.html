@@ -1,18 +1,19 @@
 {% extends 'core/base.html' %}
+{% load custom_filters %}
 
-{% block title %}Lançamento de Notas - SIGE{% endblock %}
+{% block title %}Notas - SIGE{% endblock %}
 
 {% block content %}
 <div class="container-fluid py-4" style="background-color: #f0f2f5; min-height: 90vh;">
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
         <div class="card-header bg-warning text-dark p-4 d-flex justify-content-between align-items-center">
-            <h4 class="mb-0 fw-bold"><i class="bi bi-journal-check me-2"></i>Lançamento de Notas (Matriculados)</h4>
+            <h4 class="mb-0 fw-bold"><i class="bi bi-journal-check me-2"></i>Notas (Matriculados)</h4>
             <a href="{% url 'painel_principal' %}" class="btn btn-dark rounded-pill px-4 btn-sm">Voltar</a>
         </div>
         <div class="card-body p-4">
             <!-- Filtros de Dependência -->
             <form method="GET" class="row g-3 mb-4 p-3 bg-light rounded-4 border">
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label small fw-bold">Ano Académico</label>
                     <select name="ano" class="form-select rounded-3" onchange="this.form.submit()">
                         <option value="">Selecione o Ano</option>
@@ -21,7 +22,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label small fw-bold">Turma</label>
                     <select name="turma" class="form-select rounded-3" {% if not turmas %}disabled{% endif %} onchange="this.form.submit()">
                         <option value="">Selecione a Turma</option>
@@ -39,13 +40,27 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-3 d-flex align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Professor</label>
+                    {% if professor_logado %}
+                        <input type="text" class="form-control rounded-3 bg-light" value="{{ professor_logado.nome_completo }}" readonly>
+                        <input type="hidden" name="professor" value="{{ professor_logado.id }}">
+                    {% else %}
+                        <select name="professor" class="form-select rounded-3" onchange="this.form.submit()">
+                            <option value="">Selecione o Professor</option>
+                            {% for p in professores %}
+                                <option value="{{ p.id }}" {% if professor_sel == p.id|stringformat:"i" %}selected{% endif %}>{{ p.nome_completo }}</option>
+                            {% endfor %}
+                        </select>
+                    {% endif %}
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100 rounded-pill">Filtrar Alunos</button>
                 </div>
             </form>
 
             {% if alunos %}
-            <form method="POST">
+            <form method="POST" action="?ano={{ ano_sel }}&turma={{ turma_sel }}&disciplina={{ disciplina_sel }}&professor={{ professor_sel }}">
                 {% csrf_token %}
                 <div class="table-responsive rounded-4 border">
                     <table class="table table-hover align-middle mb-0">
@@ -64,6 +79,7 @@
                                 <td>{{ aluno.nome_completo }}</td>
                                 <td>
                                     <input type="number" step="0.01" min="0" max="20" name="nota_{{ aluno.id }}" 
+                                           value="{{ notas_existentes|get_item:aluno.id|default:'' }}"
                                            class="form-control text-center rounded-pill border-warning bg-warning bg-opacity-10 shadow-none" 
                                            placeholder="0.00">
                                 </td>

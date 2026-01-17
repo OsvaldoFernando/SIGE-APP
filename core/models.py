@@ -135,7 +135,32 @@ class PeriodoLectivo(models.Model):
             PeriodoLectivo.objects.filter(ano_lectivo=self.ano_lectivo).exclude(pk=self.pk).update(ativo=False)
         super().save(*args, **kwargs)
 
+class Privilegio(models.Model):
+    MODULO_CHOICES = [
+        ('SA', 'Secretaria Acadêmica'),
+        ('RH', 'Recursos Humanos'),
+        ('FIN', 'Financeiro'),
+        ('PED', 'Pedagógico'),
+        ('ADM', 'Administrativo'),
+    ]
+    
+    nome = models.CharField(max_length=100, unique=True, verbose_name="Nome do Privilégio")
+    codigo = models.SlugField(max_length=100, unique=True, verbose_name="Código Interno")
+    descricao = models.TextField(verbose_name="Descrição")
+    modulo = models.CharField(max_length=5, choices=MODULO_CHOICES, verbose_name="Módulo")
+    
+    class Meta:
+        verbose_name = "Privilégio"
+        verbose_name_plural = "Privilégios"
+        ordering = ['modulo', 'nome']
+        
+    def __str__(self):
+        return f"{self.modulo} - {self.nome}"
+
 class PerfilUsuario(models.Model):
+    # ... campos existentes ...
+    # ... adicione isso ao modelo PerfilUsuario existente no arquivo
+    privilegios = models.ManyToManyField(Privilegio, blank=True, related_name='perfis', verbose_name="Privilégios")
     NIVEL_ACESSO_CHOICES = [
         ('admin', 'Administrador'),
         ('pedagogico', 'Pedagógico'),
@@ -715,6 +740,7 @@ class Turma(models.Model):
     turno = models.CharField(max_length=10, choices=TURNO_CHOICES, default='manha')
     capacidade = models.PositiveIntegerField(default=40)
     ativa = models.BooleanField(default=True)
+    sala = models.ForeignKey('core.Sala', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Sala Principal")
     data_criacao = models.DateTimeField(default=timezone.now, verbose_name="Data de Criação")
     
     disciplinas_turma = models.ManyToManyField('core.Disciplina', through='TurmaDisciplina', related_name='turmas_disciplina')
@@ -1150,6 +1176,23 @@ class Aluno(models.Model):
                 numero = 1
             self.numero_estudante = f"ALU-{numero:06d}"
         super().save(*args, **kwargs)
+
+class NotaEstudante(models.Model):
+    ano_academico = models.ForeignKey(AnoAcademico, on_delete=models.CASCADE, related_name='notas_estudantes')
+    turma = models.ForeignKey(Turma, on_delete=models.CASCADE, related_name='notas_estudantes')
+    disciplina = models.ForeignKey(Disciplina, on_delete=models.CASCADE, related_name='notas_estudantes')
+    professor = models.ForeignKey(Professor, on_delete=models.CASCADE, related_name='notas_estudantes')
+    aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name='notas_estudantes')
+    nota = models.DecimalField(max_digits=4, decimal_places=2, validators=[MinValueValidator(0.0), MaxValueValidator(20.0)], null=True, blank=True)
+    data_lancamento = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Nota do Estudante"
+        verbose_name_plural = "Notas dos Estudantes"
+        unique_together = ['ano_academico', 'turma', 'disciplina', 'aluno']
+
+    def __str__(self):
+        return f"{self.aluno.nome_completo} - {self.disciplina.nome}: {self.nota}"
 
 class Pai(models.Model):
     nome_completo = models.CharField(max_length=200, verbose_name="Nome Completo")

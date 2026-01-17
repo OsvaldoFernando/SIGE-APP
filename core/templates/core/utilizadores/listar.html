@@ -24,15 +24,25 @@
                     <form method="get" class="d-flex gap-2">
                         <select name="nivel" class="form-select form-select-sm">
                             <option value="">Todos os níveis</option>
-                            {% for value, label in niveis_acesso %}
-                                <option value="{{ value }}" {% if nivel_filtro == value %}selected{% endif %}>{{ label }}</option>
-                            {% endfor %}
+                            <option value="admin" {% if nivel_filtro == 'admin' %}selected{% endif %}>Administrador</option>
+                            <option value="pedagogico" {% if nivel_filtro == 'pedagogico' %}selected{% endif %}>Pedagógico</option>
+                            <option value="financeiro" {% if nivel_filtro == 'financeiro' %}selected{% endif %}>Financeiro</option>
+                            <option value="secretaria" {% if nivel_filtro == 'secretaria' %}selected{% endif %}>Secretaria</option>
+                            <option value="professor" {% if nivel_filtro == 'professor' %}selected{% endif %}>Professor</option>
+                            <option value="estudante" {% if nivel_filtro == 'estudante' %}selected{% endif %}>Estudante</option>
+                            <option value="pendente" {% if nivel_filtro == 'pendente' %}selected{% endif %}>Pendente</option>
                         </select>
                         <select name="ativo" class="form-select form-select-sm">
                             <option value="">Todos os status</option>
                             <option value="sim" {% if ativo_filtro == 'sim' %}selected{% endif %}>Ativos</option>
                             <option value="nao" {% if ativo_filtro == 'nao' %}selected{% endif %}>Inativos</option>
                             <option value="pendente" {% if ativo_filtro == 'pendente' %}selected{% endif %}>Pendentes</option>
+                        </select>
+                        <select name="privilegio" class="form-select form-select-sm">
+                            <option value="">Todos os privilégios</option>
+                            {% for priv in todos_privilegios %}
+                                <option value="{{ priv.codigo }}" {% if privilegio_filtro == priv.codigo %}selected{% endif %}>{{ priv.nome }}</option>
+                            {% endfor %}
                         </select>
                         <button type="submit" class="btn btn-outline-primary btn-sm">Filtrar</button>
                     </form>
@@ -78,6 +88,9 @@
                         <td><small>{{ user_item.date_joined|date:"d/m/Y" }}</small></td>
                         <td>
                             <div class="btn-group btn-group-sm">
+                                <a href="{% url 'gestao_acessos' user_item.perfil.id %}" class="btn btn-outline-info" title="Privilégios">
+                                    <i class="bi bi-shield-lock"></i>
+                                </a>
                                 <button type="button" class="btn btn-outline-primary" onclick="abrirModalEdicao({{ user_item.id }})" title="Editar">
                                     <i class="bi bi-pencil"></i>
                                 </button>

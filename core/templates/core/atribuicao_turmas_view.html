@@ -26,6 +26,7 @@
                     <tr>
                         <th class="ps-4">Turma</th>
                         <th>Curso</th>
+                        <th>Sala</th>
                         <th>Ano Lectivo</th>
                         <th>Ano Académico</th>
                         <th>Período</th>
@@ -38,6 +39,7 @@
                     <tr>
                         <td class="ps-4 fw-bold text-dark">{{ turma.nome }}</td>
                         <td>{{ turma.curso.nome }}</td>
+                        <td>{{ turma.sala.nome|default:"-" }}</td>
                         <td><span class="badge bg-info bg-opacity-10 text-info">{{ turma.ano_lectivo.codigo }}</span></td>
                         <td>{{ turma.ano_academico }}º Ano</td>
                         <td>{{ turma.periodo_curricular }}º Período</td>
@@ -94,6 +96,16 @@
                         <select name="ano_lectivo" class="form-select" required>
                             {% for ano in anos_lectivos %}
                             <option value="{{ ano.id }}" {% if ano.ano_atual %}selected{% endif %}>{{ ano.codigo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Sala Principal</label>
+                        <select name="sala" class="form-select">
+                            <option value="">Selecione a Sala</option>
+                            {% for sala in salas %}
+                            <option value="{{ sala.id }}">{{ sala.nome }} (Capacidade: {{ sala.capacidade }})</option>
                             {% endfor %}
                         </select>
                     </div>
