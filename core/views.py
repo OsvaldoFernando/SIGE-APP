@@ -353,9 +353,10 @@ def index(request):
         'reclamacoes_pendentes': reclamacoes_pendentes,
     })
 
-def inscricao_create(request, curso_id):
+@login_required
+def inscricao_create(request, curso_slug):
     """View para criar inscrição em um curso. Apenas cursos ativos aceitam inscrições."""
-    curso = get_object_or_404(Curso, id=curso_id)
+    curso = get_object_or_404(Curso, slug=curso_slug)
     cursos = Curso.objects.filter(ativo=True)
     anos_academicos = AnoAcademico.objects.all()
     periodos_lectivos = PeriodoLectivo.objects.all()
@@ -932,25 +933,75 @@ def lancamento_notas(request):
     return render(request, 'core/lancamento_notas.html', {
         'cursos': cursos,
         'inscricoes': inscricoes,
-        'curso_selecionado': curso_id
+        'curso_selecionado': curso_id,
+        'curso_obj': Curso.objects.get(id=curso_id) if curso_id else None,
     })
 
 @login_required
+def configuracoes_globais(request):
+    config = ConfiguracaoAcademica.objects.first()
+    if not config:
+        config = ConfiguracaoAcademica.objects.create()
+
+    if request.method == 'POST':
+        # ... (lógica anterior de salvamento)
+        config.percentagem_prova_continua = request.POST.get('pc')
+        config.peso_avaliacao_continua = request.POST.get('peso_pc')
+        config.percentagem_exame_final = request.POST.get('ef')
+        config.aplicar_lei_da_setima_global = 'lei_setima_global' in request.POST
+        config.aplicar_regras_projeto_especiais = 'regras_projeto' in request.POST
+        config.minimo_presenca_obrigatoria = request.POST.get('presenca')
+        config.ativar_barreiras_progressao = 'ativar_barreiras' in request.POST
+        config.anos_com_barreira_atraso = request.POST.get('barreiras')
+        config.limite_semestres_trancamento = request.POST.get('trancamento')
+        config.limite_tempo_exclusao_anos = request.POST.get('exclusao')
+        config.media_aprovacao_direta = request.POST.get('media_aprovacao_direta')
+        config.media_minima_exame = request.POST.get('media_minima_exame')
+        config.media_reprovacao_direta = request.POST.get('media_reprovacao_direta')
+        config.max_disciplinas_atraso = request.POST.get('max_disciplinas_atraso')
+        config.usar_creditos = 'usar_creditos' in request.POST
+        config.criterio_desempate = request.POST.get('criterio_desempate') # NOVO CAMPO
+        config.save()
+        messages.success(request, "Configurações atualizadas com sucesso!")
+        return redirect('configuracoes_globais')
+
+    return render(request, 'core/configuracoes_globais.html', {'config': config})
+
+@login_required
 def processar_aprovacao_vagas(request):
-    """Lógica de aprovação: Maior nota até preencher as vagas do curso"""
+    """Lógica de aprovação: Maior nota até preencher as vagas do curso com critério de desempate"""
     if request.method == 'POST':
         curso_id = request.POST.get('curso_id')
         curso = get_object_or_404(Curso, id=curso_id)
+        config = ConfiguracaoAcademica.objects.first()
         
         # Resetar aprovações anteriores para este curso
         Inscricao.objects.filter(curso=curso).update(aprovado=False)
         
-        # Pegar inscritos com nota válida, ordenados pela maior nota
+        # Definir ordenação baseada no critério de desempate
+        order_by = ['-nota_teste']
+        if config:
+            if config.criterio_desempate == 'idade_desc':
+                order_by.append('data_nascimento') # Mais velho (data menor)
+            elif config.criterio_desempate == 'idade_asc':
+                order_by.append('-data_nascimento') # Mais novo (data maior)
+            elif config.criterio_desempate == 'inscricao_asc':
+                order_by.append('data_inscricao') # Ordem cronológica
+            elif config.criterio_desempate == 'sexo_f':
+                order_by.append('sexo') # 'F' vem antes de 'M' alfabeticamente
+            elif config.criterio_desempate == 'sexo_m':
+                order_by.append('-sexo') # 'M' vem antes de 'F' com sinal negativo
+            elif config.criterio_desempate == 'sexo_f_novo':
+                order_by.extend(['sexo', '-data_nascimento']) # 'F' primeiro, depois os mais novos (data maior)
+            elif config.criterio_desempate == 'sexo_f_velho':
+                order_by.extend(['sexo', 'data_nascimento']) # 'F' primeiro, depois os mais velhos (data menor)
+        
+        # Pegar inscritos com nota válida
         candidatos = Inscricao.objects.filter(
             curso=curso, 
             nota_teste__isnull=False,
             nota_teste__gte=curso.nota_minima
-        ).order_by('-nota_teste')
+        ).order_by(*order_by)
         
         vagas = curso.vagas
         aprovados_count = 0
@@ -980,8 +1031,9 @@ def admissao_inscricao(request):
     if request.method == 'POST':
         curso_id = request.POST.get('curso_id')
         if curso_id:
+            curso = get_object_or_404(Curso, id=curso_id)
             # Redireciona diretamente para o formulário de inscrição do curso selecionado
-            return redirect('inscricao_create', curso_id=curso_id)
+            return redirect('inscricao_create', curso_slug=curso.slug)
     
     return render(request, 'core/admissao_inscricao.html', {
         'cursos': cursos,
@@ -1809,46 +1861,13 @@ def redefinir_senha_email_view(request, token):
 
 @login_required
 def perfis_pendentes_view(request):
-    """View para administradores gerenciarem perfis pendentes"""
-    if not request.user.is_staff:
-        messages.error(request, 'Acesso negado! Apenas administradores podem acessar esta área.')
-        return redirect('painel_principal')
-    
-    perfis_pendentes = PerfilUsuario.objects.filter(nivel_acesso='pendente').order_by('-data_cadastro')
-    
-    return render(request, 'core/perfis_pendentes.html', {
-        'perfis_pendentes': perfis_pendentes
-    })
+    """View para administradores gerenciarem perfis pendentes - DESATIVADA"""
+    return redirect('painel_principal')
 
 @login_required
 def atribuir_perfil_view(request, perfil_id):
-    """View para atribuir perfil a um usuário"""
-    if not request.user.is_staff:
-        messages.error(request, 'Acesso negado!')
-        return redirect('painel_principal')
-    
-    perfil = get_object_or_404(PerfilUsuario, id=perfil_id)
-    
-    if request.method == 'POST':
-        nivel_acesso = request.POST.get('nivel_acesso')
-        
-        if nivel_acesso in ['admin', 'secretaria', 'professor', 'coordenador', 'aluno']:
-            perfil.nivel_acesso = nivel_acesso
-            perfil.save()
-            
-            Notificacao.objects.create(
-                titulo='Perfil Atribuído',
-                mensagem=f'Seu perfil foi atribuído como {perfil.get_nivel_acesso_display()}. Agora você pode acessar o sistema.',
-                tipo='sucesso'
-            ).destinatarios.add(perfil.user)
-            
-            messages.success(request, f'Perfil "{perfil.get_nivel_acesso_display()}" atribuído com sucesso para {perfil.user.get_full_name() or perfil.user.username}!')
-        else:
-            messages.error(request, 'Nível de acesso inválido!')
-        
-        return redirect('perfis_pendentes')
-    
-    return redirect('perfis_pendentes')
+    """View para atribuir perfil a um usuário - DESATIVADA"""
+    return redirect('painel_principal')
 
 @login_required
 def get_perfis_pendentes_count(request):
@@ -2113,15 +2132,6 @@ def perfil_usuario(request):
                 for error_list in form.errors.values():
                     for error in error_list:
                         messages.error(request, error)
-        
-        elif action == 'update_system_logo' and request.user.perfil.nivel_acesso == 'super_admin' and request.FILES.get('logo'):
-            from .models import ConfiguracaoEscola
-            config = ConfiguracaoEscola.objects.first()
-            if not config:
-                config = ConfiguracaoEscola.objects.create(nome_escola="SIGA")
-            config.logo = request.FILES.get('logo')
-            config.save()
-            messages.success(request, 'Logotipo do sistema atualizado com sucesso!')
         
         return redirect('perfil_usuario')
 

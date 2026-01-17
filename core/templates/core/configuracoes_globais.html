@@ -32,6 +32,11 @@
                                         </button>
                                     </li>
                                     <li class="nav-item" role="presentation">
+                                        <button class="nav-link py-3 fw-bold" id="tab-admissao" data-bs-toggle="pill" data-bs-target="#content-admissao" type="button" role="tab">
+                                            <i class="bi bi-person-plus me-2"></i>Admissão
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
                                         <button class="nav-link py-3 fw-bold" id="tab-assiduidade" data-bs-toggle="pill" data-bs-target="#content-assiduidade" type="button" role="tab">
                                             <i class="bi bi-person-check me-2"></i>Assiduidade
                                         </button>
@@ -96,6 +101,33 @@
                                                     <input class="form-check-input ms-0 me-3" type="checkbox" name="regras_projeto" id="regrasProjeto" {% if config.aplicar_regras_projeto_especiais %}checked{% endif %}>
                                                     <label class="form-check-label fw-bold" for="regrasProjeto">Regras de Projeto Especiais</label>
                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Aba Admissão -->
+                            <div class="tab-pane fade" id="content-admissao" role="tabpanel">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body p-4">
+                                        <h5 class="fw-bold mb-4 text-warning"><i class="bi bi-person-plus me-2"></i>Regras de Admissão e Empates</h5>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label class="form-label small fw-bold text-muted">Critério de Desempate (Ranking)</label>
+                                                <select name="criterio_desempate" class="form-select form-select-lg">
+                                                    <option value="idade_desc" {% if config.criterio_desempate == 'idade_desc' %}selected{% endif %}>Mais Velho primeiro</option>
+                                                    <option value="idade_asc" {% if config.criterio_desempate == 'idade_asc' %}selected{% endif %}>Mais Novo primeiro</option>
+                                                    <option value="inscricao_asc" {% if config.criterio_desempate == 'inscricao_asc' %}selected{% endif %}>Ordem de Inscrição (Primeiros primeiro)</option>
+                                                    <option value="sexo_f" {% if config.criterio_desempate == 'sexo_f' %}selected{% endif %}>Prioridade Feminino</option>
+                                                    <option value="sexo_m" {% if config.criterio_desempate == 'sexo_m' %}selected{% endif %}>Prioridade Masculino</option>
+                                                    <option value="sexo_f_novo" {% if config.criterio_desempate == 'sexo_f_novo' %}selected{% endif %}>Feminino e Mais Novo</option>
+                                                    <option value="sexo_f_velho" {% if config.criterio_desempate == 'sexo_f_velho' %}selected{% endif %}>Feminino e Mais Velho</option>
+                                                </select>
+                                                <p class="form-text mt-2 text-info">
+                                                    <i class="bi bi-info-circle me-1"></i>
+                                                    Este critério será aplicado automaticamente quando houver candidatos com a mesma nota e o limite de vagas for atingido.
+                                                </p>
                                             </div>
                                         </div>
                                     </div>

@@ -16,14 +16,48 @@
             </div>
         </div>
         <div class="card-body p-4">
+            <!-- Resumo Analítico Estilo ERP -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-4 border-start border-primary border-4">
+                        <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.65rem;">Total de Inscritos</small>
+                        <h4 class="mb-0 fw-bold">{{ inscricoes|length }}</h4>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-4 border-start border-success border-4">
+                        <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.65rem;">Vagas Disponíveis</small>
+                        <h4 class="mb-0 fw-bold text-success">{{ curso_obj.vagas|default:"--" }}</h4>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-4 border-start border-warning border-4">
+                        <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.65rem;">Média da Turma</small>
+                        <h4 class="mb-0 fw-bold" id="mediaTurma">--</h4>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-3 bg-light rounded-4 border-start border-info border-4">
+                        <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.65rem;">Aprovação (>= 10)</small>
+                        <h4 class="mb-0 fw-bold" id="totalAptos">0</h4>
+                    </div>
+                </div>
+            </div>
+
             <form method="GET" class="row g-3 mb-4" id="filtroCursoForm">
-                <div class="col-md-12">
-                    <select name="curso" class="form-select form-select-lg border-light bg-light rounded-3 shadow-none" onchange="this.form.submit()">
-                        <option value="">Selecione o Curso...</option>
+                <div class="col-md-8">
+                    <select name="curso" class="form-select form-select-lg border-light bg-light rounded-4 shadow-none" onchange="this.form.submit()">
+                        <option value="">Selecione o Curso para Lançamento...</option>
                         {% for c in cursos %}
-                        <option value="{{ c.id }}" {% if curso_selecionado == c.id|stringformat:"s" %}selected{% endif %}>{{ c.nome }} ({{ c.vagas }} vagas)</option>
+                        <option value="{{ c.id }}" {% if curso_selecionado == c.id|stringformat:"s" %}selected{% endif %}>{{ c.nome }}</option>
                         {% endfor %}
                     </select>
+                </div>
+                <div class="col-md-4">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-light border-light rounded-start-4"><i class="bi bi-search"></i></span>
+                        <input type="text" id="filtroNomeTabela" class="form-control border-light bg-light rounded-end-4 shadow-none" placeholder="Filtrar nesta lista...">
+                    </div>
                 </div>
             </form>
 
@@ -125,9 +159,59 @@
 document.addEventListener('DOMContentLoaded', function() {
     const inputs = document.querySelectorAll('input[name^="nota_"]');
     const btnSalvar = document.getElementById('btnSalvar');
-    
+    const filtroNome = document.getElementById('filtroNomeTabela');
+
+    // Função para atualizar estatísticas em tempo real
+    function atualizarEstatisticas() {
+        let soma = 0;
+        let cont = 0;
+        let aptos = 0;
+        
+        inputs.forEach(input => {
+            let val = parseFloat(input.value.replace(',', '.'));
+            if (!isNaN(val)) {
+                soma += val;
+                cont++;
+                if (val >= 10) aptos++;
+                
+                // Feedback visual de ERP
+                if (val < 10) {
+                    input.style.color = '#ef4444';
+                    input.style.fontWeight = '700';
+                } else {
+                    input.style.color = '#10b981';
+                    input.style.fontWeight = '700';
+                }
+            } else {
+                input.style.color = '';
+                input.style.fontWeight = '';
+            }
+        });
+        
+        document.getElementById('mediaTurma').innerText = cont > 0 ? (soma / cont).toFixed(2) : '--';
+        document.getElementById('totalAptos').innerText = aptos;
+    }
+
+    // Filtro de busca na tabela (Estilo ERP)
+    if(filtroNome) {
+        filtroNome.addEventListener('keyup', function() {
+            const termo = this.value.toLowerCase();
+            const rows = document.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const nome = row.querySelector('.fw-medium').innerText.toLowerCase();
+                const bi = row.querySelector('code').innerText.toLowerCase();
+                if (nome.includes(termo) || bi.includes(termo)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+
     inputs.forEach(input => {
         input.addEventListener('input', function() {
+            atualizarEstatisticas();
             let val = this.value.replace(',', '.');
             if (val !== '') {
                 let num = parseFloat(val);
@@ -141,6 +225,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // Inicializar estatísticas
+    atualizarEstatisticas();
 
     document.querySelector('form[method="POST"]').addEventListener('submit', function(e) {
         let hasError = false;

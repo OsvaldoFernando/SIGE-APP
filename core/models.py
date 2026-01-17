@@ -472,6 +472,7 @@ class Curso(models.Model):
     
     codigo = models.CharField(max_length=50, unique=True, default="CURSO", verbose_name="Código do Curso")
     nome = models.CharField(max_length=200, verbose_name="Nome do Curso")
+    slug = models.SlugField(unique=True, null=True, blank=True, verbose_name="Slug (URL Amigável)")
     grau = models.ForeignKey(NivelAcademico, on_delete=models.CASCADE, related_name='cursos', verbose_name="Grau Académico")
     regime = models.CharField(max_length=20, choices=REGIME_CHOICES, default='diurno', verbose_name="Regime")
     modalidade = models.CharField(max_length=20, choices=MODALIDADE_CHOICES, default='presencial', verbose_name="Modalidade")
@@ -501,6 +502,15 @@ class Curso(models.Model):
     
     def __str__(self):
         return f"{self.codigo} - {self.nome}"
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            import uuid
+            self.slug = slugify(self.nome)
+            if Curso.objects.filter(slug=self.slug).exists():
+                self.slug = f"{self.slug}-{uuid.uuid4().hex[:6]}"
+        super().save(*args, **kwargs)
     
     def vagas_disponiveis(self):
         aprovados = self.inscricoes.filter(aprovado=True).count()
@@ -536,6 +546,20 @@ class ConfiguracaoAcademica(models.Model):
     limite_tempo_exclusao_anos = models.PositiveIntegerField(default=1, verbose_name="Anos para Exclusão por Inatividade")
 
     # Novas Regras Globais Académicas
+    criterio_desempate = models.CharField(
+        max_length=50,
+        choices=[
+            ('idade_desc', 'Mais Velho primeiro'),
+            ('idade_asc', 'Mais Novo primeiro'),
+            ('inscricao_asc', 'Ordem de Inscrição (Primeiros primeiro)'),
+            ('sexo_f', 'Prioridade Feminino'),
+            ('sexo_m', 'Prioridade Masculino'),
+            ('sexo_f_novo', 'Feminino e Mais Novo'),
+            ('sexo_f_velho', 'Feminino e Mais Velho'),
+        ],
+        default='idade_desc',
+        verbose_name="Critério de Desempate"
+    )
     media_aprovacao_direta = models.DecimalField(max_digits=4, decimal_places=2, default=14.0, verbose_name="Média Aprovação Direta")
     media_minima_exame = models.DecimalField(max_digits=4, decimal_places=2, default=10.0, verbose_name="Média Mínima Exame")
     media_reprovacao_direta = models.DecimalField(max_digits=4, decimal_places=2, default=7.0, verbose_name="Média Reprovação Direta")

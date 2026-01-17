@@ -114,11 +114,6 @@
                                 <button class="btn btn-action btn-editar-perfil rounded-pill" data-bs-toggle="modal" data-bs-target="#modalEditarPerfil">
                                     <i class="bi bi-pencil me-2"></i> Editar Perfil
                                 </button>
-                                {% if user.perfil.nivel_acesso == 'super_admin' %}
-                                <button class="btn btn-action btn-logo-sistema rounded-pill" data-bs-toggle="modal" data-bs-target="#modalAlterarLogoSistema">
-                                    <i class="bi bi-image me-2"></i> Logo do Sistema
-                                </button>
-                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -127,42 +122,6 @@
         </div>
     </div>
 </div>
-
-{% if user.perfil.nivel_acesso == 'super_admin' %}
-<!-- Modal Alterar Logo do Sistema -->
-<div class="modal fade" id="modalAlterarLogoSistema" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
-            <div class="modal-header border-bottom-0">
-                <h5 class="modal-title fw-bold">Alterar Logotipo do Sistema</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form method="POST" enctype="multipart/form-data" action="{% url 'perfil_usuario' %}">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <div class="mb-3 text-center">
-                        <p class="text-muted small mb-4">O novo logotipo aparecerá no login e no topo do sistema.</p>
-                        {% if config.logo %}
-                            <div class="mb-3">
-                                <img src="{{ config.logo.url }}" alt="Logo Atual" style="max-height: 80px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                <div class="p-3 bg-light rounded text-muted small" style="display: none;">
-                                    <i class="bi bi-image-fill fs-2 d-block mb-1"></i>
-                                    Logo não encontrada
-                                </div>
-                            </div>
-                        {% endif %}
-                        <input type="file" class="form-control rounded-3" name="logo" accept="image/*" required>
-                    </div>
-                </div>
-                <div class="modal-footer border-top-0 pt-0">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" name="action" value="update_system_logo" class="btn btn-dark rounded-pill px-4">Salvar Logotipo</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-{% endif %}
 
 <!-- Modal Alterar Foto -->
 <div class="modal fade" id="modalAlterarFoto" tabindex="-1">

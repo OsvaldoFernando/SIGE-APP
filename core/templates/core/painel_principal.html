@@ -251,7 +251,7 @@
     </style>
 
         <!-- SEÇÃO RECURSOS HUMANOS (RH) - OBRIGATÓRIA -->
-        <div class="menu-section animate__animated animate__fadeInUp" style="display: block !important; visibility: visible !important; opacity: 1 !important; z-index: 999 !important; position: relative !important; animation-delay: 0.05s;">
+        <div id="secao-rh" class="menu-section animate__animated animate__fadeInUp" style="display: block !important; visibility: visible !important; opacity: 1 !important; z-index: 999 !important; position: relative !important; animation-delay: 0.05s;">
             <div class="section-header d-flex align-items-center">
                 <div class="bg-success bg-opacity-10 p-2 rounded-3 me-3">
                     <i class="bi bi-people-fill text-success fs-4"></i>
@@ -395,7 +395,7 @@
             </div>
         </div>
 
-        <!-- SEÇÃO DE CONFIGURAÇÕES -->
+                <!-- SEÇÃO DE CONFIGURAÇÕES -->
         {% if user.perfil.nivel_acesso == 'admin' or user.perfil.nivel_acesso == 'super_admin' %}
         <div class="menu-section animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
             <div class="section-header d-flex align-items-center">
@@ -415,19 +415,6 @@
                                 </div>
                                 <h6 class="card-title">Gestão de Acessos</h6>
                                 <p class="card-text mb-0">Controle de utilizadores e privilégios do sistema.</p>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.1s;">
-                    <a href="{% url 'perfis_pendentes' %}" class="text-decoration-none h-100 d-block">
-                        <div class="card shadow-sm card-menu p-4">
-                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
-                                <div class="icon-wrapper" style="background: rgba(25, 135, 84, 0.1); color: #198754;">
-                                    <i class="bi bi-person-check-fill fs-2"></i>
-                                </div>
-                                <h6 class="card-title">Aprovações</h6>
-                                <p class="card-text mb-0">Validar novos utilizadores e solicitações.</p>
                             </div>
                         </div>
                     </a>

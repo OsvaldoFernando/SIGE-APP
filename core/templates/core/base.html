@@ -367,7 +367,7 @@
                 <div class="user-info">
                     <a href="/" class="user-logo" style="height: 48px; display: flex; align-items: center; text-decoration: none;">
                         {% if config.logo %}
-                            <img src="{{ config.logo.url }}" alt="Logo" style="height: 48px; width: auto; max-width: 150px; object-fit: contain; display: block;">
+                            <img src="{{ config.logo.url }}" alt="Logo" style="height: 48px; width: auto; max-width: 150px; object-fit: contain; display: block;" onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\'fw-bold fs-4 text-white\'>SIGE</span>';">
                         {% else %}
                             <span class="fw-bold fs-4 text-white">SIGE</span>
                         {% endif %}
@@ -432,13 +432,7 @@
 
                         {% if user_perfil.nivel_acesso in 'admin super_admin pedagogico financeiro secretaria' %}
                         <div class="user-dropdown-divider"></div>
-                        <h6 class="dropdown-header small text-muted text-uppercase fw-bold px-3 pt-2">Administração</h6>
-                        <a href="{% url 'registrar_horario' %}" class="user-dropdown-item">
-                            <i class="bi bi-clock"></i> Registrar Horário
-                        </a>
-                        <a href="{% url 'painel_rh_faltas' %}" class="user-dropdown-item">
-                            <i class="bi bi-person-x"></i> Painel de Faltas (RH)
-                        </a>
+                        
                         {% endif %}
 
                         <div class="user-dropdown-divider"></div>
@@ -563,6 +557,20 @@
     </footer>
 
     {% block extra_js %}{% endblock %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Se o usuário está voltando para o painel (referrer é o próprio domínio mas não o painel, ou ação de "voltar")
+            // Como é difícil detectar o "voltar" do navegador de forma pura, vamos focar em quando ele clica em links para o painel
+            const urlParams = new URLSearchParams(window.location.search);
+            if (window.location.pathname === '/index/' || window.location.pathname === '/painel/') {
+                const rhSection = document.getElementById('secao-rh');
+                if (rhSection) {
+                    rhSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        });
+    </script>
     
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
