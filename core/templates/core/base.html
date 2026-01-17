@@ -16,58 +16,44 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Correção Radical para o tremor da modal */
-        html {
-            overflow: hidden;
-            height: 100%;
-        }
-        body {
-            height: 100%;
-            overflow-y: scroll; /* Força o scroll no body para ser o container principal */
-            padding-right: 0 !important;
-            margin: 0;
-        }
-        
-        /* Impede o Bootstrap de tentar "ajustar" o body */
-        body.modal-open {
-            overflow: hidden !important;
-            padding-right: 0 !important;
-        }
-
-        .modal {
-            background: rgba(0, 0, 0, 0.5); /* Backdrop customizado para evitar conflitos */
-        }
-
-        /* Força o backdrop a não causar reflow */
-        .modal-backdrop {
-            display: none !important; 
-        }
-
         :root {
             --primary-color: #1e3a8a;
             --secondary-color: #059669;
             --accent-color: #f59e0b;
             --light-bg: #f8fafc;
         }
+
+        /* Estrutura Master ERP SIGE */
         html, body {
             height: 100%;
             margin: 0;
+            padding: 0;
         }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--light-bg);
+            background-color: #f8fafc;
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
         }
+
         main {
             flex: 1 0 auto;
-            padding-top: 20px;
+            width: 100%;
+            padding-bottom: 100px;
         }
+
         footer {
             flex-shrink: 0;
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             color: white;
-            padding: 20px 0;
+            padding: 25px 0;
+            width: 100%;
+            margin-top: auto;
+            border-top: 5px solid var(--secondary-color);
+            position: relative;
+            z-index: 1000;
         }
 
         /* Melhorias nas Abas (Tabs) */
@@ -550,9 +536,13 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="mt-5 py-4">
+    <footer class="py-4">
         <div class="container text-center">
-            <p class="mb-0">&copy; 2026 SIGE - Sistema Integrado de Gestão Educacional. Todos os direitos reservados.</p>
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <p class="mb-0">&copy; 2026 SIGE - Sistema Integrado de Gestão Educacional. Todos os direitos reservados.</p>
+                </div>
+            </div>
         </div>
     </footer>
 

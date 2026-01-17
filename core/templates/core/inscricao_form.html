@@ -33,34 +33,6 @@
         </div>
     </div>
 
-    <!-- Photo Preview (Moved Outside Form) -->
-    <div class="row justify-content-center mb-4">
-        <div class="col-lg-4 col-md-6 text-center">
-            <div id="photo_preview_main" class="bg-white border rounded-4 p-3 shadow-sm">
-                <h6 class="fw-bold mb-3">Sua Foto</h6>
-                <div id="image_preview_container" class="bg-light border rounded-4 d-flex align-items-center justify-content-center position-relative overflow-hidden" style="width: 100%; aspect-ratio: 3/4; max-width: 150px; margin: 0 auto;">
-                    <i class="bi bi-person-bounding-box text-muted opacity-25" id="main_placeholder_icon" style="font-size: 4rem;"></i>
-                    <img id="main_image_preview" src="#" alt="Preview" class="d-none w-100 h-100" style="object-fit: cover;">
-                </div>
-                <p class="small text-muted mt-2 mb-0">Aparecerá aqui após selecionar ou capturar</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Photo Preview (Moved Outside Form) -->
-    <div class="row justify-content-center mb-4">
-        <div class="col-lg-4 col-md-6 text-center">
-            <div id="photo_preview_main" class="bg-white border rounded-4 p-3 shadow-sm">
-                <h6 class="fw-bold mb-3">Sua Foto</h6>
-                <div id="image_preview_container" class="bg-light border rounded-4 d-flex align-items-center justify-content-center position-relative overflow-hidden" style="width: 100%; aspect-ratio: 3/4; max-width: 150px; margin: 0 auto;">
-                    <i class="bi bi-person-bounding-box text-muted opacity-25" id="main_placeholder_icon" style="font-size: 4rem;"></i>
-                    <img id="main_image_preview" src="#" alt="Preview" class="d-none w-100 h-100" style="object-fit: cover;">
-                </div>
-                <p class="small text-muted mt-2 mb-0">Aparecerá aqui após selecionar ou capturar</p>
-            </div>
-        </div>
-    </div>
-
     <div class="row justify-content-center">
         <div class="col-lg-11 col-xl-10">
             <!-- Modern Wizard Card -->
@@ -249,19 +221,20 @@
                                 <h5 class="fw-bold mb-0">Informações Académicas</h5>
                             </div>
                             <div class="row g-4">
-                                <div class="col-md-6">
-                                    <label class="form-label small fw-bold text-muted">NÍVEL PRETENDIDO (Ano Académico) *</label>
-                                    <select name="nivel_academico" class="form-select bg-light border-0 py-2 shadow-none rounded-3" required>
-                                        <option value="Licenciatura" selected>Licenciatura</option>
-                                        <option value="Técnico">Técnico</option>
-                                        <option value="Pós-graduação">Pós-graduação</option>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label small fw-bold text-muted text-uppercase">CURSO DESEJADO *</label>
+                                    <select name="curso" id="id_curso_selection" class="form-select bg-light border-0 py-2 shadow-none rounded-3" required>
+                                        <option value="">Selecione um curso...</option>
+                                        {% for c in cursos %}
+                                            <option value="{{ c.id }}" data-vagas="{{ c.vagas_disponiveis }}" {% if c.id == curso.id or form_data.curso == c.id|stringformat:"i" %}selected{% endif %}>
+                                                {{ c.nome }} ({{ c.vagas_disponiveis }} vagas)
+                                            </option>
+                                        {% endfor %}
                                     </select>
+                                    <div id="vagas_feedback" class="form-text mt-2 d-none"></div>
                                 </div>
-                                <div class="col-md-6 d-none">
-                                    <label class="form-label small fw-bold text-muted">CURSO SELECIONADO</label>
-                                    <input type="text" class="form-control bg-light border-0 py-2 shadow-none rounded-3 fw-bold" readonly value="{{ curso.nome }}">
-                                    <input type="hidden" name="curso" value="{{ curso.id }}">
-                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label small fw-bold text-muted">NÍVEL PRETENDIDO *</label>
                                 <div class="col-md-6 d-none">
                                     <label class="form-label small fw-bold text-muted">ANO LECTIVO *</label>
                                     <select name="ano_academico" class="form-select bg-light border-0 py-2 shadow-none rounded-3" required>
@@ -642,6 +615,30 @@
 
     if (nacionalidadeSelect) {
         nacionalidadeSelect.addEventListener('change', toggleProvinciaMunicipio);
+    }
+
+    const cursoSelect = document.getElementById('id_curso_selection');
+    const vagasFeedback = document.getElementById('vagas_feedback');
+
+    if (cursoSelect) {
+        cursoSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const vagas = selectedOption.getAttribute('data-vagas');
+            
+            if (this.value && vagas !== null) {
+                vagasFeedback.classList.remove('d-none');
+                if (parseInt(vagas) <= 0) {
+                    vagasFeedback.innerHTML = `<i class="bi bi-exclamation-triangle-fill text-danger me-1"></i> <span class="text-danger fw-bold">Curso sem vagas disponíveis no momento.</span>`;
+                    btnNext.disabled = true;
+                } else {
+                    vagasFeedback.innerHTML = `<i class="bi bi-check-circle-fill text-success me-1"></i> <span class="text-success">${vagas} vagas disponíveis.</span>`;
+                    btnNext.disabled = false;
+                }
+            } else {
+                vagasFeedback.classList.add('d-none');
+                btnNext.disabled = false;
+            }
+        });
     }
 
     if (provinciaSelect) {

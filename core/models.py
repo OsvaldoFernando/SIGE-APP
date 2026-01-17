@@ -495,6 +495,12 @@ class Curso(models.Model):
     data_criacao = models.DateTimeField(auto_now_add=True)
     data_atualizacao = models.DateTimeField(auto_now=True)
     
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            self.slug = slugify(self.nome)
+        super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = "Curso"
         verbose_name_plural = "Cursos"

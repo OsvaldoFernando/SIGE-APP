@@ -354,21 +354,11 @@ def index(request):
     })
 
 @login_required
-def inscricao_create(request, curso_slug):
-    """View para criar inscrição em um curso. Apenas cursos ativos aceitam inscrições."""
-    curso = get_object_or_404(Curso, slug=curso_slug)
+def inscricao_create(request):
+    """View para criar inscrição. O curso deve ser selecionado no formulário."""
     cursos = Curso.objects.filter(ativo=True)
     anos_academicos = AnoAcademico.objects.all()
     periodos_lectivos = PeriodoLectivo.objects.all()
-    
-    # Validar se o curso está ativo
-    if not curso.ativo:
-        messages.error(
-            request, 
-            f'O curso "{curso.nome}" está indisponível para inscrições. '
-            f'Por favor, entre em contato com a administração para mais informações.'
-        )
-        return redirect('index')
     
     # Verificar calendário
     ano_atual = AnoAcademico.objects.filter(ano_atual=True).first()
@@ -377,19 +367,35 @@ def inscricao_create(request, curso_slug):
         return redirect('index')
     
     context = {
-        'curso': curso,
         'cursos': cursos,
         'anos_academicos': anos_academicos,
         'periodos_lectivos': periodos_lectivos
     }
-    if curso.requer_prerequisitos:
-        context['prerequisitos'] = curso.prerequisitos.all()
     
     if request.method == 'POST':
         # Adicionar dados do POST ao contexto para persistência
         context.update({
             'form_data': request.POST
         })
+        
+        curso_id = request.POST.get('curso')
+        if not curso_id:
+            messages.error(request, 'Por favor, selecione um curso.')
+            return render(request, 'core/inscricao_form.html', context)
+            
+        curso = get_object_or_404(Curso, id=curso_id)
+        context['curso'] = curso
+        
+        # Validar se o curso está ativo
+        if not curso.ativo:
+            messages.error(request, f'O curso "{curso.nome}" está indisponível.')
+            return render(request, 'core/inscricao_form.html', context)
+            
+        # Verificar vagas
+        if curso.vagas <= curso.inscricoes.count():
+            messages.error(request, f'Lamentamos, mas não há mais vagas disponíveis para o curso "{curso.nome}".')
+            return render(request, 'core/inscricao_form.html', context)
+
         # ... (validações BI, email, telefone permanecem iguais)
         bilhete_identidade = request.POST.get('bilhete_identidade')
         if bilhete_identidade and Inscricao.objects.filter(bilhete_identidade=bilhete_identidade).exists():
@@ -414,6 +420,18 @@ def inscricao_create(request, curso_slug):
 
         # 1. Informações Pessoais
         try:
+            # Validação de Idade (Mínimo 17 anos para ERP Académico)
+            data_nascimento_str = request.POST.get('data_nascimento')
+            if data_nascimento_str:
+                from datetime import datetime, date
+                nascimento = datetime.strptime(data_nascimento_str, '%Y-%m-%d').date()
+                hoje = date.today()
+                idade = hoje.year - nascimento.year - ((hoje.month, hoje.day) < (nascimento.month, nascimento.day))
+                if idade < 17:
+                    messages.error(request, 'A idade mínima para inscrição é de 17 anos.')
+                    context['current_step'] = 1
+                    return render(request, 'core/inscricao_form.html', context)
+
             # Obter escola selecionada
             escola_id = request.POST.get('escola')
             escola = get_object_or_404(Escola, id=escola_id) if escola_id else None

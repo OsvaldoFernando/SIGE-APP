@@ -39,7 +39,7 @@
                         
                         {% if curso.ativo %}
                             {% if curso.vagas_disponiveis > 0 %}
-                                <a href="{% url 'inscricao_create' curso.id %}" class="btn btn-custom w-100 mt-3">
+                                <a href="{% url 'inscricao_create' %}" class="btn btn-custom w-100 mt-3">
                                     <i class="bi bi-pencil-square me-2"></i>
                                     Inscrever-se
                                 </a>
