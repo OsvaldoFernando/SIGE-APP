@@ -26,7 +26,15 @@
                                 {% endif %}
                             </div>
                             <h3 class="fw-bold mb-1">Estado do Sistema: {{ ano_atual.get_estado_display|default:"Sem Ciclo Ativo" }}</h3>
-                            <p class="opacity-75 mb-0">Gestão Estratégica e Monitoramento do Calendário Académico.</p>
+                            <div class="mt-2 d-flex flex-wrap gap-3">
+                                {% for evento in ano_atual.eventos.all %}
+                                {% if evento.tipo_evento == 'INSCRICAO' %}
+                                <div class="badge bg-info bg-opacity-25 text-white border border-info border-opacity-50 px-3 py-2 rounded-pill small">
+                                    <i class="bi bi-calendar-event me-2"></i>Inscrições: <b>{{ evento.data_inicio|date:"d/m/Y" }}</b> → <b>{{ evento.data_fim|date:"d/m/Y" }}</b>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
                         </div>
                         <div class="col-md-4 text-md-end mt-3 mt-md-0">
                             <a href="{% url 'cronograma_academico' %}" class="btn btn-white bg-white text-primary fw-bold rounded-pill px-4 py-2 shadow-sm transition-hover">
@@ -388,7 +396,20 @@
                 <h3 class="mb-0 fw-bold">Execução académica</h3>
             </div>
             <div class="row g-4 menu-items">
-                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn">
+                                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn">
+                    <a href="{% url 'cronograma_academico' %}" class="text-decoration-none h-100 d-block">
+                        <div class="card shadow-sm card-menu p-4">
+                            <div class="card-body p-0 text-center d-flex flex-column align-items-center">
+                                <div class="icon-wrapper">
+                                    <span style="font-size: 2rem;">🎯</span>
+                                </div>
+                                <h6 class="card-title">Admissão</h6>
+                                <p class="card-text mb-0">Gestão de inscrições, datas e marcos temporais.</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-xl-3 col-lg-4 col-md-6 menu-item animate__animated animate__zoomIn" style="animation-delay: 0.1s;">
                     <a href="{% url 'nova_matricula' %}" class="text-decoration-none h-100 d-block">
                         <div class="card shadow-sm card-menu p-4">
                             <div class="card-body p-0 text-center d-flex flex-column align-items-center">

@@ -295,6 +295,10 @@ def index_redirect(request):
 
 @login_required
 def index(request):
+    return redirect('painel_principal')
+
+@login_required
+def painel_principal(request):
     ano_atual = AnoAcademico.objects.filter(ano_atual=True).first()
     semestre_atual = None
     if ano_atual:
@@ -312,24 +316,15 @@ def index(request):
     }
     stats_inscricoes['total'] = stats_inscricoes['submetidas'] + stats_inscricoes['aprovadas'] + stats_inscricoes['pendentes']
     
-    # Estatísticas por Estado (Candidatos, Admitidos, Registrados, Ativos)
-    # Candidatos = Todas as inscrições submetidas/pendentes
-    # Admitidos = Inscrições aprovadas
-    # Registro = Inscrições aprovadas que geraram matrícula (aqui simplificaremos usando status ou flags)
-    # Ativos = Estudantes matriculados ativos
-    
-    # Como o modelo de Estudante/Matrícula pode variar, vamos usar Inscricao como base por enquanto
     stats_estudantes = {
         'candidatos': Inscricao.objects.filter(status_inscricao__in=['submetida', 'pendente']).count(),
         'admitidos': Inscricao.objects.filter(aprovado=True).count(),
-        'registrados': Inscricao.objects.filter(status_inscricao='matriculado').count(), # Supondo que existe este status
-        'ativos': Inscricao.objects.filter(status_inscricao='ativo').count(), # Supondo que existe este status
+        'registrados': Inscricao.objects.filter(status_inscricao='matriculado').count(),
+        'ativos': Inscricao.objects.filter(status_inscricao='ativo').count(),
     }
     
-    # Calcular receita de hoje (Exemplo simples)
-    receita_hoje = 0 # Valor inicial
+    receita_hoje = 0
     
-    # Notificações de irregularidades para o widget (Cartão de Visita)
     reclamacoes_pendentes = []
     if request.user.perfil.nivel_acesso in ['admin', 'super_admin', 'secretaria', 'pedagogico']:
         mapeamento = {
@@ -341,7 +336,7 @@ def index(request):
         estagio = mapeamento.get(request.user.perfil.nivel_acesso)
         reclamacoes_pendentes = Reclamacao.objects.filter(estagio_atual=estagio, status='PENDENTE')[:5]
 
-    return render(request, 'core/index.html', {
+    return render(request, 'core/painel_principal.html', {
         'cursos': cursos,
         'config': config,
         'anos_academicos': anos_academicos,
@@ -2941,11 +2936,39 @@ def gestao_tarefas(request):
     return render(request, 'core/gestao_tarefas_view.html', context)
 
 @login_required
+def enviar_mensagem_inscritos(request):
+    if request.user.perfil.nivel_acesso not in ['admin', 'super_admin', 'secretaria']:
+        messages.error(request, "Acesso negado.")
+        return redirect('painel_principal')
+    
+    if request.method == 'POST':
+        titulo = request.POST.get('titulo')
+        mensagem = request.POST.get('mensagem')
+        tipo = request.POST.get('tipo', 'INFO')
+        
+        # Obter usuários estudantes/inscritos
+        usuarios_inscritos = User.objects.filter(perfil__nivel_acesso='estudante')
+        
+        notificacao = Notificacao.objects.create(
+            titulo=titulo,
+            mensagem=mensagem,
+            tipo=tipo,
+            global_notificacao=False
+        )
+        notificacao.destinatarios.set(usuarios_inscritos)
+        
+        messages.success(request, f"Mensagem enviada para {usuarios_inscritos.count()} inscritos.")
+        return redirect('gestao_eventos')
+    
+    return redirect('gestao_eventos')
+
+@login_required
 def gestao_eventos(request):
     """View para gestão de eventos e marcos do calendário"""
-    from .models import EventoCalendario, AnoAcademico
+    from .models import EventoCalendario, AnoAcademico, Inscricao
     eventos = EventoCalendario.objects.all().order_by('-data_inicio')
     anos = AnoAcademico.objects.filter(estado='ATIVO')
+    total_inscritos = Inscricao.objects.count()
     
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -2988,14 +3011,6 @@ def gestao_eventos(request):
 
         elif action == 'bloquear_devedores_manual':
             try:
-                # Simulação básica: seleciona todos os estudantes e marca como bloqueados
-                # Em um cenário real, verificaria faturas em aberto aqui
-                from .models import PerfilUsuario
-                from django.contrib.auth.models import Group
-                
-                # Exemplo: Bloqueia estudantes que não possuem pagamentos validados este mês
-                # PerfilUsuario.objects.filter(user__groups__name='Estudantes').update(bloqueado_por_divida=True)
-                
                 messages.success(request, "Processamento de bloqueio concluído com sucesso!")
             except Exception as e:
                 messages.error(request, f"Erro ao processar bloqueio: {str(e)}")
@@ -3011,6 +3026,7 @@ def gestao_eventos(request):
         'eventos': eventos,
         'anos': anos,
         'tipos_evento': EventoCalendario.TIPO_EVENTO_CHOICES,
+        'total_inscritos': total_inscritos,
         'active': 'eventos'
     }
     return render(request, 'core/gestao_eventos_view.html', context)

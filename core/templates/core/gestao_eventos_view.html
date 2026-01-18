@@ -5,7 +5,7 @@
 <div class="container-fluid py-4 bg-light min-vh-100">
     <!-- Header Section -->
     <div class="row mb-4 align-items-center">
-        <div class="col-lg-6 mb-3 mb-lg-0">
+        <div class="col-lg-5 mb-3 mb-lg-0">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb bg-transparent p-0 mb-2">
                     <li class="breadcrumb-item"><a href="{% url 'painel_principal' %}" class="text-decoration-none text-muted">Painel</a></li>
@@ -14,12 +14,15 @@
                 </ol>
             </nav>
             <h1 class="h3 fw-bold mb-1"><i class="bi bi-calendar-check-fill text-primary me-2"></i>Gestão de Eventos</h1>
-            <p class="text-muted small mb-0">Gerencie marcos acadêmicos e configurações financeiras</p>
+            <p class="text-muted small mb-0">Gerencie marcos acadêmicos e comunicações com candidatos</p>
         </div>
-        <div class="col-lg-6 d-flex justify-content-lg-end gap-2 flex-wrap">
+        <div class="col-lg-7 d-flex justify-content-lg-end gap-2 flex-wrap">
             <a href="{% url 'cronograma_academico' %}" class="btn btn-white border shadow-sm rounded-pill px-3">
                 <i class="bi bi-arrow-left me-1"></i>Voltar
             </a>
+            <button type="button" class="btn btn-soft-info rounded-pill px-3 shadow-sm border-0" data-bs-toggle="modal" data-bs-target="#mensagemInscritosModal">
+                <i class="bi bi-chat-dots-fill me-1"></i>Mensagem aos Inscritos
+            </button>
             <button type="button" class="btn btn-soft-danger rounded-pill px-3 shadow-sm border-0" data-bs-toggle="modal" data-bs-target="#bloquearDevedoresModal">
                 <i class="bi bi-person-x-fill me-1"></i>Bloquear Devedores
             </button>
@@ -318,6 +321,45 @@
                 <div class="modal-footer border-0 pb-4 px-4">
                     <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-primary rounded-pill px-5 shadow-sm">Criar Evento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal Mensagem aos Inscritos -->
+<div class="modal fade" id="mensagemInscritosModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 25px;">
+            <div class="modal-header border-0 pt-4 px-4 pb-0">
+                <h5 class="modal-title fw-bold"><i class="bi bi-chat-dots-fill text-info me-2"></i>Enviar Mensagem aos Inscritos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'enviar_mensagem_inscritos' %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <div class="alert alert-info border-0 rounded-4 small mb-4">
+                        <i class="bi bi-info-circle-fill me-2"></i>Esta mensagem será enviada para todos os <strong>{{ total_inscritos }}</strong> candidatos registrados no sistema.
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Assunto / Título</label>
+                        <input type="text" name="titulo" class="form-control rounded-3" placeholder="Ex: Informação sobre Exames de Acesso" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Tipo de Aviso</label>
+                        <select name="tipo" class="form-select rounded-3">
+                            <option value="INFO">Informativo</option>
+                            <option value="AVISO">Aviso Importante</option>
+                            <option value="URGENTE">Urgente</option>
+                        </select>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Mensagem</label>
+                        <textarea name="mensagem" class="form-control rounded-3" rows="5" placeholder="Digite aqui o conteúdo da mensagem..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pb-4 px-4">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-info text-white rounded-pill px-5 shadow-sm fw-bold">Enviar Mensagem</button>
                 </div>
             </form>
         </div>

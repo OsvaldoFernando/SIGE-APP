@@ -23,15 +23,15 @@
             </div>
             <div class="d-none d-md-block">
                 <div class="d-flex gap-2">
+                    {% if user.perfil.nivel_acesso in 'admin,super_admin,secretaria' %}
+                    <a href="{% url 'gestao_eventos' %}" class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm transition-hover">
+                        <i class="bi bi-calendar-event me-2"></i> Gerir Cronograma
+                    </a>
+                    {% endif %}
                     <a href="{% url 'ano_academico_lista' %}" class="btn btn-outline-dark px-4 py-2 rounded-pill fw-bold transition-hover">
                         <i class="bi bi-gear me-2"></i> Ciclos
                     </a>
-                    {% for ano in anos %}
-                    <a href="{% url 'periodo_lectivo_lista' ano.id %}" class="btn btn-outline-primary px-4 py-2 rounded-pill fw-bold transition-hover">
-                        <i class="bi bi-layers me-2"></i> Períodos
-                    </a>
-                    {% endfor %}
-                    <button class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm transition-hover" onclick="window.print()">
+                    <button class="btn btn-outline-primary px-4 py-2 rounded-pill fw-bold shadow-sm transition-hover" onclick="window.print()">
                         <i class="bi bi-printer me-2"></i> Exportar
                     </button>
                 </div>
@@ -122,13 +122,17 @@
                                                 <div class="marker-line"></div>
                                                 <div class="marker-dot shadow-sm"></div>
                                             </div>
-                                            <div class="timeline-content-erp flex-fill p-4 border rounded-4 bg-white shadow-sm transition-hover {% if evento.esta_ocorrendo %}border-primary border-2{% endif %}">
-                                                <div class="d-flex justify-content-between align-items-start mb-3">
-                                                    <h6 class="fw-bold text-dark mb-0 fs-5">{{ evento.descricao }}</h6>
-                                                    <span class="badge {% if evento.tipo_evento == 'INSCRICAO' %}bg-info{% elif evento.tipo_evento == 'MATRICULA' %}bg-success{% elif evento.tipo_evento == 'TESTE' %}bg-warning{% else %}bg-secondary{% endif %} rounded-pill px-3 py-2">
-                                                        {{ evento.get_tipo_evento_display }}
-                                                    </span>
-                                                </div>
+                                                    <div class="timeline-content-erp flex-fill p-4 border rounded-4 bg-white shadow-sm transition-hover {% if evento.esta_ocorrendo %}border-primary border-2{% endif %}">
+                                                        <div class="d-flex justify-content-between align-items-start mb-3">
+                                                            <h6 class="fw-bold text-dark mb-0 fs-5">
+                                                                {{ evento.descricao }}
+                                                            </h6>
+                                                            <div class="d-flex align-items-center gap-2">
+                                                                <span class="badge {% if evento.tipo_evento == 'INSCRICAO' %}bg-info{% elif evento.tipo_evento == 'MATRICULA' %}bg-success{% elif evento.tipo_evento == 'EXAME_ACESSO' or evento.tipo_evento == 'PROVAS_ADMISSAO' %}bg-warning{% elif evento.tipo_evento == 'EXAME' or evento.tipo_evento == 'RECURSO' %}bg-danger{% else %}bg-secondary{% endif %} rounded-pill px-3 py-2">
+                                                                    {{ evento.get_tipo_evento_display }}
+                                                                </span>
+                                                            </div>
+                                                        </div>
                                                 <div class="d-flex align-items-center text-muted fs-6">
                                                     <i class="bi bi-calendar3 me-2 text-primary"></i>
                                                     <span class="fw-medium text-dark">{{ evento.data_inicio|date:"d/m/Y" }}</span>
@@ -326,6 +330,10 @@
         body { background: white !important; }
         .container-fluid { padding: 0 !important; }
         .card-header { padding-top: 2rem !important; }
+    }
+    .hover-primary:hover {
+        color: #3b82f6 !important;
+        text-decoration: underline !important;
     }
 </style>
 {% endblock %}

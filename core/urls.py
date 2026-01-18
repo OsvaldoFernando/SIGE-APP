@@ -3,7 +3,8 @@ from . import views
 
 urlpatterns = [
     path('', views.index_redirect, name='index_redirect'),
-    path('painel/', views.index, name='painel_principal'),
+    path('index/', views.index, name='index'),
+    path('painel/', views.painel_principal, name='painel_principal'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('admissao/candidato/novo/', views.inscricao_create, name='inscricao_create'),
@@ -29,7 +30,6 @@ urlpatterns = [
     path('horarios/confirmar/<int:horario_id>/', views.confirmar_aula, name='confirmar_aula'),
     path('rh/faltas/', views.painel_rh_faltas, name='painel_rh_faltas'),
     path('rh/novo/', views.rh_novo_registro, name='rh_novo_registro'),
-    path('rh/', views.index, name='rh_index_fallback'),
     path('utilizadores/', views.listar_utilizadores, name='listar_utilizadores'),
     path('utilizadores/novo/', views.criar_utilizador, name='criar_utilizador'),
     path('utilizadores/<int:user_id>/editar/', views.editar_utilizador, name='editar_utilizador'),
@@ -38,9 +38,6 @@ urlpatterns = [
     path('anos-academicos/', views.ano_academico_lista, name='ano_academico_lista'),
     path('anos-academicos/novo/', views.ano_academico_create, name='ano_academico_create'),
     path('anos-academicos/<int:pk>/editar/', views.ano_academico_edit, name='ano_academico_edit'),
-    path('anos-academicos/<int:ano_id>/periodos/', views.periodo_lectivo_lista, name='periodo_lectivo_lista'),
-    path('anos-academicos/<int:ano_id>/periodos/novo/', views.periodo_lectivo_create, name='periodo_lectivo_create'),
-    path('periodos/<int:pk>/editar/', views.periodo_lectivo_edit, name='periodo_lectivo_edit'),
     
     # URLs para Menus do Painel Principal
     path('nova-matricula/', views.selecionar_tipo_matricula, name='nova_matricula'),
@@ -72,4 +69,6 @@ urlpatterns = [
     path('professores/<int:professor_id>/associar-disciplina/', views.associar_disciplina_professor, name='associar_disciplina_professor'),
     path('professores/remover-disciplina/<int:relacao_id>/', views.remover_disciplina_professor, name='remover_disciplina_professor'),
     path('utilizadores/<int:perfil_id>/acessos/', views.gestao_acessos, name='gestao_acessos'),
+    path('cronograma-academico/', views.cronograma_academico, name='cronograma_academico'),
+    path('gestao-eventos/comunicacao/', views.enviar_mensagem_inscritos, name='enviar_mensagem_inscritos'),
 ]

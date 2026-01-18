@@ -76,12 +76,17 @@ class AnoAcademico(models.Model):
 class EventoCalendario(models.Model):
     TIPO_EVENTO_CHOICES = [
         ('INSCRICAO', 'Inscrição'),
+        ('LISTA_INSCRITOS', 'Publicação da Lista de Inscritos'),
+        ('EXAME_ACESSO', 'Exame de Acesso/Admissão'),
+        ('PROVAS_ADMISSAO', 'Realização das Provas de Admissão'),
+        ('CONSULTA_INDIVIDUAL', 'Consultas da Lista Individual'),
+        ('RESULTADOS_ADMISSAO', 'Publicação de Resultados (Admissão)'),
         ('MATRICULA', 'Matrícula'),
         ('PROVA_PARCELAR_1', '1ª Prova Parcelar'),
         ('PROVA_PARCELAR_2', '2ª Prova Parcelar'),
         ('EXAME', 'Exame'),
         ('RECURSO', 'Recurso'),
-        ('EXAME_ESPECIAL', 'Exame Especial'),
+        ('EXAME_ESPECIAL', 'Exame Especial/Época Especial'),
         ('FERIAS', 'Férias'),
         ('OUTRO', 'Outro'),
     ]
