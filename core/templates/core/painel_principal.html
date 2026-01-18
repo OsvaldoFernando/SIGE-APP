@@ -4,6 +4,71 @@
 
 {% block content %}
 <div class="container-fluid px-4 py-5">
+    <!-- Status do Ano Académico e Eventos Próximos -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 h-100" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);">
+                <div class="card-body p-4 text-white">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge bg-white text-primary rounded-pill px-3 py-2 fw-bold me-3 shadow-sm">
+                                    <i class="bi bi-calendar-check me-1"></i> CICLO {{ ano_atual.codigo|default:"---" }}
+                                </span>
+                                {% if ano_atual.inscricoes_abertas %}
+                                <span class="badge bg-success rounded-pill px-3 py-2 fw-bold shadow-sm">
+                                    <i class="bi bi-unlock-fill me-1"></i> INSCRIÇÕES ABERTAS
+                                </span>
+                                {% else %}
+                                <span class="badge bg-danger rounded-pill px-3 py-2 fw-bold shadow-sm">
+                                    <i class="bi bi-lock-fill me-1"></i> INSCRIÇÕES ENCERRADAS
+                                </span>
+                                {% endif %}
+                            </div>
+                            <h3 class="fw-bold mb-1">Estado do Sistema: {{ ano_atual.get_estado_display|default:"Sem Ciclo Ativo" }}</h3>
+                            <p class="opacity-75 mb-0">Gestão Estratégica e Monitoramento do Calendário Académico.</p>
+                        </div>
+                        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                            <a href="{% url 'cronograma_academico' %}" class="btn btn-white bg-white text-primary fw-bold rounded-pill px-4 py-2 shadow-sm transition-hover">
+                                <i class="bi bi-clock-history me-2"></i>Ver Cronograma
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Alertas de Eventos -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-4 h-100 bg-white">
+                <div class="card-header bg-transparent border-0 p-4 pb-0">
+                    <h6 class="fw-bold text-dark mb-0"><i class="bi bi-bell-fill text-warning me-2"></i>Próximos Eventos</h6>
+                </div>
+                <div class="card-body p-4 pt-2">
+                    {% if alertas_academicos %}
+                    <div class="d-flex flex-column gap-3">
+                        {% for evento in alertas_academicos|slice:":3" %}
+                        <div class="d-flex align-items-center p-2 rounded-3 hover-bg-light transition-all border-start border-4 {% if evento.tipo_evento == 'EXAME' %}border-danger{% elif 'PROVA' in evento.tipo_evento %}border-warning{% else %}border-primary{% endif %}">
+                            <div class="flex-grow-1">
+                                <div class="fw-bold text-dark small">{{ evento.descricao }}</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">
+                                    <i class="bi bi-calendar-event me-1"></i>{{ evento.data_inicio|date:"d/m" }} até {{ evento.data_fim|date:"d/m" }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-calendar2-check text-muted opacity-25 display-6"></i>
+                        <p class="text-muted small mt-2">Nenhum evento crítico nos próximos 30 dias.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Gráfico de Total de Estudantes por Estado e Evolução -->
     <div class="row g-4 mb-4">
         <div class="col-lg-6">

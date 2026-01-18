@@ -22,22 +22,32 @@
                 </div>
             </div>
             <div class="d-none d-md-block">
-                <button class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm transition-hover" onclick="window.print()">
-                    <i class="bi bi-printer me-2"></i> Exportar Calendário
-                </button>
+                <div class="d-flex gap-2">
+                    <a href="{% url 'ano_academico_lista' %}" class="btn btn-outline-dark px-4 py-2 rounded-pill fw-bold transition-hover">
+                        <i class="bi bi-gear me-2"></i> Ciclos
+                    </a>
+                    {% for ano in anos %}
+                    <a href="{% url 'periodo_lectivo_lista' ano.id %}" class="btn btn-outline-primary px-4 py-2 rounded-pill fw-bold transition-hover">
+                        <i class="bi bi-layers me-2"></i> Períodos
+                    </a>
+                    {% endfor %}
+                    <button class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-sm transition-hover" onclick="window.print()">
+                        <i class="bi bi-printer me-2"></i> Exportar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="container pb-5">
+    <div class="container-fluid pb-5 px-md-5">
         <div class="row g-4 justify-content-center">
             {% for ano in anos %}
-            <div class="col-xl-10">
+            <div class="col-12">
                 <div class="card border-0 shadow-lg h-100" style="border-radius: 24px; background: #fff; overflow: hidden;">
                     <div class="card-header bg-white border-0 pt-5 px-5 d-flex justify-content-between align-items-start flex-wrap gap-4">
                         <div>
                             <div class="d-flex align-items-center gap-3 mb-2 flex-wrap">
-                                <h2 class="fw-bold mb-0 text-dark" style="font-size: 2.8rem; letter-spacing: -1px;">Ciclo {{ ano.codigo }}</h2>
+                                <h2 class="fw-bold mb-0 text-dark" style="font-size: 3.5rem; letter-spacing: -2px;">Ciclo {{ ano.codigo }}</h2>
                                 {% if ano.ano_atual %}
                                 <span class="badge bg-primary px-3 py-2 rounded-pill fw-bold" style="font-size: 0.8rem; letter-spacing: 0.5px;">ANO ACTUAL</span>
                                 {% endif %}
@@ -65,43 +75,43 @@
                     <div class="card-body p-5">
                         <!-- Dashboard de Status ERP -->
                         <div class="row g-4 mb-5">
-                            <div class="col-md-4">
-                                <div class="p-4 rounded-4 border bg-light bg-opacity-25 h-100 transition-hover border-2 text-center">
-                                    <label class="text-muted smaller fw-bold text-uppercase d-block mb-3" style="letter-spacing: 1px;">Estado Operacional</label>
-                                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 p-3 mb-3" style="width: 65px; height: 65px;">
-                                        <i class="bi bi-activity text-primary fs-3"></i>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="p-4 rounded-4 border bg-light bg-opacity-25 h-100 transition-hover border-2 text-center shadow-sm d-flex flex-column align-items-center justify-content-center py-5">
+                                    <label class="text-muted smaller fw-bold text-uppercase d-block mb-3" style="letter-spacing: 2px;">Estado Operacional</label>
+                                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary bg-opacity-10 p-3 mb-4" style="width: 80px; height: 80px;">
+                                        <i class="bi bi-activity text-primary fs-1"></i>
                                     </div>
-                                    <h4 class="fw-bold text-dark mb-0">{{ ano.get_estado_display }}</h4>
+                                    <h3 class="fw-bold text-dark mb-0 fs-2">{{ ano.get_estado_display }}</h3>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="p-4 rounded-4 border bg-light bg-opacity-25 h-100 transition-hover border-2 text-center">
-                                    <label class="text-muted smaller fw-bold text-uppercase d-block mb-3" style="letter-spacing: 1px;">Início do Ciclo</label>
-                                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success bg-opacity-10 p-3 mb-3" style="width: 65px; height: 65px;">
-                                        <i class="bi bi-calendar-check text-success fs-3"></i>
+                            <div class="col-lg-4 col-md-6">
+                                <div class="p-4 rounded-4 border bg-light bg-opacity-25 h-100 transition-hover border-2 text-center shadow-sm d-flex flex-column align-items-center justify-content-center py-5">
+                                    <label class="text-muted smaller fw-bold text-uppercase d-block mb-3" style="letter-spacing: 2px;">Início do Ciclo</label>
+                                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-success bg-opacity-10 p-3 mb-4" style="width: 80px; height: 80px;">
+                                        <i class="bi bi-calendar-check text-success fs-1"></i>
                                     </div>
-                                    <h4 class="fw-bold text-dark mb-0">{{ ano.data_inicio|date:"d M Y" }}</h4>
+                                    <h3 class="fw-bold text-dark mb-0 fs-2">{{ ano.data_inicio|date:"d M Y" }}</h3>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="p-4 rounded-4 border bg-light bg-opacity-25 h-100 transition-hover border-2 text-center">
-                                    <label class="text-muted smaller fw-bold text-uppercase d-block mb-3" style="letter-spacing: 1px;">Encerramento</label>
-                                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10 p-3 mb-3" style="width: 65px; height: 65px;">
-                                        <i class="bi bi-calendar-x text-danger fs-3"></i>
+                            <div class="col-lg-4 col-md-12">
+                                <div class="p-4 rounded-4 border bg-light bg-opacity-25 h-100 transition-hover border-2 text-center shadow-sm d-flex flex-column align-items-center justify-content-center py-5">
+                                    <label class="text-muted smaller fw-bold text-uppercase d-block mb-3" style="letter-spacing: 2px;">Encerramento</label>
+                                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger bg-opacity-10 p-3 mb-4" style="width: 80px; height: 80px;">
+                                        <i class="bi bi-calendar-x text-danger fs-1"></i>
                                     </div>
-                                    <h4 class="fw-bold text-dark mb-0">{{ ano.data_fim|date:"d M Y" }}</h4>
+                                    <h3 class="fw-bold text-dark mb-0 fs-2">{{ ano.data_fim|date:"d M Y" }}</h3>
                                 </div>
                             </div>
                         </div>
 
                         <div class="row g-5">
                             <!-- Lado Esquerdo: Timeline Profissional -->
-                            <div class="col-lg-7">
+                            <div class="col-lg-8">
                                 <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
-                                    <h5 class="fw-bold mb-0 d-flex align-items-center">
-                                        <i class="bi bi-clock-history text-primary me-2"></i> Marcos Temporais
-                                    </h5>
-                                    <span class="badge bg-light text-dark border rounded-pill px-3">{{ ano.eventos.count }} Acções</span>
+                                    <h4 class="fw-bold mb-0 d-flex align-items-center">
+                                        <i class="bi bi-clock-history text-primary me-3 fs-3"></i> Marcos Temporais
+                                    </h4>
+                                    <span class="badge bg-light text-dark border rounded-pill px-4 py-2 fs-6">{{ ano.eventos.count }} Acções</span>
                                 </div>
                                 
                                 <div class="timeline-erp pt-2 ps-2">
@@ -146,84 +156,75 @@
                             </div>
 
                             <!-- Lado Direito: Regras de Negócio e Facturação -->
-                            <div class="col-lg-5">
+                            <div class="col-lg-4 mb-5 pb-5">
                                 {% if ano.cobrar_propinas %}
                                 <div class="d-flex align-items-center mb-4 pb-2 border-bottom">
-                                    <h5 class="fw-bold mb-0 d-flex align-items-center text-success">
-                                        <i class="bi bi-shield-check me-2"></i> Regras de Facturação
-                                    </h5>
+                                    <h4 class="fw-bold mb-0 d-flex align-items-center text-success">
+                                        <i class="bi bi-shield-check me-3 fs-3"></i> Regras de Facturação
+                                    </h4>
                                 </div>
 
-                                <div class="card border-0 bg-dark text-white rounded-4 p-4 mb-4 shadow-lg overflow-hidden position-relative">
-                                    <div class="position-absolute top-0 end-0 p-3 opacity-10">
-                                        <i class="bi bi-currency-dollar" style="font-size: 6rem;"></i>
+                                <div class="card border-0 bg-dark text-white rounded-4 p-3 mb-2 shadow-lg position-relative" style="font-size: 0.9rem;">
+                                    <div class="position-absolute top-0 end-0 p-2 opacity-10">
+                                        <span style="font-size: 4rem; font-weight: 800; font-family: 'Inter', sans-serif;">Kz</span>
                                     </div>
                                     
                                     <div class="position-relative z-1">
                                         {% with dia_hoje=hoje|date:"j"|add:"0" %}
-                                        <div class="mb-4">
+                                        <div class="mb-3">
                                             {% if dia_hoje <= ano.dia_pagamento_limite %}
                                                 <div class="bg-success bg-opacity-25 border border-success border-opacity-50 p-3 rounded-3 mb-0 text-center">
-                                                    <p class="small fw-bold mb-1 text-uppercase">Janela Regular Activa</p>
+                                                    <i class="bi bi-check-circle-fill mb-1 d-block fs-4 text-success"></i>
+                                                    <p class="small fw-bold mb-1 text-uppercase">Janela de Pagamento Regular</p>
                                                     <div class="progress mb-2" style="height: 4px; background: rgba(255,255,255,0.1);">
                                                         <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio dia_hoje ano.dia_pagamento_limite 100 %}%"></div>
                                                     </div>
-                                                    <small class="opacity-75">Status: Em conformidade operacional.</small>
+                                                    <small class="opacity-75" style="font-size: 0.75rem;">Status: Pagamentos sem acréscimo de multas até o dia {{ ano.dia_pagamento_limite }}.</small>
                                                 </div>
                                             {% elif dia_hoje <= ano.dia_limite_multa %}
                                                 <div class="bg-warning bg-opacity-25 border border-warning border-opacity-50 p-3 rounded-3 mb-0 text-center text-warning">
-                                                    <p class="small fw-bold mb-1 text-uppercase text-white">Fase de Mora</p>
+                                                    <i class="bi bi-exclamation-triangle-fill mb-1 d-block fs-4"></i>
+                                                    <p class="small fw-bold mb-1 text-uppercase text-white">Fase de Mora (Com Multa)</p>
                                                     <div class="progress mb-2" style="height: 4px; background: rgba(255,255,255,0.1);">
                                                         <div class="progress-bar bg-warning" role="progressbar" style="width: 100%"></div>
                                                     </div>
-                                                    <small class="text-white opacity-75">Atenção: Sobrecargas de multa activas.</small>
+                                                    <small class="text-white opacity-75" style="font-size: 0.75rem;">Atenção: Aplicação de multa de {{ ano.percentagem_multa_inicial }}% sobre o valor base.</small>
                                                 </div>
                                             {% else %}
-                                                <div class="bg-danger bg-opacity-25 border border-danger border-opacity-50 p-3 rounded-3 mb-0 text-center">
-                                                    <p class="small fw-bold mb-0 text-uppercase">Ciclo de Bloqueio Activo</p>
+                                                <div class="bg-danger bg-opacity-25 border border-danger border-opacity-50 p-3 rounded-3 mb-0 text-center text-white">
+                                                    <i class="bi bi-slash-circle-fill mb-1 d-block fs-4"></i>
+                                                    <p class="small fw-bold mb-1 text-uppercase">Ciclo de Bloqueio Activo</p>
+                                                    <small class="opacity-75" style="font-size: 0.75rem;">Sistema: Estudante impedido de realizar operações académicas por falta de pagamento.</small>
                                                 </div>
                                             {% endif %}
                                         </div>
                                         {% endwith %}
 
-                                        <div class="space-y-4">
-                                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-50">
-                                                <span class="opacity-75 small">Limite Regular</span>
+                                        <div class="space-y-2">
+                                            <div class="d-flex justify-content-between align-items-center py-1 border-bottom border-secondary border-opacity-50">
+                                                <span class="opacity-75 smaller">Pagamento Regular até</span>
                                                 <span class="fw-bold">Dia {{ ano.dia_pagamento_limite }}</span>
                                             </div>
-                                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-50">
-                                                <span class="opacity-75 small">Início Mora</span>
+                                            <div class="d-flex justify-content-between align-items-center py-1 border-bottom border-secondary border-opacity-50">
+                                                <span class="opacity-75 smaller">Início das Multas</span>
                                                 <span class="fw-bold text-warning">Dia {{ ano.dia_inicio_multa }}</span>
                                             </div>
-                                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom border-secondary border-opacity-50">
-                                                <span class="opacity-75 small">Taxa de Mora</span>
+                                            <div class="d-flex justify-content-between align-items-center py-1 border-bottom border-secondary border-opacity-50">
+                                                <span class="opacity-75 smaller">Taxa de Mora (Multa)</span>
                                                 <span class="fw-bold text-danger">{{ ano.percentagem_multa_inicial }}%</span>
                                             </div>
-                                            <div class="d-flex justify-content-between align-items-center py-2">
-                                                <span class="opacity-75 small">Bloqueio Operacional</span>
+                                            <div class="d-flex justify-content-between align-items-center py-1">
+                                                <span class="opacity-75 smaller">Bloqueio do Sistema</span>
                                                 <span class="fw-bold text-danger">Dia {{ ano.dia_bloqueio_estudante }}</span>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
                                 {% endif %}
-                                
-                                <div class="card border-0 bg-white shadow-sm p-4 rounded-4 mb-4 border-start border-primary border-4">
-                                    <h6 class="fw-bold mb-3"><i class="bi bi-lightning-charge-fill me-2 text-primary"></i>Gestão Rápida</h6>
-                                    <div class="d-grid gap-3">
-                                        <a href="{% url 'ano_academico_lista' %}" class="btn btn-outline-dark rounded-pill py-2 fw-bold">
-                                            <i class="bi bi-gear me-2"></i> Configurar Ciclos
-                                        </a>
-                                        <a href="{% url 'periodo_lectivo_lista' ano.id %}" class="btn btn-outline-primary rounded-pill py-2 fw-bold">
-                                            <i class="bi bi-layers me-2"></i> Períodos Lectivos
-                                        </a>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="card-footer bg-light border-0 px-5 py-4 d-flex justify-content-between align-items-center" style="border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;">
+                    <div class="card-footer bg-light border-0 px-5 py-4 d-flex justify-content-between align-items-center mt-5" style="border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;">
                         <span class="text-muted small"><i class="bi bi-shield-lock me-1"></i> Auditado pelo Sistema em: {{ ano.data_criacao|date:"d/m/Y H:i" }}</span>
                         <div class="d-flex gap-2">
                             <button class="btn btn-sm btn-light border px-4 rounded-pill fw-bold">Histórico</button>
@@ -312,6 +313,9 @@
     }
     .border-dashed {
         border: 2.5px dashed #e2e8f0 !important;
+    }
+    .space-y-2 > * + * {
+        margin-top: 0.5rem;
     }
     .space-y-4 > * + * {
         margin-top: 1rem;

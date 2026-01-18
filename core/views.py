@@ -1419,12 +1419,9 @@ def ano_academico_create(request):
 def ano_academico_edit(request, pk):
     ano = get_object_or_404(AnoAcademico, pk=pk)
     
-    if ano.estado == 'ENCERRADO':
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({'success': False, 'message': "Erro: Este ano está encerrado e não pode ser editado."})
-        messages.error(request, "Este ano está encerrado e não pode ser editado.")
-        return redirect('ano_academico_lista')
-
+    # Removida a restrição total de edição para anos encerrados para permitir reativação
+    # A lógica de proteção agora é tratada no salvamento ou via permissões
+    
     if request.method == 'POST':
         ano.codigo = request.POST.get('codigo')
         ano.descricao = request.POST.get('descricao')
@@ -1439,8 +1436,8 @@ def ano_academico_edit(request, pk):
         return redirect('ano_academico_lista')
     
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return render(request, 'core/partials/ano_academico_form_inner.html')
-    return render(request, 'core/ano_academico_form.html')
+        return render(request, 'core/partials/ano_academico_form_inner.html', {'ano': ano})
+    return render(request, 'core/ano_academico_form.html', {'ano': ano})
 
 @login_required
 def semestre_create(request, ano_id):
@@ -2030,6 +2027,15 @@ def painel_principal(request):
         ]
     }
 
+    # Alertas Académicos (Próximos 30 dias)
+    hoje_data = date.today()
+    futuro_data = hoje_data + timezone.timedelta(days=30)
+    alertas_academicos = EventoCalendario.objects.filter(
+        ano_lectivo=ano_atual,
+        estado='ATIVO',
+        data_inicio__range=[hoje_data, futuro_data]
+    ).order_by('data_inicio') if ano_atual else []
+
     context = {
         'total_inscricoes': total_inscricoes,
         'total_aprovados': total_aprovados,
@@ -2049,7 +2055,8 @@ def painel_principal(request):
         'stats_taxa_aprovacao': json.dumps(stats_taxa_aprovacao),
         'stats_indicacoes': json.dumps(stats_indicacoes),
         'stats_receitas': json.dumps(stats_receitas),
-        'stats_pagamentos_estado': json.dumps(stats_pagamentos_estado)
+        'stats_pagamentos_estado': json.dumps(stats_pagamentos_estado),
+        'alertas_academicos': alertas_academicos,
     }
     return render(request, 'core/painel_principal.html', context)
 

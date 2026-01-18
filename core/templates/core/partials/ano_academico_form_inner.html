@@ -1,40 +1,73 @@
 <form id="academicForm" method="post" action="{% if ano %}{% url 'ano_academico_edit' ano.pk %}{% else %}{% url 'ano_academico_create' %}{% endif %}">
     {% csrf_token %}
-    <div class="row g-4">
+    <div class="row g-3">
         <div class="col-md-12">
-            <label class="form-label">Código do Ano</label>
-            <div class="input-group">
-                <span class="input-group-text bg-light border-end-0"><i class="bi bi-hash"></i></span>
-                <input type="text" name="codigo" class="form-control border-start-0" value="{{ ano.codigo }}" placeholder="Ex: 2024/2025" required>
+            <label class="form-label fw-bold small text-muted text-uppercase mb-1" style="letter-spacing: 0.5px;">Código do Ciclo</label>
+            <div class="input-group input-group-lg">
+                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-hash"></i></span>
+                <input type="text" name="codigo" class="form-control border-start-0 ps-0 fw-bold" value="{{ ano.codigo }}" placeholder="Ex: 2024/2025" required style="font-size: 1.1rem;">
             </div>
         </div>
         <div class="col-12">
-            <label class="form-label">Descrição</label>
-            <input type="text" name="descricao" class="form-control" value="{{ ano.descricao }}" placeholder="Ex: Ano Lectivo 2024–2025" required>
+            <label class="form-label fw-bold small text-muted text-uppercase mb-1" style="letter-spacing: 0.5px;">Designação / Descrição</label>
+            <input type="text" name="descricao" class="form-control form-control-lg fs-6" value="{{ ano.descricao }}" placeholder="Ex: Ano Lectivo Estratégico" required>
         </div>
         <div class="col-md-6">
-            <label class="form-label">Data de Início</label>
-            <input type="date" name="data_inicio" class="form-control" value="{{ ano.data_inicio|date:'Y-m-d' }}" required>
+            <label class="form-label fw-bold small text-muted text-uppercase mb-1" style="letter-spacing: 0.5px;">Data Início</label>
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-calendar-event"></i></span>
+                <input type="date" name="data_inicio" class="form-control border-start-0 ps-0" value="{{ ano.data_inicio|date:'Y-m-d' }}" required>
+            </div>
         </div>
         <div class="col-md-6">
-            <label class="form-label">Data de Fim</label>
-            <input type="date" name="data_fim" class="form-control" value="{{ ano.data_fim|date:'Y-m-d' }}" required>
+            <label class="form-label fw-bold small text-muted text-uppercase mb-1" style="letter-spacing: 0.5px;">Data Término</label>
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-calendar-x"></i></span>
+                <input type="date" name="data_fim" class="form-control border-start-0 ps-0" value="{{ ano.data_fim|date:'Y-m-d' }}" required>
+            </div>
         </div>
         <div class="col-12">
-            <label class="form-label">Estado</label>
-            <select name="estado" class="form-select">
-                <option value="PLANEADO" {% if ano.estado == 'PLANEADO' %}selected{% endif %}>Planeado</option>
-                <option value="ATIVO" {% if ano.estado == 'ATIVO' %}selected{% endif %}>Ativo</option>
-                <option value="ENCERRADO" {% if ano.estado == 'ENCERRADO' %}selected{% endif %}>Encerrado</option>
-            </select>
+            <label class="form-label fw-bold small text-muted text-uppercase mb-1" style="letter-spacing: 0.5px;">Estado de Gestão</label>
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-activity"></i></span>
+                <select name="estado" id="estadoSelect" class="form-select border-start-0 ps-0" onchange="toggleAnoAtualSwitch()">
+                    <option value="PLANEADO" {% if ano.estado == 'PLANEADO' %}selected{% endif %}>Planeado</option>
+                    <option value="ATIVO" {% if ano.estado == 'ATIVO' %}selected{% endif %}>Ativo</option>
+                    <option value="ENCERRADO" {% if ano.estado == 'ENCERRADO' %}selected{% endif %}>Encerrado</option>
+                </select>
+            </div>
         </div>
-        <div class="col-12">
-            <div class="p-3 bg-light rounded-3">
-                <div class="form-check form-switch mb-0">
-                    <input type="checkbox" name="ano_atual" class="form-check-input" id="ativoSwitch" style="width: 2.5em; height: 1.25em;" {% if ano.ano_atual %}checked{% endif %}>
-                    <label class="form-check-label ms-2 fw-bold text-primary" for="ativoSwitch">Definir como Ano Atual do Sistema</label>
+        <div class="col-12 mt-4">
+            <div class="p-3 rounded-4 border bg-primary bg-opacity-10 shadow-sm border-primary border-opacity-25">
+                <div class="form-check form-switch d-flex align-items-center mb-0">
+                    <input type="checkbox" name="ano_atual" class="form-check-input" id="ativoSwitch" style="width: 2.8em; height: 1.4em; cursor: pointer;" {% if ano.ano_atual %}checked{% endif %} onchange="toggleEstadoSelect()">
+                    <label class="form-check-label ms-3 fw-bold text-primary mb-0" for="ativoSwitch" style="cursor: pointer;">Definir como Ano Actual do Sistema</label>
                 </div>
             </div>
         </div>
     </div>
 </form>
+
+<script>
+    function toggleAnoAtualSwitch() {
+        const estadoSelect = document.getElementById('estadoSelect');
+        const ativoSwitch = document.getElementById('ativoSwitch');
+        
+        if (estadoSelect.value !== 'ATIVO') {
+            ativoSwitch.checked = false;
+        } else {
+            ativoSwitch.checked = true;
+        }
+    }
+
+    function toggleEstadoSelect() {
+        const estadoSelect = document.getElementById('estadoSelect');
+        const ativoSwitch = document.getElementById('ativoSwitch');
+        
+        if (ativoSwitch.checked) {
+            estadoSelect.value = 'ATIVO';
+        } else if (estadoSelect.value === 'ATIVO') {
+            estadoSelect.value = 'PLANEADO';
+        }
+    }
+</script>

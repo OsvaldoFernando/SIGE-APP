@@ -59,20 +59,17 @@ class AnoAcademico(models.Model):
         return evento.esta_ocorrendo()
 
     def save(self, *args, **kwargs):
-        if self.pk:
-            try:
-                old_obj = AnoAcademico.objects.get(pk=self.pk)
-                if old_obj.estado == 'ENCERRADO':
-                    raise ValueError("Um ano académico ENCERRADO não pode ser alterado.")
-            except AnoAcademico.DoesNotExist:
-                pass
-
-        if self.estado == 'ATIVO':
-            AnoAcademico.objects.exclude(pk=self.pk).filter(estado='ATIVO').update(estado='ENCERRADO', ano_atual=False)
-            self.ano_atual = True
-        
+        # Sincronização lógica: se for o Ano Atual, o estado deve ser ATIVO
+        if self.ano_atual:
+            self.estado = 'ATIVO'
+            
+        # Garante que apenas UM ano seja o "Atual" (ano_atual=True)
         if self.ano_atual:
             AnoAcademico.objects.exclude(pk=self.pk).update(ano_atual=False)
+            
+        # Ao ativar um ano (estado='ATIVO'), os outros são marcados como encerrados
+        if self.estado == 'ATIVO':
+            AnoAcademico.objects.exclude(pk=self.pk).update(estado='ENCERRADO', ano_atual=False)
             
         super().save(*args, **kwargs)
 
@@ -80,8 +77,11 @@ class EventoCalendario(models.Model):
     TIPO_EVENTO_CHOICES = [
         ('INSCRICAO', 'Inscrição'),
         ('MATRICULA', 'Matrícula'),
-        ('TESTE', 'Teste / Avaliação'),
-        ('EXAMES', 'Exames'),
+        ('PROVA_PARCELAR_1', '1ª Prova Parcelar'),
+        ('PROVA_PARCELAR_2', '2ª Prova Parcelar'),
+        ('EXAME', 'Exame'),
+        ('RECURSO', 'Recurso'),
+        ('EXAME_ESPECIAL', 'Exame Especial'),
         ('FERIAS', 'Férias'),
         ('OUTRO', 'Outro'),
     ]
@@ -131,8 +131,14 @@ class PeriodoLectivo(models.Model):
         return f"{self.nome} - {self.ano_lectivo}"
 
     def save(self, *args, **kwargs):
+        # Apenas um período letivo pode ser o "corrente" (ativo=True) por ano académico
         if self.ativo:
             PeriodoLectivo.objects.filter(ano_lectivo=self.ano_lectivo).exclude(pk=self.pk).update(ativo=False)
+        
+        # Sincronização lógica: se está ativo (corrente), o estado deve ser ATIVO
+        if self.ativo:
+            self.estado = 'ATIVO'
+            
         super().save(*args, **kwargs)
 
 class Privilegio(models.Model):
