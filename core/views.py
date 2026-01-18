@@ -3967,6 +3967,12 @@ def registrar_horario(request):
     }
 
     if request.method == 'POST':
+        # Validação de campos obrigatórios no backend
+        required_fields = ['turma', 'disciplina', 'professor', 'sala', 'dia_semana', 'hora_inicio', 'hora_fim', 'tempos_aula']
+        missing = [f for f in required_fields if not request.POST.get(f)]
+        if missing:
+            messages.error(request, "Por favor, preencha todos os campos obrigatórios.")
+            return render(request, 'core/registrar_horario.html', context)
         try:
             from .models import TurmaDisciplina, Turma, Disciplina, User, Sala, HorarioAula
             

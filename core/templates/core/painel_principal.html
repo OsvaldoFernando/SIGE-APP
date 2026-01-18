@@ -86,6 +86,68 @@
     </div>
 
     <div id="menusContainer">
+        <!-- SEÇÃO DE ESTATÍSTICAS -->
+        <div class="menu-section mb-5 animate__animated animate__fadeIn">
+            <div class="section-header d-flex align-items-center mb-4">
+                <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
+                    <i class="bi bi-graph-up text-primary fs-4"></i>
+                </div>
+                <h3 class="mb-0 fw-bold">Estatísticas do Sistema</h3>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm rounded-3 h-100">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold mb-4 text-dark">Novas Inscrições (Mensal)</h6>
+                            <div style="height: 300px;">
+                                <canvas id="inscricoesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm rounded-3 h-100">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold mb-4 text-dark">Taxa de Aprovação</h6>
+                            <div style="height: 300px;">
+                                <canvas id="taxaAprovacaoChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-3 h-100">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold mb-4 text-dark">Origem das Inscrições</h6>
+                            <div style="height: 300px;">
+                                <canvas id="indicacoesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-3 h-100">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold mb-4 text-dark">Fluxo de Receita</h6>
+                            <div style="height: 300px;">
+                                <canvas id="receitasChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-3 h-100">
+                        <div class="card-body p-4">
+                            <h6 class="fw-bold mb-4 text-dark">Estado dos Pagamentos</h6>
+                            <div style="height: 300px;">
+                                <canvas id="pagamentosChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- SEÇÃO RECURSOS HUMANOS (RH) - OBRIGATÓRIA -->
             <div class="section-header d-flex align-items-center">
                 <div class="bg-success bg-opacity-10 p-2 rounded-3 me-3">
@@ -650,196 +712,251 @@
             }
         });
 
-        // Gráfico de Taxa de Aprovação
-        const statsTaxa = JSON.parse('{{ stats_taxa_aprovacao|safe }}');
-        const ctxTaxa = document.getElementById('taxaAprovacaoChart').getContext('2d');
-        
-        new Chart(ctxTaxa, {
-            type: 'bar',
-            data: {
-                labels: statsTaxa.labels,
-                datasets: [{
-                    label: 'Quantidade',
-                    data: statsTaxa.valores,
-                    backgroundColor: [
-                        'rgba(16, 185, 129, 0.7)', // Aprovados (Verde)
-                        'rgba(239, 68, 68, 0.7)',  // Reprovados (Vermelho)
-                        'rgba(245, 158, 11, 0.7)'   // Em espera (Amarelo)
-                    ],
-                    borderColor: [
-                        'rgb(16, 185, 129)',
-                        'rgb(239, 68, 68)',
-                        'rgb(245, 158, 11)'
-                    ],
-                    borderWidth: 1,
-                    borderRadius: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                        titleColor: '#1e293b',
-                        bodyColor: '#64748b',
-                        borderColor: '#e2e8f0',
+        // Gráfico de Inscrições (Barras)
+        const statsInscricoes = JSON.parse('{{ stats_inscricoes_mensais|safe }}');
+        const canvasInscricoes = document.getElementById('inscricoesChart');
+        if (canvasInscricoes) {
+            const ctxInscricoes = canvasInscricoes.getContext('2d');
+            new Chart(ctxInscricoes, {
+                type: 'bar',
+                data: {
+                    labels: statsInscricoes.meses,
+                    datasets: [{
+                        label: 'Inscrições',
+                        data: statsInscricoes.valores,
+                        backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                        borderColor: 'rgb(59, 130, 246)',
                         borderWidth: 1,
-                        padding: 12
-                    }
+                        borderRadius: 5
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: 'rgba(0, 0, 0, 0.05)' },
-                        ticks: { stepSize: 1, color: '#64748b' }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#1e293b',
+                            bodyColor: '#64748b',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1,
+                            padding: 12
+                        }
                     },
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: '#1e293b', font: { weight: '600' } }
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                            ticks: { stepSize: 1, color: '#64748b' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#1e293b', font: { weight: '600' } }
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
+
+        // Gráfico de Taxa de Aprovação
+        const statsTaxa = JSON.parse('{{ stats_taxa_aprovacao|safe }}');
+        const canvasTaxa = document.getElementById('taxaAprovacaoChart');
+        if (canvasTaxa) {
+            const ctxTaxa = canvasTaxa.getContext('2d');
+            new Chart(ctxTaxa, {
+                type: 'bar',
+                data: {
+                    labels: statsTaxa.labels,
+                    datasets: [{
+                        label: 'Quantidade',
+                        data: statsTaxa.valores,
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.7)', // Aprovados (Verde)
+                            'rgba(239, 68, 68, 0.7)',  // Reprovados (Vermelho)
+                            'rgba(245, 158, 11, 0.7)'   // Em espera (Amarelo)
+                        ],
+                        borderColor: [
+                            'rgb(16, 185, 129)',
+                            'rgb(239, 68, 68)',
+                            'rgb(245, 158, 11)'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#1e293b',
+                            bodyColor: '#64748b',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1,
+                            padding: 12
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                            ticks: { stepSize: 1, color: '#64748b' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#1e293b', font: { weight: '600' } }
+                        }
+                    }
+                }
+            });
+        }
 
         // Gráfico de Indicações (Pizza)
         const statsIndicacoes = JSON.parse('{{ stats_indicacoes|safe }}');
-        const ctxIndicacoes = document.getElementById('indicacoesChart').getContext('2d');
-        
-        new Chart(ctxIndicacoes, {
-            type: 'pie',
-            data: {
-                labels: statsIndicacoes.labels,
-                datasets: [{
-                    data: statsIndicacoes.valores,
-                    backgroundColor: [
-                        'rgba(59, 130, 246, 0.7)', // Online (Azul)
-                        'rgba(107, 114, 128, 0.7)' // Presencial (Cinza)
-                    ],
-                    borderColor: [
-                        'rgb(59, 130, 246)',
-                        'rgb(107, 114, 128)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            color: '#64748b',
-                            padding: 20,
-                            font: { size: 12 }
+        const canvasIndicacoes = document.getElementById('indicacoesChart');
+        if (canvasIndicacoes) {
+            const ctxIndicacoes = canvasIndicacoes.getContext('2d');
+            new Chart(ctxIndicacoes, {
+                type: 'pie',
+                data: {
+                    labels: statsIndicacoes.labels,
+                    datasets: [{
+                        data: statsIndicacoes.valores,
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.7)', // Online (Azul)
+                            'rgba(107, 114, 128, 0.7)' // Presencial (Cinza)
+                        ],
+                        borderColor: [
+                            'rgb(59, 130, 246)',
+                            'rgb(107, 114, 128)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#64748b',
+                                padding: 20,
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#1e293b',
+                            bodyColor: '#64748b',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1,
+                            padding: 12
                         }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                        titleColor: '#1e293b',
-                        bodyColor: '#64748b',
-                        borderColor: '#e2e8f0',
-                        borderWidth: 1,
-                        padding: 12
                     }
                 }
-            }
-        });
+            });
+        }
 
         // Gráfico de Receitas
         const statsReceitas = JSON.parse('{{ stats_receitas|safe }}');
-        const ctxReceitas = document.getElementById('receitasChart').getContext('2d');
-        
-        new Chart(ctxReceitas, {
-            type: 'bar',
-            data: {
-                labels: statsReceitas.labels,
-                datasets: [{
-                    label: 'Receita Total',
-                    data: statsReceitas.valores,
-                    backgroundColor: 'rgba(16, 185, 129, 0.7)',
-                    borderColor: 'rgb(16, 185, 129)',
-                    borderWidth: 1,
-                    borderRadius: 5
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                        titleColor: '#1e293b',
-                        bodyColor: '#64748b',
-                        borderColor: '#e2e8f0',
+        const canvasReceitas = document.getElementById('receitasChart');
+        if (canvasReceitas) {
+            const ctxReceitas = canvasReceitas.getContext('2d');
+            new Chart(ctxReceitas, {
+                type: 'bar',
+                data: {
+                    labels: statsReceitas.labels,
+                    datasets: [{
+                        label: 'Receita Total',
+                        data: statsReceitas.valores,
+                        backgroundColor: 'rgba(16, 185, 129, 0.7)',
+                        borderColor: 'rgb(16, 185, 129)',
                         borderWidth: 1,
-                        padding: 12
-                    }
+                        borderRadius: 5
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: 'rgba(0, 0, 0, 0.05)' },
-                        ticks: { color: '#64748b' }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#1e293b',
+                            bodyColor: '#64748b',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1,
+                            padding: 12
+                        }
                     },
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: '#1e293b', font: { weight: '600' } }
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                            ticks: { color: '#64748b' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#1e293b', font: { weight: '600' } }
+                        }
                     }
                 }
-            }
-        });
+            });
+        }
 
         // Gráfico de Pagamentos (Donut)
         const statsPagamentos = JSON.parse('{{ stats_pagamentos_estado|safe }}');
-        const ctxPagamentos = document.getElementById('pagamentosChart').getContext('2d');
-        
-        new Chart(ctxPagamentos, {
-            type: 'doughnut',
-            data: {
-                labels: statsPagamentos.labels,
-                datasets: [{
-                    data: statsPagamentos.valores,
-                    backgroundColor: [
-                        'rgba(16, 185, 129, 0.7)', // Aprovado
-                        'rgba(245, 158, 11, 0.7)', // Pendente
-                        'rgba(239, 68, 68, 0.7)'  // Rejeitado
-                    ],
-                    borderColor: [
-                        'rgb(16, 185, 129)',
-                        'rgb(245, 158, 11)',
-                        'rgb(239, 68, 68)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '70%',
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            color: '#64748b',
-                            padding: 20,
-                            font: { size: 12 }
+        const canvasPagamentos = document.getElementById('pagamentosChart');
+        if (canvasPagamentos) {
+            const ctxPagamentos = canvasPagamentos.getContext('2d');
+            new Chart(ctxPagamentos, {
+                type: 'doughnut',
+                data: {
+                    labels: statsPagamentos.labels,
+                    datasets: [{
+                        data: statsPagamentos.valores,
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.7)', // Aprovado
+                            'rgba(245, 158, 11, 0.7)', // Pendente
+                            'rgba(239, 68, 68, 0.7)'  // Rejeitado
+                        ],
+                        borderColor: [
+                            'rgb(16, 185, 129)',
+                            'rgb(245, 158, 11)',
+                            'rgb(239, 68, 68)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#64748b',
+                                padding: 20,
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#1e293b',
+                            bodyColor: '#64748b',
+                            borderColor: '#e2e8f0',
+                            borderWidth: 1,
+                            padding: 12
                         }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                        titleColor: '#1e293b',
-                        bodyColor: '#64748b',
-                        borderColor: '#e2e8f0',
-                        borderWidth: 1,
-                        padding: 12
                     }
                 }
-            }
-        });
+            });
+        }
 
         // Lógica de Pesquisa
         const searchInput = document.getElementById('searchMenu');
@@ -877,7 +994,9 @@
                         }
                     });
 
-                    if (sectionVisible) {
+                    // Verifica se a seção deve ser ocultada apenas se não for uma seção de gráficos/estatísticas
+                    // Ou se a pesquisa estiver vazia
+                    if (sectionVisible || term === '') {
                         section.classList.remove('d-none');
                     } else {
                         section.classList.add('d-none');

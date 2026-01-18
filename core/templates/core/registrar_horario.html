@@ -128,14 +128,14 @@
                                             <label class="form-label small fw-bold text-secondary">Hora Início</label>
                                             <div class="input-group input-group-lg">
                                                 <span class="input-group-text bg-white"><i class="bi bi-clock text-success"></i></span>
-                                                <input type="time" name="hora_inicio" class="form-control border fw-bold shadow-none" required>
+                                                <input type="time" name="hora_inicio" id="id_hora_inicio" class="form-control border fw-bold shadow-none" required>
                                             </div>
                                         </div>
                                         <div class="col-md-5">
                                             <label class="form-label small fw-bold text-secondary">Hora Fim</label>
                                             <div class="input-group input-group-lg">
                                                 <span class="input-group-text bg-white"><i class="bi bi-clock-fill text-success"></i></span>
-                                                <input type="time" name="hora_fim" class="form-control border fw-bold shadow-none" required>
+                                                <input type="time" name="hora_fim" id="id_hora_fim" class="form-control border fw-bold shadow-none" required>
                                             </div>
                                         </div>
                                     </div>
@@ -326,20 +326,56 @@
     // Validação de Campos por Aba
     function validarCamposAba(tabId) {
         const tabPane = document.getElementById(tabId);
+        if (!tabPane) return true;
+        
         const inputs = tabPane.querySelectorAll('input[required], select[required], textarea[required]');
         let valido = true;
 
         inputs.forEach(input => {
-            if (!input.value || input.value.trim() === '') {
-                input.classList.add('is-invalid');
-                valido = false;
-            } else {
-                input.classList.remove('is-invalid');
+            // Se for radio, tratar de forma especial
+            if (input.type === 'radio') {
+                const name = input.getAttribute('name');
+                const radios = tabPane.querySelectorAll(`input[name="${name}"]`);
+                const checked = Array.from(radios).some(r => r.checked);
+                
+                if (!checked) {
+                    valido = false;
+                    radios.forEach(r => r.classList.add('is-invalid'));
+                } else {
+                    radios.forEach(r => r.classList.remove('is-invalid'));
+                }
+                return;
+            }
+
+            // Verificar se o input está visível e não está desabilitado
+            const isVisible = input.offsetWidth > 0 || input.offsetHeight > 0;
+            if (isVisible && !input.disabled) {
+                if (!input.value || input.value.trim() === '') {
+                    input.classList.add('is-invalid');
+                    valido = false;
+                    
+                    // Adicionar feedback visual se não existir
+                    let feedback = input.nextElementSibling;
+                    if (!feedback || !feedback.classList.contains('invalid-feedback')) {
+                        feedback = document.createElement('div');
+                        feedback.classList.add('invalid-feedback');
+                        feedback.className = 'invalid-feedback small mt-1';
+                        feedback.textContent = 'Este campo é obrigatório.';
+                        input.parentNode.insertBefore(feedback, input.nextSibling);
+                    }
+                } else {
+                    input.classList.remove('is-invalid');
+                }
             }
         });
 
         if (!valido) {
-            showToast('Por favor, preencha todos os campos obrigatórios desta etapa.', 'warning');
+            const toastElement = document.getElementById('toast-container');
+            if (toastElement) {
+                showToast('Por favor, preencha todos os campos obrigatórios desta etapa.', 'warning');
+            } else {
+                alert('Por favor, preencha todos os campos obrigatórios desta etapa antes de prosseguir.');
+            }
         }
         return valido;
     }
@@ -347,15 +383,34 @@
     // Controle de Navegação com Validação
     document.getElementById('btn-proximo-academico').addEventListener('click', function() {
         if (validarCamposAba('academico')) {
-            bootstrap.Tab.getOrCreateInstance(document.querySelector('#tempo-tab')).show();
+            const nextTab = document.querySelector('#tempo-tab');
+            if (nextTab) {
+                bootstrap.Tab.getOrCreateInstance(nextTab).show();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
     });
 
     document.getElementById('btn-proximo-tempo').addEventListener('click', function() {
         if (validarCamposAba('tempo')) {
-            bootstrap.Tab.getOrCreateInstance(document.querySelector('#atribuicao-tab')).show();
+            const nextTab = document.querySelector('#atribuicao-tab');
+            if (nextTab) {
+                bootstrap.Tab.getOrCreateInstance(nextTab).show();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
         }
     });
+
+    // Validar submissão final
+    const form = document.querySelector('form.needs-validation');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (!validarCamposAba('atribuicao')) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
+    }
 
     // Remover estado de erro ao digitar
     document.querySelectorAll('input, select, textarea').forEach(el => {
