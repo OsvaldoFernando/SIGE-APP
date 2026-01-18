@@ -93,7 +93,12 @@
                             <td class="pe-3 py-2 text-end">
                                 <div class="d-flex justify-content-end gap-1">
                                     <button type="button" class="btn btn-sm btn-icon bg-light text-dark rounded-3" 
-                                            onclick="abrirModalEdicao('{{ evento.id }}', '{{ evento.tipo_evento }}', '{{ evento.descricao|escapejs }}', '{{ evento.data_inicio|date:'Y-m-d' }}', '{{ evento.data_fim|date:'Y-m-d' }}')">
+                                            data-bs-toggle="modal" data-bs-target="#editarEventoModal"
+                                            data-evento-id="{{ evento.id }}"
+                                            data-evento-tipo="{{ evento.tipo_evento }}"
+                                            data-evento-desc="{{ evento.descricao }}"
+                                            data-evento-inicio="{{ evento.data_inicio|date:'Y-m-d' }}"
+                                            data-evento-fim="{{ evento.data_fim|date:'Y-m-d' }}">
                                         <i class="bi bi-pencil-square"></i>
                                     </button>
                                     <button type="button" class="btn btn-sm btn-icon bg-danger bg-opacity-10 text-danger rounded-3" 
@@ -201,18 +206,134 @@
     </div>
 </div>
 
+<!-- Modal Editar Evento -->
+<div class="modal fade" id="editarEventoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 25px;">
+            <div class="modal-header border-0 pt-4 px-4 pb-0">
+                <h5 class="modal-title fw-bold"><i class="bi bi-pencil-fill text-primary me-2"></i>Editar Marco Acadêmico</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="editar_evento">
+                <input type="hidden" name="evento_id" id="edit_evento_id">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Tipo de Evento</label>
+                        <select name="tipo_evento" id="edit_tipo_evento" class="form-select rounded-3" required>
+                            {% for value, label in tipos_evento %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Início</label>
+                            <input type="date" name="data_inicio" id="edit_data_inicio" class="form-control rounded-3" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold text-muted text-uppercase">Término</label>
+                            <input type="date" name="data_fim" id="edit_data_fim" class="form-control rounded-3" required>
+                        </div>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Descrição Detalhada</label>
+                        <div class="input-group shadow-sm">
+                            <textarea name="descricao" id="edit_descricao" class="form-control rounded-start-3 border-end-0" rows="3" required></textarea>
+                            <button class="btn btn-white border border-start-0 rounded-end-3 px-3" type="button" id="emoji-picker-btn-edit" title="Inserir Emoji">
+                                <i class="bi bi-emoji-smile fs-5 text-primary"></i>
+                            </button>
+                        </div>
+                        <div id="emoji-container-edit" class="mt-2 shadow-lg d-none position-absolute bg-white border rounded-3 p-2" style="z-index: 1050; width: 220px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;">
+                            <span class="emoji-item p-1 text-center rounded" style="cursor: pointer; font-size: 1.2rem;">📝</span>
+                            <span class="emoji-item p-1 text-center rounded" style="cursor: pointer; font-size: 1.2rem;">📅</span>
+                            <span class="emoji-item p-1 text-center rounded" style="cursor: pointer; font-size: 1.2rem;">📢</span>
+                            <span class="emoji-item p-1 text-center rounded" style="cursor: pointer; font-size: 1.2rem;">🎓</span>
+                            <span class="emoji-item p-1 text-center rounded" style="cursor: pointer; font-size: 1.2rem;">✅</span>
+                            <span class="emoji-item p-1 text-center rounded" style="cursor: pointer; font-size: 1.2rem;">❌</span>
+                            <span class="emoji-item p-1 text-center rounded" style="cursor: pointer; font-size: 1.2rem;">⚠️</span>
+                            <span class="emoji-item p-1 text-center rounded" style="cursor: pointer; font-size: 1.2rem;">💰</span>
+                            <span class="emoji-item p-1 text-center rounded" style="cursor: pointer; font-size: 1.2rem;">🏢</span>
+                            <span class="emoji-item p-1 text-center rounded" style="cursor: pointer; font-size: 1.2rem;">🚀</span>
+                            <span class="emoji-item p-1 text-center rounded" style="cursor: pointer; font-size: 1.2rem;">🔔</span>
+                            <span class="emoji-item p-1 text-center rounded" style="cursor: pointer; font-size: 1.2rem;">📌</span>
+                            <span class="emoji-item p-1 text-center rounded" style="cursor: pointer; font-size: 1.2rem;">📚</span>
+                            <span class="emoji-item p-1 text-center rounded" style="cursor: pointer; font-size: 1.2rem;">💡</span>
+                            <span class="emoji-item p-1 text-center rounded" style="cursor: pointer; font-size: 1.2rem;">⭐</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pb-4 px-4">
+                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-5 shadow-sm">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
-    const confirmDeleteModal = document.getElementById('confirmDeleteModal');
-    if (confirmDeleteModal) {
-        confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            const id = button.getAttribute('data-evento-id');
-            const nome = button.getAttribute('data-evento-nome');
-            
-            document.getElementById('deleteEventoId').value = id;
-            document.getElementById('deleteEventoNome').textContent = nome;
-        });
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+        // Scripts para Modal de Exclusão
+        const confirmDeleteModal = document.getElementById('confirmDeleteModal');
+        if (confirmDeleteModal) {
+            confirmDeleteModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-evento-id');
+                const nome = button.getAttribute('data-evento-nome');
+                document.getElementById('deleteEventoId').value = id;
+                document.getElementById('deleteEventoNome').textContent = nome;
+            });
+        }
+
+        // Scripts para Modal de Edição
+        const editarEventoModal = document.getElementById('editarEventoModal');
+        if (editarEventoModal) {
+            editarEventoModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                document.getElementById('edit_evento_id').value = button.getAttribute('data-evento-id');
+                document.getElementById('edit_tipo_evento').value = button.getAttribute('data-evento-tipo');
+                document.getElementById('edit_data_inicio').value = button.getAttribute('data-evento-inicio');
+                document.getElementById('edit_data_fim').value = button.getAttribute('data-evento-fim');
+                document.getElementById('edit_descricao').value = button.getAttribute('data-evento-desc');
+            });
+        }
+
+        // Script unificado para Emoji Picker (Novo e Editar)
+        function setupEmojiPicker(btnId, containerId, textareaId) {
+            const btn = document.getElementById(btnId);
+            const container = document.getElementById(containerId);
+            const textarea = document.getElementById(textareaId);
+
+            if (btn && container && textarea) {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    container.classList.toggle('d-none');
+                });
+
+                container.querySelectorAll('.emoji-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const emoji = this.textContent;
+                        const start = textarea.selectionStart;
+                        const end = textarea.selectionEnd;
+                        textarea.value = textarea.value.substring(0, start) + emoji + textarea.value.substring(end);
+                        container.classList.add('d-none');
+                        textarea.focus();
+                    });
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!container.contains(e.target) && e.target !== btn) {
+                        container.classList.add('d-none');
+                    }
+                });
+            }
+        }
+
+        setupEmojiPicker('emoji-picker-btn', 'emoji-container', 'desc_evento_modal');
+        setupEmojiPicker('emoji-picker-btn-edit', 'emoji-container-edit', 'edit_descricao');
+    });
 </script>
 
 <!-- Modal Bloquear Devedores -->

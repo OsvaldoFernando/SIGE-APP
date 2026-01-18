@@ -234,21 +234,28 @@
 
         .user-logo-container {
             background: white;
-            padding: 8px 12px;
-            border-radius: 8px;
+            padding: 4px 10px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 50px;
+            height: 53px;
             margin-right: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+        .user-logo-container:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
         }
         .user-logo-container img {
             height: 100%;
             width: auto;
-            max-width: 150px;
+            max-width: 160px;
             object-fit: contain;
             display: block;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));
         }
         .academic-badge {
             background: rgba(255,255,255,0.1);

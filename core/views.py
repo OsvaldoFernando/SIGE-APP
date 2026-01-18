@@ -2584,6 +2584,75 @@ def grelha_curricular(request):
     })
 
 @login_required
+def gestao_eventos_view(request):
+    """View para gerir marcos académicos (eventos)"""
+    from .models import AnoAcademico, EventoCalendario
+    
+    perfil = getattr(request.user, 'perfil', None)
+    if not request.user.is_superuser and not (perfil and perfil.nivel_acesso in ['admin', 'super_admin', 'secretaria', 'pedagogico']):
+        messages.error(request, "Acesso negado.")
+        return redirect('painel_principal')
+        
+    ano_atual = AnoAcademico.get_atual()
+    eventos = EventoCalendario.objects.all().order_by('-data_inicio')
+    anos = AnoAcademico.objects.all()
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'criar_evento':
+            try:
+                ano_id = request.POST.get('ano_lectivo')
+                tipo = request.POST.get('tipo_evento')
+                inicio = request.POST.get('data_inicio')
+                fim = request.POST.get('data_fim')
+                desc = request.POST.get('descricao')
+                
+                EventoCalendario.objects.create(
+                    ano_lectivo_id=ano_id,
+                    tipo_evento=tipo,
+                    data_inicio=inicio,
+                    data_fim=fim,
+                    descricao=desc
+                )
+                messages.success(request, "Evento criado com sucesso!")
+            except Exception as e:
+                messages.error(request, f"Erro ao criar evento: {str(e)}")
+                
+        elif action == 'editar_evento':
+            try:
+                evento_id = request.POST.get('evento_id')
+                evento = get_object_or_404(EventoCalendario, id=evento_id)
+                evento.tipo_evento = request.POST.get('tipo_evento')
+                evento.data_inicio = request.POST.get('data_inicio')
+                evento.data_fim = request.POST.get('data_fim')
+                evento.descricao = request.POST.get('descricao')
+                evento.save()
+                messages.success(request, "Evento atualizado com sucesso!")
+            except Exception as e:
+                messages.error(request, f"Erro ao editar evento: {str(e)}")
+                
+        elif action == 'deletar_evento':
+            try:
+                evento_id = request.POST.get('evento_id')
+                evento = get_object_or_404(EventoCalendario, id=evento_id)
+                evento.delete()
+                messages.success(request, "Evento removido com sucesso!")
+            except Exception as e:
+                messages.error(request, f"Erro ao deletar evento: {str(e)}")
+                
+        return redirect('gestao_eventos_view')
+
+    context = {
+        'eventos': eventos,
+        'anos': anos,
+        'ano_atual': ano_atual,
+        'tipos_evento': EventoCalendario.TIPO_EVENTO_CHOICES,
+        'active': 'cronograma'
+    }
+    return render(request, 'core/gestao_eventos_view.html', context)
+
+@login_required
 def cronograma_academico(request):
     """View para exibir cronograma acadêmico estratégico (ERP)"""
     from .models import AnoAcademico, EventoCalendario, PerfilUsuario

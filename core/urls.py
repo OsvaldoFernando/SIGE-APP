@@ -70,5 +70,6 @@ urlpatterns = [
     path('professores/remover-disciplina/<int:relacao_id>/', views.remover_disciplina_professor, name='remover_disciplina_professor'),
     path('utilizadores/<int:perfil_id>/acessos/', views.gestao_acessos, name='gestao_acessos'),
     path('cronograma-academico/', views.cronograma_academico, name='cronograma_academico'),
+    path('gestao-eventos/', views.gestao_eventos_view, name='gestao_eventos_view'),
     path('gestao-eventos/comunicacao/', views.enviar_mensagem_inscritos, name='enviar_mensagem_inscritos'),
 ]

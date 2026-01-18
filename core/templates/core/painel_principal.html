@@ -73,238 +73,20 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="row g-4 mb-4">
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm rounded-4 h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
-                            <i class="bi bi-bar-chart-fill text-primary fs-5"></i>
-                        </div>
-                        <h6 class="mb-0 fw-bold text-dark">Total de Estudantes (por estado)</h6>
-                    </div>
-                    <div style="height: 300px;">
-                        <canvas id="estadoEstudantesChart"></canvas>
-                    </div>
+            <!-- Feedback de Pesquisa Vazia -->
+            <div id="noResultsFeedback" class="text-center py-4 d-none">
+                <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-search text-muted fs-4"></i>
                 </div>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm rounded-4 h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="bg-success bg-opacity-10 p-2 rounded-3 me-3">
-                            <i class="bi bi-graph-up-arrow text-success fs-5"></i>
-                        </div>
-                        <h6 class="mb-0 fw-bold text-dark">Evolução de Matrículas por Ano Lectivo</h6>
-                    </div>
-                    <div style="height: 300px;">
-                        <canvas id="evolucaoMatriculasChart"></canvas>
-                    </div>
-                </div>
+                <h6 class="fw-bold text-dark">Nenhum menu encontrado para "<span id="searchTermDisplay" class="text-primary"></span>"</h6>
+                <p class="text-muted small">Tente pesquisar por outros termos como "Matrículas", "Turmas" ou "RH".</p>
+                <button class="btn btn-sm btn-outline-primary rounded-pill px-4 mt-2" onclick="resetSearch()">Limpar Pesquisa</button>
             </div>
         </div>
     </div>
 
-    <!-- Gráfico de Estudantes por Curso e Inscrições por Curso -->
-    <div class="row g-4 mb-4">
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm rounded-4 h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="bg-info bg-opacity-10 p-2 rounded-3 me-3">
-                            <i class="bi bi-mortarboard-fill text-info fs-5"></i>
-                        </div>
-                        <h6 class="mb-0 fw-bold text-dark">Estudantes por Curso</h6>
-                    </div>
-                    <div style="height: 350px;">
-                        <canvas id="cursosChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-6">
-            <div class="card border-0 shadow-sm rounded-4 h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="bg-warning bg-opacity-10 p-2 rounded-3 me-3">
-                            <i class="bi bi-person-plus-fill text-warning fs-5"></i>
-                        </div>
-                        <h6 class="mb-0 fw-bold text-dark">Inscrições por Curso</h6>
-                    </div>
-                    <div style="height: 350px;">
-                        <canvas id="inscricoesCursoChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Gráfico de Taxa de Aprovação e Indicações -->
-    <div class="row g-4 mb-4">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm rounded-4 h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
-                            <i class="bi bi-check-circle-fill text-primary fs-5"></i>
-                        </div>
-                        <h6 class="mb-0 fw-bold text-dark">Taxa de Aprovação no Teste</h6>
-                    </div>
-                    <div style="height: 300px;">
-                        <canvas id="taxaAprovacaoChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm rounded-4 h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="bg-secondary bg-opacity-10 p-2 rounded-3 me-3">
-                            <i class="bi bi-pie-chart-fill text-secondary fs-5"></i>
-                        </div>
-                        <h6 class="mb-0 fw-bold text-dark">Indicações por Via</h6>
-                    </div>
-                    <div style="height: 300px;">
-                        <canvas id="indicacoesChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Gráfico de Receitas e Pagamentos -->
-    <div class="row g-4 mb-4">
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm rounded-4 h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="bg-success bg-opacity-10 p-2 rounded-3 me-3">
-                            <i class="bi bi-cash-stack text-success fs-5"></i>
-                        </div>
-                        <h6 class="mb-0 fw-bold text-dark">Receitas por Ano</h6>
-                    </div>
-                    <div style="height: 300px;">
-                        <canvas id="receitasChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm rounded-4 h-100">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="bg-danger bg-opacity-10 p-2 rounded-3 me-3">
-                            <i class="bi bi-wallet2 text-danger fs-5"></i>
-                        </div>
-                        <h6 class="mb-0 fw-bold text-dark">Status de Pagamentos</h6>
-                    </div>
-                    <div style="height: 300px;">
-                        <canvas id="pagamentosChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <style>
-        .menu-section {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 2rem;
-            padding: 2.5rem;
-            margin-bottom: 3rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-        }
-        .section-header {
-            margin-bottom: 2.5rem;
-            position: relative;
-        }
-        .section-header h3 {
-            font-size: 1.5rem;
-            letter-spacing: -0.02em;
-            color: #1e293b;
-        }
-        .card-menu {
-            border: none !important;
-            background: #ffffff;
-            border-radius: 1.5rem !important;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
-        }
-        .card-menu::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(var(--bs-primary-rgb), 0.05) 0%, rgba(var(--bs-primary-rgb), 0) 100%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            z-index: -1;
-        }
-        .card-menu:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08) !important;
-        }
-        .card-menu:hover::before {
-            opacity: 1;
-        }
-        .icon-wrapper {
-            width: 70px;
-            height: 70px;
-            background: #f8fafc;
-            border-radius: 1.25rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 1.5rem;
-            transition: all 0.4s ease;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-        }
-        .card-menu:hover .icon-wrapper {
-            background: var(--bs-primary);
-            color: white !important;
-            transform: rotate(-5deg);
-        }
-        .card-menu:hover .icon-wrapper i,
-        .card-menu:hover .icon-wrapper span {
-            color: white !important;
-        }
-        .card-title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 0.5rem;
-        }
-        .card-text {
-            font-size: 0.85rem;
-            color: #64748b;
-            line-height: 1.4;
-        }
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-    </style>
-
-    <!-- Estilos específicos para remover scroll indesejado -->
-    <style>
-        html, body {
-            scroll-behavior: auto !important;
-        }
-    </style>
-
+    <div id="menusContainer">
         <!-- SEÇÃO RECURSOS HUMANOS (RH) - OBRIGATÓRIA -->
-        <div id="secao-rh" class="menu-section animate__animated animate__fadeInUp" style="display: block !important; visibility: visible !important; opacity: 1 !important; z-index: 999 !important; position: relative !important; animation-delay: 0.05s;">
             <div class="section-header d-flex align-items-center">
                 <div class="bg-success bg-opacity-10 p-2 rounded-3 me-3">
                     <i class="bi bi-people-fill text-success fs-4"></i>
@@ -1065,60 +847,72 @@
         const feedback = document.getElementById('noResultsFeedback');
         const termDisplay = document.getElementById('searchTermDisplay');
 
-        function resetSearch() {
-            searchInput.value = '';
-            searchInput.dispatchEvent(new Event('input'));
-        }
+        window.resetSearch = function() {
+            if (searchInput) {
+                searchInput.value = '';
+                searchInput.dispatchEvent(new Event('input'));
+                searchInput.focus();
+            }
+        };
 
-        searchInput.addEventListener('input', function(e) {
-            const term = e.target.value.toLowerCase();
-            let anyVisible = false;
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const term = e.target.value.toLowerCase().trim();
+                let anyVisible = false;
 
-            sections.forEach(section => {
-                const items = section.querySelectorAll('.menu-item');
-                let sectionVisible = false;
+                sections.forEach(section => {
+                    const items = section.querySelectorAll('.menu-item');
+                    let sectionVisible = false;
 
-                items.forEach(item => {
-                    const text = item.textContent.toLowerCase();
-                    if (text.includes(term)) {
-                        item.classList.remove('d-none');
-                        sectionVisible = true;
-                        anyVisible = true;
+                    items.forEach(item => {
+                        const title = item.querySelector('.card-title')?.textContent.toLowerCase() || '';
+                        const text = item.querySelector('.card-text')?.textContent.toLowerCase() || '';
+                        
+                        if (title.includes(term) || text.includes(term)) {
+                            item.classList.remove('d-none');
+                            sectionVisible = true;
+                            anyVisible = true;
+                        } else {
+                            item.classList.add('d-none');
+                        }
+                    });
+
+                    if (sectionVisible) {
+                        section.classList.remove('d-none');
                     } else {
-                        item.classList.add('d-none');
+                        section.classList.add('d-none');
                     }
                 });
 
-                if (sectionVisible) {
-                    section.classList.remove('d-none');
+                if (!anyVisible && term !== '') {
+                    feedback.classList.remove('d-none');
+                    termDisplay.textContent = term;
                 } else {
-                    section.classList.add('d-none');
+                    feedback.classList.add('d-none');
                 }
             });
-
-            if (!anyVisible && term !== '') {
-                feedback.classList.remove('d-none');
-                termDisplay.textContent = term;
-            } else {
-                feedback.classList.add('d-none');
-            }
-        });
+        }
 
         // Toggle Menus
         const toggleBtn = document.getElementById('toggleAllMenus');
         const menusContainer = document.getElementById('menusContainer');
-        toggleBtn.addEventListener('click', function() {
-            const isHidden = menusContainer.classList.contains('d-none');
-            if (isHidden) {
-                menusContainer.classList.remove('d-none');
-                this.querySelector('span').textContent = 'Ocultar Menus';
-                this.querySelector('i').className = 'bi bi-eye-slash me-1';
-            } else {
-                menusContainer.classList.add('d-none');
-                this.querySelector('span').textContent = 'Mostrar Menus';
-                this.querySelector('i').className = 'bi bi-eye me-1';
-            }
-        });
+        if (toggleBtn && menusContainer) {
+            toggleBtn.addEventListener('click', function() {
+                const isHidden = menusContainer.style.display === 'none';
+                const icon = this.querySelector('i');
+                const span = this.querySelector('span');
+                
+                if (isHidden) {
+                    menusContainer.style.display = 'block';
+                    if (span) span.textContent = 'Ocultar Menus';
+                    if (icon) icon.className = 'bi bi-eye-slash';
+                } else {
+                    menusContainer.style.display = 'none';
+                    if (span) span.textContent = 'Mostrar Menus';
+                    if (icon) icon.className = 'bi bi-eye';
+                }
+            });
+        }
     });
 </script>
 {% endblock %}

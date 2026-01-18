@@ -31,9 +31,6 @@
                     <a href="{% url 'ano_academico_lista' %}" class="btn btn-outline-dark px-4 py-2 rounded-pill fw-bold transition-hover">
                         <i class="bi bi-gear me-2"></i> Ciclos
                     </a>
-                    <button class="btn btn-outline-primary px-4 py-2 rounded-pill fw-bold shadow-sm transition-hover" onclick="window.print()">
-                        <i class="bi bi-printer me-2"></i> Exportar
-                    </button>
                 </div>
             </div>
         </div>
@@ -230,13 +227,6 @@
                         </div>
                     </div>
                     
-                    <div class="card-footer bg-light border-0 px-5 py-4 d-flex justify-content-between align-items-center mt-5" style="border-bottom-left-radius: 24px; border-bottom-right-radius: 24px;">
-                        <span class="text-muted small"><i class="bi bi-shield-lock me-1"></i> Auditado pelo Sistema em: {{ ano.data_criacao|date:"d/m/Y H:i" }}</span>
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-sm btn-light border px-4 rounded-pill fw-bold">Histórico</button>
-                            <button class="btn btn-sm btn-primary px-4 rounded-pill fw-bold">Verificar Integridade</button>
-                        </div>
-                    </div>
                 </div>
             </div>
             {% empty %}

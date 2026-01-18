@@ -11,3 +11,9 @@ pillow
 python-docx
 qrcode
 reportlab
+Django==5.2.10
+gunicorn==23.0.0
+pillow==12.1.0
+python-docx
+qrcode==8.2
+reportlab==4.4.7

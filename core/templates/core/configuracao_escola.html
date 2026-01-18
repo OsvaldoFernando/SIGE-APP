@@ -28,14 +28,30 @@
                             <label class="form-label small fw-bold">Nome da Escola</label>
                             <input type="text" name="nome_escola" class="form-control" value="{{ config.nome_escola }}" required>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label small fw-bold">Logótipo</label>
-                            {% if config.logo %}
-                            <div class="mb-2">
-                                <img src="{{ config.logo.url }}" alt="Logo" style="height: 60px;">
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-uppercase text-muted mb-3">Logótipo Institucional</label>
+                            <div class="p-4 border rounded-4 bg-light bg-opacity-50 text-center mb-3 shadow-inner" style="min-height: 200px; display: flex; align-items: center; justify-content: center; border-style: dashed !important;">
+                                {% if config.logo %}
+                                <div class="position-relative group">
+                                    <img src="{{ config.logo.url }}" alt="Logo" class="img-fluid rounded-3 shadow-lg" style="max-height: 160px; object-fit: contain; background: white; padding: 10px;">
+                                    <div class="position-absolute top-0 start-100 translate-middle">
+                                        <span class="badge rounded-pill bg-success shadow-sm">Ativo</span>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="text-muted">
+                                    <i class="bi bi-image display-4 d-block mb-2 opacity-25"></i>
+                                    <span class="small fw-medium">Nenhum logotipo carregado</span>
+                                </div>
+                                {% endif %}
                             </div>
-                            {% endif %}
-                            <input type="file" name="logo" class="form-control" accept="image/*">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-upload text-primary"></i></span>
+                                <input type="file" name="logo" class="form-control border-start-0 ps-0" accept="image/*">
+                            </div>
+                            <div class="form-text smaller text-muted mt-2">
+                                <i class="bi bi-info-circle me-1"></i> Recomendamos imagens em formato PNG com fundo transparente e alta resolução.
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label small fw-bold">Tipo de Ensino</label>

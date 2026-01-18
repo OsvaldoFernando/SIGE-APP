@@ -76,15 +76,15 @@
                                             <div class="form-text smaller text-muted">Definido automaticamente pelo sistema.</div>
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label small fw-bold text-secondary">Período</label>
+                                            <label class="form-label small fw-bold text-secondary">Período Lectivo Ativo</label>
                                             <div class="input-group">
-                                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-clock-history text-primary"></i></span>
-                                                <select name="periodo" class="form-select border-start-0 ps-0 shadow-none" required style="border-left: none !important;">
-                                                    {% for p in periodos %}
-                                                    <option value="{{ p.id }}" {% if p.ativo %}selected{% endif %}>{{ p.nome }} {% if p.ativo %}(ATUAL){% endif %}</option>
-                                                    {% endfor %}
-                                                </select>
+                                                <span class="input-group-text bg-light border-end-0"><i class="bi bi-clock-history text-primary"></i></span>
+                                                <input type="text" class="form-control bg-light border-start-0 ps-0 fw-bold text-primary shadow-none" value="{% if periodo_ativo %}{{ periodo_ativo.nome }}{% else %}Nenhum período ativo{% endif %}" readonly style="border-left: none !important;">
+                                                <input type="hidden" name="periodo" value="{{ periodo_ativo.id }}">
                                             </div>
+                                            {% if not periodo_ativo %}
+                                            <div class="form-text smaller text-danger"><i class="bi bi-exclamation-triangle me-1"></i> Atenção: Configure um período letivo ativo nas configurações.</div>
+                                            {% endif %}
                                         </div>
                                         <div class="col-12" id="container_temporalidade">
                                             <label class="form-label small fw-bold text-secondary mb-3 d-block">Temporalidade do Horário</label>
@@ -95,7 +95,7 @@
                                         </div>
                                     </div>
                                     <div class="mt-5 d-flex justify-content-end">
-                                        <button type="button" class="btn btn-primary px-5 py-2 rounded-pill fw-bold shadow-sm" onclick="bootstrap.Tab.getOrCreateInstance(document.querySelector('#tempo-tab')).show()">
+                                        <button type="button" class="btn btn-primary px-5 py-2 rounded-pill fw-bold shadow-sm" id="btn-proximo-academico">
                                             Próximo Passo <i class="bi bi-arrow-right ms-2"></i>
                                         </button>
                                     </div>
@@ -143,7 +143,7 @@
                                         <button type="button" class="btn btn-light px-4 py-2 rounded-pill fw-bold border" onclick="bootstrap.Tab.getOrCreateInstance(document.querySelector('#academico-tab')).show()">
                                             <i class="bi bi-arrow-left me-2"></i> Anterior
                                         </button>
-                                        <button type="button" class="btn btn-success px-5 py-2 rounded-pill fw-bold shadow-sm" onclick="bootstrap.Tab.getOrCreateInstance(document.querySelector('#atribuicao-tab')).show()">
+                                        <button type="button" class="btn btn-success px-5 py-2 rounded-pill fw-bold shadow-sm" id="btn-proximo-tempo">
                                             Próximo Passo <i class="bi bi-arrow-right ms-2"></i>
                                         </button>
                                     </div>
@@ -323,6 +323,49 @@
 </style>
 
 <script>
+    // Validação de Campos por Aba
+    function validarCamposAba(tabId) {
+        const tabPane = document.getElementById(tabId);
+        const inputs = tabPane.querySelectorAll('input[required], select[required], textarea[required]');
+        let valido = true;
+
+        inputs.forEach(input => {
+            if (!input.value || input.value.trim() === '') {
+                input.classList.add('is-invalid');
+                valido = false;
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+
+        if (!valido) {
+            showToast('Por favor, preencha todos os campos obrigatórios desta etapa.', 'warning');
+        }
+        return valido;
+    }
+
+    // Controle de Navegação com Validação
+    document.getElementById('btn-proximo-academico').addEventListener('click', function() {
+        if (validarCamposAba('academico')) {
+            bootstrap.Tab.getOrCreateInstance(document.querySelector('#tempo-tab')).show();
+        }
+    });
+
+    document.getElementById('btn-proximo-tempo').addEventListener('click', function() {
+        if (validarCamposAba('tempo')) {
+            bootstrap.Tab.getOrCreateInstance(document.querySelector('#atribuicao-tab')).show();
+        }
+    });
+
+    // Remover estado de erro ao digitar
+    document.querySelectorAll('input, select, textarea').forEach(el => {
+        el.addEventListener('input', function() {
+            if (this.value.trim() !== '') {
+                this.classList.remove('is-invalid');
+            }
+        });
+    });
+
     function atualizarInterfacePeriodo(select) {
         const option = select.options[select.selectedIndex];
         if (!option || !option.value) return;
