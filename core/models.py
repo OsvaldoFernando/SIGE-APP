@@ -203,6 +203,10 @@ class PerfilUsuario(models.Model):
         
     def __str__(self):
         return f"{self.user.username} - {self.get_nivel_acesso_display()}"
+        
+    @property
+    def privilegios_codigos(self):
+        return self.privilegios.values_list('codigo', flat=True)
 
 class Notificacao(models.Model):
     TIPO_CHOICES = [

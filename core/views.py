@@ -299,6 +299,7 @@ def index(request):
 
 @login_required
 def painel_principal(request):
+    from .models import AnoAcademico, Curso, Inscricao, Reclamacao, EventoCalendario
     ano_atual = AnoAcademico.objects.filter(ano_atual=True).first()
     semestre_atual = None
     if ano_atual:
@@ -308,6 +309,14 @@ def painel_principal(request):
     config = ConfiguracaoEscola.objects.first()
     anos_academicos = AnoAcademico.objects.all()
     
+    # Eventos para o Painel
+    eventos_ticker = []
+    if ano_atual:
+        eventos_ticker = EventoCalendario.objects.filter(
+            ano_lectivo=ano_atual,
+            estado='ATIVO'
+        ).order_by('data_inicio')
+
     # Estatísticas de Inscrições Reais
     stats_inscricoes = {
         'submetidas': Inscricao.objects.filter(status_inscricao='submetida').count(),
@@ -346,6 +355,7 @@ def painel_principal(request):
         'stats_inscricoes': stats_inscricoes,
         'stats_estudantes': stats_estudantes,
         'reclamacoes_pendentes': reclamacoes_pendentes,
+        'eventos_ticker': eventos_ticker,
     })
 
 @login_required
@@ -1892,6 +1902,7 @@ def painel_principal(request):
     """View para o painel principal com menu lateral"""
     from datetime import date
     from django.db.models import Count, Q
+    from .models import EventoCalendario, AnoAcademico, Curso, Inscricao, Notificacao, Subscricao, PagamentoSubscricao
     total_inscricoes = Inscricao.objects.count()
     total_aprovados = Inscricao.objects.filter(aprovado=True).count()
     total_reprovados = Inscricao.objects.filter(aprovado=False, nota_teste__isnull=False).count()
@@ -3062,6 +3073,15 @@ def gestao_eventos(request):
             except Exception as e:
                 messages.error(request, f"Erro ao processar bloqueio: {str(e)}")
         
+        elif action == 'editar_evento':
+            evento_id = request.POST.get('evento_id')
+            evento = get_object_or_404(EventoCalendario, id=evento_id)
+            evento.tipo_evento = request.POST.get('tipo_evento')
+            evento.descricao = request.POST.get('descricao')
+            evento.data_inicio = request.POST.get('data_inicio')
+            evento.data_fim = request.POST.get('data_fim')
+            evento.save()
+            messages.success(request, "Evento atualizado com sucesso!")
         elif action == 'deletar_evento':
             evento_id = request.POST.get('evento_id')
             EventoCalendario.objects.filter(id=evento_id).delete()
@@ -3826,7 +3846,12 @@ def horarios(request):
 
 @login_required
 def gestao_horarios(request):
-    """View principal de gestão de horários com estatísticas ERP"""
+    """View principal de gestão de horários com estatísticas ERP e permissão dinâmica"""
+    perfil = request.user.perfil
+    if perfil.nivel_acesso not in ['admin', 'super_admin', 'pedagogico', 'secretaria', 'professor'] and not perfil.privilegios.filter(codigo='gerir_horarios').exists():
+        messages.error(request, "Acesso negado.")
+        return redirect('painel_principal')
+        
     from .models import HorarioAula, Professor, Sala, Turma
     
     context = {
@@ -4019,6 +4044,12 @@ def listar_horarios(request):
 
 @login_required
 def editar_horario(request, pk):
+    """Edição de horário com permissão dinâmica"""
+    perfil = request.user.perfil
+    if perfil.nivel_acesso not in ['admin', 'super_admin', 'pedagogico', 'secretaria', 'professor'] and not perfil.privilegios.filter(codigo='gerir_horarios').exists():
+        messages.error(request, "Acesso negado.")
+        return redirect('painel_principal')
+        
     from .models import TurmaDisciplina, Turma, Disciplina, Sala, AnoAcademico
     from django.contrib.auth.models import User
     
@@ -4064,6 +4095,12 @@ def editar_horario(request, pk):
 
 @login_required
 def deletar_horario(request, pk):
+    """Exclusão de horário com permissão dinâmica"""
+    perfil = request.user.perfil
+    if perfil.nivel_acesso not in ['admin', 'super_admin', 'pedagogico', 'secretaria', 'professor'] and not perfil.privilegios.filter(codigo='gerir_horarios').exists():
+        messages.error(request, "Acesso negado.")
+        return redirect('painel_principal')
+        
     from .models import TurmaDisciplina
     horario = get_object_or_404(TurmaDisciplina, pk=pk)
     if request.method == 'POST':
@@ -4123,6 +4160,12 @@ from .models import Professor, Disciplina, HorarioAula
 
 @login_required
 def registrar_horario(request):
+    """View de registro de horário com permissão dinâmica"""
+    perfil = request.user.perfil
+    if perfil.nivel_acesso not in ['admin', 'super_admin', 'pedagogico', 'secretaria', 'professor'] and not perfil.privilegios.filter(codigo='gerir_horarios').exists():
+        messages.error(request, "Acesso negado.")
+        return redirect('painel_principal')
+        
     from .models import Professor, Disciplina, HorarioAula, AnoAcademico, PeriodoLectivo, Turma
     
     professores = Professor.objects.all()
