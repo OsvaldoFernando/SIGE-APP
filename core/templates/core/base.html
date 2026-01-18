@@ -23,49 +23,88 @@
             --light-bg: #f8fafc;
         }
 
-        /* Ticker Style */
-        .ticker-wrapper {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(30, 58, 138, 0.95);
-            color: white;
-            z-index: 9999;
-            padding: 8px 0;
+        /* Estrutura ERP SIGE */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
             overflow: hidden;
-            border-top: 2px solid var(--secondary-color);
-            backdrop-filter: blur(5px);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .main-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        main {
+            flex: 1 0 auto;
+            width: 100%;
+            padding: 20px 0;
+        }
+
+        .footer-fixed-container {
+            flex-shrink: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        footer {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 10px 0;
+            width: 100%;
+            border-top: 3px solid var(--secondary-color);
+        }
+
+        .ticker-wrapper {
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            padding: 2px 0;
+            overflow: hidden;
+            border-top: 1px solid rgba(255,255,255,0.1);
             display: flex;
             align-items: center;
+            height: 28px;
+            width: 100%;
         }
 
         .ticker-label {
             background: var(--secondary-color);
-            padding: 0 15px;
+            padding: 0 12px;
             font-weight: bold;
-            font-size: 0.8rem;
+            font-size: 0.65rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            z-index: 2;
             height: 100%;
             display: flex;
             align-items: center;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+            z-index: 2;
+            white-space: nowrap;
         }
 
         .ticker-content {
             display: inline-block;
             white-space: nowrap;
             padding-left: 100%;
-            animation: ticker 30s linear infinite;
+            animation: ticker 45s linear infinite;
         }
 
         .ticker-item {
             display: inline-block;
-            padding: 0 40px;
-            font-size: 0.9rem;
-            font-weight: 500;
+            padding: 0 25px;
+            font-size: 0.75rem;
         }
 
         @keyframes ticker {
@@ -76,42 +115,6 @@
         .ticker-content:hover {
             animation-play-state: paused;
         }
-
-        /* Estrutura Master ERP SIGE */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        main {
-            flex: 1 0 auto;
-            width: 100%;
-            padding-top: 20px;
-            padding-bottom: 120px; /* Aumentado para garantir espaço antes do rodapé */
-        }
-
-        footer {
-            flex-shrink: 0;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            padding: 25px 0 65px 0; /* Espaço para o ticker */
-            width: 100%;
-            border-top: 5px solid var(--secondary-color);
-            position: relative;
-            margin-top: auto;
-            z-index: 1000;
-        }
-
-        /* Melhorias nas Abas (Tabs) */
         .list-group-item {
             border: none;
             margin-bottom: 5px;
@@ -132,10 +135,10 @@
             box-shadow: 0 10px 15px -3px rgba(30, 58, 138, 0.2) !important;
         }
         
-        /* Toast Notification Styles - Posicionados acima do ticker */
+        /* Toast Notification Styles */
         .toast-container {
             position: fixed;
-            bottom: 55px; /* Acima da altura do ticker (45px) */
+            bottom: 55px;
             right: 20px;
             z-index: 10002;
             display: flex;
@@ -180,16 +183,12 @@
             transition: width linear;
         }
         
-        /* Cores baseadas na imagem */
         .custom-toast.success .toast-icon { color: #22c55e; }
         .custom-toast.success .toast-progress-bar { background: #22c55e; }
-        
         .custom-toast.error .toast-icon { color: #ef4444; }
         .custom-toast.error .toast-progress-bar { background: #ef4444; }
-        
         .custom-toast.warning .toast-icon { color: #f59e0b; }
         .custom-toast.warning .toast-progress-bar { background: #f59e0b; }
-        
         .custom-toast.info .toast-icon { color: #3b82f6; }
         .custom-toast.info .toast-progress-bar { background: #3b82f6; }
         
@@ -217,14 +216,22 @@
         .navbar-top {
             flex-shrink: 0;
             background: linear-gradient(90deg, #1e3a8a 0%, #065f46 100%);
-            height: 60px;
+            min-height: 60px;
             color: white;
             display: flex;
-            align-items: center;
-            padding: 0 15px;
+            flex-direction: column;
             z-index: 10001;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
+
+        .navbar-main-content {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            width: 100%;
+        }
+
         .user-logo-container {
             background: white;
             padding: 4px 8px;
@@ -254,8 +261,8 @@
             font-weight: 500;
         }
         .nav-icon-btn {
-            width: 38px;
-            height: 38px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -264,7 +271,32 @@
             color: white;
             transition: all 0.2s;
             position: relative;
-            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .nav-icon-btn:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .nav-icon-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 10px;
+            height: 10px;
+            background: #ef4444;
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: pulse-red 2s infinite;
+        }
+        .online-indicator {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background: #10b981;
+            border: 2px solid white;
+            border-radius: 50%;
+            animation: pulse-green 2s infinite;
         }
         .user-avatar {
             width: 40px;
@@ -285,7 +317,7 @@
             padding: 0.5rem;
             min-width: 220px;
             margin-top: 8px !important;
-            z-index: 9999; /* Garante que o menu fique acima de outros elementos */
+            z-index: 9999;
         }
         .user-dropdown-header {
             display: flex;
@@ -363,44 +395,7 @@
         .user-dropdown-logout:hover {
             background-color: #fef2f2 !important;
         }
-        .nav-icon-btn {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255,255,255,0.1);
-            color: white;
-            transition: all 0.2s;
-            position: relative;
-        }
-        .nav-icon-btn:hover {
-            background: rgba(255,255,255,0.2);
-            color: white;
-        }
-        .nav-icon-badge {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            width: 10px;
-            height: 10px;
-            background: #ef4444;
-            border: 2px solid var(--primary-color);
-            border-radius: 50%;
-            animation: pulse-red 2s infinite;
-        }
-        .online-indicator {
-            position: absolute;
-            bottom: 2px;
-            right: 2px;
-            width: 12px;
-            height: 12px;
-            background: #10b981;
-            border: 2px solid white;
-            border-radius: 50%;
-            animation: pulse-green 2s infinite;
-        }
+
         @keyframes pulse-red {
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); opacity: 0.7; }
             70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); opacity: 1; }
@@ -415,7 +410,7 @@
             flex: 1 0 auto;
             width: 100%;
             padding-top: 20px;
-            padding-bottom: 100px; /* Aumentado para garantir espaço */
+            padding-bottom: 100px;
             margin-bottom: 0;
         }
         .card {
@@ -454,12 +449,13 @@
             font-weight: 600;
             font-size: 0.875rem;
         }
+        .text-accent { color: #f59e0b; }
     </style>
 </head>
 <body>
     {% if user.is_authenticated %}
     <div class="navbar-top">
-        <div class="navbar-content d-flex justify-content-between align-items-center w-100">
+        <div class="navbar-main-content d-flex justify-content-between align-items-center w-100">
             <div class="d-flex align-items-center">
                 <div class="user-logo-container">
                     <a href="/" style="text-decoration: none; display: flex; align-items: center;">
@@ -528,7 +524,6 @@
 
                         {% if user_perfil.nivel_acesso in 'admin super_admin pedagogico financeiro secretaria' %}
                         <div class="user-dropdown-divider"></div>
-                        
                         {% endif %}
 
                         <div class="user-dropdown-divider"></div>
@@ -538,6 +533,37 @@
                         </a>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div class="ticker-wrapper">
+            <div class="ticker-label">
+                <i class="bi bi-megaphone-fill me-2"></i> Avisos
+            </div>
+            <div class="ticker-content">
+                {% for notif in notificacoes_recentes %}
+                <div class="ticker-item">
+                    <span class="text-accent fw-bold">[{{ notif.data_criacao|date:"d/m" }}]</span> {{ notif.titulo }}: {{ notif.mensagem }}
+                </div>
+                {% endfor %}
+                {% for evento in eventos_ativos %}
+                <div class="ticker-item">
+                    <span class="text-accent fw-bold">[EVENTO]</span> {{ evento.descricao }}: {{ evento.get_tipo_evento_display }} (Até {{ evento.data_fim|date:"d/m" }})
+                </div>
+                {% endfor %}
+                {% if not notificacoes_recentes and not eventos_ativos %}
+                <div class="ticker-item">Bem-vindo ao SIGE - Sistema Integrado de Gestão Educacional</div>
+                {% endif %}
+                {% for notif in notificacoes_recentes %}
+                <div class="ticker-item">
+                    <span class="text-accent fw-bold">[{{ notif.data_criacao|date:"d/m" }}]</span> {{ notif.titulo }}: {{ notif.mensagem }}
+                </div>
+                {% endfor %}
+                {% for evento in eventos_ativos %}
+                <div class="ticker-item">
+                    <span class="text-accent fw-bold">[EVENTO]</span> {{ evento.descricao }}: {{ evento.get_tipo_evento_display }} (Até {{ evento.data_fim|date:"d/m" }})
+                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -566,42 +592,7 @@
 
     <div class="toast-container" id="toast-container"></div>
 
-    <!-- Ticker de Notificações -->
-    {% if user.is_authenticated %}
-    <div class="ticker-wrapper">
-        <div class="ticker-label">
-            <i class="bi bi-megaphone-fill me-2"></i> Avisos
-        </div>
-        <div class="ticker-content">
-            {% for notif in notificacoes_recentes %}
-            <div class="ticker-item">
-                <span class="text-accent fw-bold">[{{ notif.data_criacao|date:"d/m" }}]</span> {{ notif.titulo }}: {{ notif.mensagem }}
-            </div>
-            {% endfor %}
-            {% for evento in eventos_ativos %}
-            <div class="ticker-item">
-                <span class="text-accent fw-bold">[EVENTO]</span> {{ evento.descricao }}: {{ evento.get_tipo_evento_display }} (Até {{ evento.data_fim|date:"d/m" }})
-            </div>
-            {% endfor %}
-            <!-- Duplicate for seamless loop -->
-            {% for notif in notificacoes_recentes %}
-            <div class="ticker-item">
-                <span class="text-accent fw-bold">[{{ notif.data_criacao|date:"d/m" }}]</span> {{ notif.titulo }}: {{ notif.mensagem }}
-            </div>
-            {% endfor %}
-            {% for evento in eventos_ativos %}
-            <div class="ticker-item">
-                <span class="text-accent fw-bold">[EVENTO]</span> {{ evento.descricao }}: {{ evento.get_tipo_evento_display }} (Até {{ evento.data_fim|date:"d/m" }})
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    <style>
-        .text-accent { color: #f59e0b; }
-    </style>
-    {% endif %}
-
-    <!-- Modal de Notificações Rápidas (Global) -->
+    <!-- Modal de Notificações Rápidas -->
     <div class="modal fade" id="modalNotificacoesRapidas" tabindex="-1" aria-labelledby="modalNotificacoesRapidasLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg rounded-4">
@@ -610,9 +601,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body py-4">
-                    {% if notificacoes_recente %}
+                    {% if notificacoes_recentes %}
                         <div class="list-group list-group-flush gap-2">
-                            {% for notif in notificacoes_recente %}
+                            {% for notif in notificacoes_recentes %}
                                 <div class="list-group-item rounded-3 border-0 p-3 bg-light bg-opacity-50 mb-2">
                                     <div class="d-flex gap-3">
                                         <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
@@ -670,129 +661,110 @@
         </div>
     </div>
 
-    <main class="container">
-        {% if messages %}
-            {% for message in messages %}
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        const type = "{{ message.tags }}";
-                        const msg = "{{ message }}";
-                        showToast(msg, type);
-                    });
-                </script>
-            {% endfor %}
-        {% endif %}
+    <div class="main-wrapper">
+        <main class="container flex-grow-1">
+            {% if messages %}
+                {% for message in messages %}
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const type = "{{ message.tags }}";
+                            const msg = "{{ message }}";
+                            showToast(msg, type);
+                        });
+                    </script>
+                {% endfor %}
+            {% endif %}
 
-        <!-- Widget de Irregularidades (Cartão de Visita) -->
-        {% if reclamacoes_pendentes %}
-        <div id="complaints-widget" class="fixed-bottom mb-4 ms-4" style="width: 320px; z-index: 1050; animation: slideIn 0.5s ease-out;">
-            <div class="card shadow-lg border-0 bg-white rounded-4 overflow-hidden">
-                <div class="card-header bg-danger bg-opacity-10 border-0 py-3 d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0 fw-bold text-danger">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i>Irregularidades Pendentes
-                    </h6>
-                    <button type="button" class="btn-close btn-sm" onclick="document.getElementById('complaints-widget').remove()"></button>
-                </div>
-                <div class="card-body p-3">
-                    {% for rec in reclamacoes_pendentes %}
-                    <div class="d-flex align-items-start gap-3 mb-3" style="border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">
-                        <div class="bg-light rounded-circle p-2 flex-shrink-0">
-                            <i class="bi {% if rec.tipo == 'ACADEMICA' %}bi-book{% else %}bi-cash-coin{% endif %} text-danger fs-5"></i>
+            {% if reclamacoes_pendentes %}
+            <div id="complaints-widget" class="fixed-bottom mb-4 ms-4" style="width: 320px; z-index: 1050; animation: slideIn 0.5s ease-out;">
+                <div class="card shadow-lg border-0 bg-white rounded-4 overflow-hidden">
+                    <div class="card-header bg-danger bg-opacity-10 border-0 py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 fw-bold text-danger">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>Irregularidades Pendentes
+                        </h6>
+                        <button type="button" class="btn-close btn-sm" onclick="document.getElementById('complaints-widget').remove()"></button>
+                    </div>
+                    <div class="card-body p-3">
+                        {% for rec in reclamacoes_pendentes %}
+                        <div class="d-flex align-items-start gap-3 mb-3" style="border-bottom: 1px solid #f1f5f9; padding-bottom: 8px;">
+                            <div class="bg-light rounded-circle p-2 flex-shrink-0">
+                                <i class="bi {% if rec.tipo == 'ACADEMICA' %}bi-book{% else %}bi-cash-coin{% endif %} text-danger fs-5"></i>
+                            </div>
+                            <div class="overflow-hidden">
+                                <div class="fw-bold text-dark small text-truncate">{{ rec.estudante.username }}</div>
+                                <div class="text-muted" style="font-size: 0.75rem;">{{ rec.get_tipo_display }} - {{ rec.data_criacao|date:"d/m" }}</div>
+                                <p class="text-muted small mb-0 text-truncate" title="{{ rec.motivo }}">{{ rec.motivo }}</p>
+                            </div>
                         </div>
-                        <div class="overflow-hidden">
-                            <div class="fw-bold text-dark small text-truncate">{{ rec.estudante.username }}</div>
-                            <div class="text-muted" style="font-size: 0.75rem;">{{ rec.get_tipo_display }} - {{ rec.data_criacao|date:"d/m" }}</div>
-                            <p class="text-muted small mb-0 text-truncate" title="{{ rec.motivo }}">{{ rec.motivo }}</p>
+                        {% endfor %}
+                    </div>
+                    <div class="card-footer bg-light border-0 text-center py-2">
+                        <a href="{% url 'gerir_reclamacoes' %}" class="btn btn-danger btn-sm w-100 rounded-3">Gerir Irregularidades</a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% block content %}{% endblock %}
+        </main>
+
+        <div class="footer-fixed-container mt-auto">
+            <footer class="text-center text-lg-start">
+                <div class="container p-2 pb-0">
+                    <div class="row align-items-center">
+                        <div class="col-md-6 text-center text-md-start">
+                            <div class="p-2" style="font-size: 0.75rem;">
+                                <span class="fw-bold">IOGD - Isaias Future</span> - Empresa de tecnologia, software e inovação
+                                <span class="mx-2 text-muted">|</span>
+                                <span class="fw-bold" style="color: #ff0000 !important;">v1.0.4</span>
+                                <span class="mx-2 text-muted">|</span>
+                                © {% now "Y" %}
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-center text-md-end">
+                            <div class="p-2" style="font-size: 0.75rem;">
+                                <a href="https://wa.me/244923483984" target="_blank" class="text-white text-decoration-none me-3">
+                                    <i class="bi bi-headset me-1"></i> Suporte Técnico
+                                </a>
+                                <span class="fw-bold" style="color: #ff0000 !important;">Todos os direitos reservados.</span>
+                            </div>
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
-                <div class="card-footer bg-light border-0 text-center py-2">
-                    <a href="{% url 'gerir_reclamacoes' %}" class="btn btn-danger btn-sm w-100 rounded-3">Gerir Irregularidades</a>
-                </div>
-            </div>
+            </footer>
         </div>
-        <style>
-            @keyframes slideIn {
-                from { transform: translateX(-100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-        </style>
-        {% endif %}
-        
-        {% block content %}{% endblock %}
-    </main>
-
-    <footer class="py-4">
-        <div class="container text-center">
-            <div class="row align-items-center">
-                <div class="col-12">
-                    <p class="mb-0">&copy; 2026 SIGE - Sistema Integrado de Gestão Educacional. Todos os direitos reservados.</p>
-                </div>
-            </div>
-        </div>
-    </footer>
+    </div>
 
     {% block extra_js %}{% endblock %}
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Se o usuário está voltando para o painel (referrer é o próprio domínio mas não o painel, ou ação de "voltar")
-            // Como é difícil detectar o "voltar" do navegador de forma pura, vamos focar em quando ele clica em links para o painel
-            const urlParams = new URLSearchParams(window.location.search);
-            if (window.location.pathname === '/index/' || window.location.pathname === '/painel/') {
-                const rhSection = document.getElementById('secao-rh');
-                if (rhSection) {
-                    rhSection.scrollIntoView({ behavior: 'smooth' });
-                }
-            }
-        });
-    </script>
-    
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
-            
-            // Mapeamento de ícones baseado na imagem (círculo com check)
             const icons = {
                 'success': 'bi-check-circle-fill',
                 'error': 'bi-x-circle-fill',
                 'warning': 'bi-exclamation-triangle-fill',
                 'info': 'bi-info-circle-fill'
             };
-
-            // Normalização de tipos (Django tags)
             if (type === 'debug' || type === 'info') type = 'info';
             if (type === 'error' || type === 'danger') type = 'error';
-            
             toast.className = `custom-toast ${type}`;
             toast.innerHTML = `
-                <div class="toast-icon">
-                    <i class="bi ${icons[type] || 'bi-info-circle-fill'}"></i>
-                </div>
+                <div class="toast-icon"><i class="bi ${icons[type] || 'bi-info-circle-fill'}"></i></div>
                 <div class="toast-content">${message}</div>
                 <i class="bi bi-x toast-close" onclick="this.parentElement.remove()"></i>
-                <div class="toast-progress">
-                    <div class="toast-progress-bar"></div>
-                </div>
+                <div class="toast-progress"><div class="toast-progress-bar"></div></div>
             `;
-            
             container.appendChild(toast);
-            
-            // Animação de entrada e progresso
             setTimeout(() => {
                 toast.classList.add('show');
                 const bar = toast.querySelector('.toast-progress-bar');
                 bar.style.transition = 'width 4s linear';
                 bar.style.width = '100%';
             }, 10);
-            
-            // Auto-remover
             setTimeout(() => {
                 toast.classList.remove('show');
                 setTimeout(() => toast.remove(), 300);
@@ -803,9 +775,7 @@
             const now = new Date();
             const timeString = now.toLocaleTimeString('pt-BR', { hour12: false });
             const clockElement = document.getElementById('real-time-clock');
-            if (clockElement) {
-                clockElement.textContent = timeString;
-            }
+            if (clockElement) clockElement.textContent = timeString;
         }
         setInterval(updateClock, 1000);
         updateClock();
@@ -817,68 +787,43 @@
         }
 
         {% if user.is_authenticated %}
-        // Lógica de Auto-Logout por Inatividade (Melhorada)
         let idleTime = 0;
-        let countdownTime = 30;
         let isCountdownActive = false;
         let countdownInterval;
-        const idleModalElement = document.getElementById('idleTimeoutModal');
-        const idleModal = new bootstrap.Modal(idleModalElement);
+        const idleModal = new bootstrap.Modal(document.getElementById('idleTimeoutModal'));
 
         function resetTimer() {
             if (!isCountdownActive) {
                 idleTime = 0;
             } else {
-                // Se o modal estiver aberto, fechar e resetar ao tocar em qualquer parte do sistema
                 isCountdownActive = false;
                 idleTime = 0;
                 clearInterval(countdownInterval);
                 idleModal.hide();
-                // Ping ao servidor para manter a sessão ativa no backend
                 fetch('/');
             }
         }
 
-        // Eventos que resetam o timer (Qualquer toque no sistema)
-        window.addEventListener('load', resetTimer);
-        window.addEventListener('mousemove', resetTimer);
-        window.addEventListener('mousedown', resetTimer);
-        window.addEventListener('touchstart', resetTimer);
-        window.addEventListener('click', resetTimer);
-        window.addEventListener('keydown', resetTimer);
-        window.addEventListener('scroll', resetTimer);
+        ['load', 'mousemove', 'mousedown', 'touchstart', 'click', 'keydown', 'scroll'].forEach(evt => 
+            window.addEventListener(evt, resetTimer)
+        );
 
-        // Verifica inatividade a cada segundo
         setInterval(function() {
             if (!isCountdownActive) {
                 idleTime++;
-                if (idleTime >= 60) { // 1 minuto (60 segundos) para teste
-                    startCountdown();
-                }
+                if (idleTime >= 300) startCountdown(); // 5 minutos
             }
         }, 1000);
 
         function startCountdown() {
             isCountdownActive = true;
-            countdownTime = 60; // 60 segundos de aviso para dar mais tempo
-            document.getElementById('idleTimerSeconds').textContent = countdownTime;
+            let count = 60;
+            document.getElementById('idleTimerSeconds').textContent = count;
             idleModal.show();
-
-            // Adiciona evento para fechar ao clicar no fundo do modal (backdrop)
-            idleModalElement.addEventListener('click', function(e) {
-                if (e.target === idleModalElement) {
-                    resetTimer();
-                }
-            });
-
-            countdownInterval = setInterval(function() {
-                countdownTime--;
-                document.getElementById('idleTimerSeconds').textContent = countdownTime;
-                
-                if (countdownTime <= 0) {
-                    clearInterval(countdownInterval);
-                    window.location.href = "{% url 'logout' %}";
-                }
+            countdownInterval = setInterval(() => {
+                count--;
+                document.getElementById('idleTimerSeconds').textContent = count;
+                if (count <= 0) window.location.href = "{% url 'logout' %}";
             }, 1000);
         }
         {% endif %}

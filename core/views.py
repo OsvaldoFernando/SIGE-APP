@@ -3016,9 +3016,17 @@ def gestao_eventos(request):
                 # Obter ano académico da sessão ou padrão
                 ano_id = request.session.get('ano_academico_id')
                 if ano_id:
-                    ano = get_object_or_404(AnoAcademico, id=ano_id)
+                    ano = AnoAcademico.objects.filter(id=ano_id).first()
                 else:
                     ano = AnoAcademico.get_atual()
+
+                if not ano:
+                    # Tenta pegar qualquer ano ativo se o padrão falhar
+                    ano = AnoAcademico.objects.filter(estado='ATIVO').first()
+                
+                if not ano:
+                    messages.error(request, "Erro: Nenhum Ano Académico ativo encontrado. Por favor, configure um Ano Académico primeiro.")
+                    return redirect('gestao_eventos')
 
                 EventoCalendario.objects.create(
                     ano_lectivo=ano,
