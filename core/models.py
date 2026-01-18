@@ -87,6 +87,10 @@ class EventoCalendario(models.Model):
         ('EXAME', 'Exame'),
         ('RECURSO', 'Recurso'),
         ('EXAME_ESPECIAL', 'Exame Especial/Época Especial'),
+        ('PUBLICACAO_LISTAS', 'Publicação de Inscrição das Listas dos Inscritos'),
+        ('REALIZACAO_PROVAS', 'Realização das Provas de Admissão'),
+        ('CONSULTA_LISTA', 'Consultas da Lista Individual'),
+        ('PUBL_PAUTA', 'Publicação da Pauta dos Resultados'),
         ('FERIAS', 'Férias'),
         ('OUTRO', 'Outro'),
     ]
@@ -110,6 +114,10 @@ class EventoCalendario(models.Model):
 
     def __str__(self):
         return f"{self.get_tipo_evento_display()} - {self.ano_lectivo}"
+
+    @property
+    def ja_passou(self):
+        return timezone.now().date() > self.data_fim
 
     def esta_ocorrendo(self):
         hoje = timezone.now().date()

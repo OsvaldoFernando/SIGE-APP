@@ -23,6 +23,60 @@
             --light-bg: #f8fafc;
         }
 
+        /* Ticker Style */
+        .ticker-wrapper {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(30, 58, 138, 0.95);
+            color: white;
+            z-index: 9999;
+            padding: 8px 0;
+            overflow: hidden;
+            border-top: 2px solid var(--secondary-color);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+        }
+
+        .ticker-label {
+            background: var(--secondary-color);
+            padding: 0 15px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            z-index: 2;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.2);
+        }
+
+        .ticker-content {
+            display: inline-block;
+            white-space: nowrap;
+            padding-left: 100%;
+            animation: ticker 30s linear infinite;
+        }
+
+        .ticker-item {
+            display: inline-block;
+            padding: 0 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+
+        .ticker-content:hover {
+            animation-play-state: paused;
+        }
+
         /* Estrutura Master ERP SIGE */
         html, body {
             height: 100%;
@@ -49,10 +103,10 @@
             flex-shrink: 0;
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             color: white;
-            padding: 25px 0;
+            padding: 25px 0 65px 0; /* Espaço para o ticker */
             width: 100%;
             border-top: 5px solid var(--secondary-color);
-            position: relative; /* Mantém o rodapé no fluxo normal, mas permite que ele seja "empurrado" pelo flex */
+            position: relative;
             margin-top: auto;
             z-index: 1000;
         }
@@ -78,43 +132,45 @@
             box-shadow: 0 10px 15px -3px rgba(30, 58, 138, 0.2) !important;
         }
         
-        /* Toast Notification Styles */
+        /* Toast Notification Styles - Posicionados acima do ticker */
         .toast-container {
             position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1060;
+            bottom: 55px; /* Acima da altura do ticker (45px) */
+            right: 20px;
+            z-index: 10002;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: flex-end;
+            pointer-events: none;
+            gap: 10px;
         }
         .custom-toast {
+            pointer-events: auto;
             background: white;
-            border-radius: 8px;
-            padding: 12px 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 14px;
+            padding: 14px 22px;
+            box-shadow: 0 15px 35px -5px rgba(0,0,0,0.2);
             display: flex;
             align-items: center;
             gap: 12px;
-            min-width: 320px;
-            max-width: 450px;
+            min-width: 340px;
+            max-width: 480px;
             position: relative;
             overflow: hidden;
             opacity: 0;
-            transform: translateY(-20px);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translateX(100%) scale(0.95);
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            border: 1px solid rgba(0,0,0,0.05);
         }
         .custom-toast.show {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateX(0) scale(1);
         }
         .toast-progress {
             position: absolute;
             bottom: 0;
             left: 0;
-            height: 4px;
+            height: 3px;
             width: 100%;
             background: rgba(0,0,0,0.05);
         }
@@ -509,6 +565,41 @@
     </div>
 
     <div class="toast-container" id="toast-container"></div>
+
+    <!-- Ticker de Notificações -->
+    {% if user.is_authenticated %}
+    <div class="ticker-wrapper">
+        <div class="ticker-label">
+            <i class="bi bi-megaphone-fill me-2"></i> Avisos
+        </div>
+        <div class="ticker-content">
+            {% for notif in notificacoes_recentes %}
+            <div class="ticker-item">
+                <span class="text-accent fw-bold">[{{ notif.data_criacao|date:"d/m" }}]</span> {{ notif.titulo }}: {{ notif.mensagem }}
+            </div>
+            {% endfor %}
+            {% for evento in eventos_ativos %}
+            <div class="ticker-item">
+                <span class="text-accent fw-bold">[EVENTO]</span> {{ evento.descricao }}: {{ evento.get_tipo_evento_display }} (Até {{ evento.data_fim|date:"d/m" }})
+            </div>
+            {% endfor %}
+            <!-- Duplicate for seamless loop -->
+            {% for notif in notificacoes_recentes %}
+            <div class="ticker-item">
+                <span class="text-accent fw-bold">[{{ notif.data_criacao|date:"d/m" }}]</span> {{ notif.titulo }}: {{ notif.mensagem }}
+            </div>
+            {% endfor %}
+            {% for evento in eventos_ativos %}
+            <div class="ticker-item">
+                <span class="text-accent fw-bold">[EVENTO]</span> {{ evento.descricao }}: {{ evento.get_tipo_evento_display }} (Até {{ evento.data_fim|date:"d/m" }})
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <style>
+        .text-accent { color: #f59e0b; }
+    </style>
+    {% endif %}
 
     <!-- Modal de Notificações Rápidas (Global) -->
     <div class="modal fade" id="modalNotificacoesRapidas" tabindex="-1" aria-labelledby="modalNotificacoesRapidasLabel" aria-hidden="true">

@@ -2587,12 +2587,21 @@ def cronograma_academico(request):
     else:
         anos = AnoAcademico.objects.all().order_by('-data_inicio')[:1]
     
-    eventos_recentes = EventoCalendario.objects.filter(estado='ATIVO').order_by('data_inicio')[:5]
+    eventos_recentes = EventoCalendario.objects.filter(estado='ATIVO').order_by('data_inicio')
+    
+    # Notificações para o ticker baseadas em eventos ativos
+    hoje_date = hoje.date()
+    eventos_ativos = EventoCalendario.objects.filter(
+        data_inicio__lte=hoje_date,
+        data_fim__gte=hoje_date,
+        estado='ATIVO'
+    )
     
     context = {
         'active': 'cronograma',
         'anos': anos,
         'eventos_recentes': eventos_recentes,
+        'eventos_ativos': eventos_ativos,
         'hoje': hoje,
     }
     return render(request, 'core/cronograma_academico.html', context)
@@ -2963,6 +2972,36 @@ def enviar_mensagem_inscritos(request):
     return redirect('gestao_eventos')
 
 @login_required
+@login_required
+def enviar_mensagem_geral(request):
+    if request.method == 'POST':
+        titulo = request.POST.get('titulo')
+        mensagem = request.POST.get('mensagem')
+        tipo_aviso = request.POST.get('tipo', 'INFO')
+        destinatario_grupo = request.POST.get('destinatario_grupo')
+        
+        usuarios = User.objects.none()
+        if destinatario_grupo == 'inscritos':
+            usuarios = User.objects.filter(perfil__nivel_acesso='estudante', inscricoes__status_inscricao__in=['submetida', 'pendente'])
+        elif destinatario_grupo == 'admitidos':
+            usuarios = User.objects.filter(perfil__nivel_acesso='estudante', inscricoes__aprovado=True)
+        elif destinatario_grupo == 'estudantes_antigos':
+            usuarios = User.objects.filter(perfil__nivel_acesso='estudante', inscricoes__status_inscricao='ativo')
+        elif destinatario_grupo == 'todos':
+            usuarios = User.objects.filter(perfil__nivel_acesso='estudante')
+            
+        notificacao = Notificacao.objects.create(
+            titulo=titulo,
+            mensagem=mensagem,
+            tipo=tipo_aviso,
+            global_notificacao=False
+        )
+        notificacao.destinatarios.set(usuarios)
+        
+        messages.success(request, f"Mensagem enviada para {usuarios.count()} destinatários.")
+        return redirect('gestao_eventos')
+    return redirect('gestao_eventos')
+
 def gestao_eventos(request):
     """View para gestão de eventos e marcos do calendário"""
     from .models import EventoCalendario, AnoAcademico, Inscricao

@@ -116,39 +116,41 @@
                                 
                                 <div class="timeline-erp pt-2 ps-2">
                                     {% for evento in ano.eventos.all %}
-                                    <div class="timeline-item-erp mb-4 {% if evento.esta_ocorrendo %}active{% endif %}">
-                                        <div class="d-flex">
-                                            <div class="timeline-marker me-4">
-                                                <div class="marker-line"></div>
-                                                <div class="marker-dot shadow-sm"></div>
-                                            </div>
-                                                    <div class="timeline-content-erp flex-fill p-4 border rounded-4 bg-white shadow-sm transition-hover {% if evento.esta_ocorrendo %}border-primary border-2{% endif %}">
-                                                        <div class="d-flex justify-content-between align-items-start mb-3">
-                                                            <h6 class="fw-bold text-dark mb-0 fs-5">
-                                                                {{ evento.descricao }}
-                                                            </h6>
-                                                            <div class="d-flex align-items-center gap-2">
-                                                                <span class="badge {% if evento.tipo_evento == 'INSCRICAO' %}bg-info{% elif evento.tipo_evento == 'MATRICULA' %}bg-success{% elif evento.tipo_evento == 'EXAME_ACESSO' or evento.tipo_evento == 'PROVAS_ADMISSAO' %}bg-warning{% elif evento.tipo_evento == 'EXAME' or evento.tipo_evento == 'RECURSO' %}bg-danger{% else %}bg-secondary{% endif %} rounded-pill px-3 py-2">
-                                                                    {{ evento.get_tipo_evento_display }}
-                                                                </span>
-                                                            </div>
+                                        {% if evento.esta_ocorrendo or not evento.ja_passou %}
+                                        <div class="timeline-item-erp mb-4 {% if evento.esta_ocorrendo %}active{% endif %}">
+                                            <div class="d-flex">
+                                                <div class="timeline-marker me-4">
+                                                    <div class="marker-line"></div>
+                                                    <div class="marker-dot shadow-sm"></div>
+                                                </div>
+                                                <div class="timeline-content-erp flex-fill p-4 border rounded-4 bg-white shadow-sm transition-hover {% if evento.esta_ocorrendo %}border-primary border-2{% endif %}">
+                                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                                        <h6 class="fw-bold text-dark mb-0 fs-5">
+                                                            {{ evento.descricao }}
+                                                        </h6>
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <span class="badge {% if evento.tipo_evento == 'INSCRICAO' %}bg-info{% elif evento.tipo_evento == 'MATRICULA' %}bg-success{% elif evento.tipo_evento == 'EXAME_ACESSO' or evento.tipo_evento == 'PROVAS_ADMISSAO' %}bg-warning{% elif evento.tipo_evento == 'EXAME' or evento.tipo_evento == 'RECURSO' %}bg-danger{% else %}bg-secondary{% endif %} rounded-pill px-3 py-2">
+                                                                {{ evento.get_tipo_evento_display }}
+                                                            </span>
                                                         </div>
-                                                <div class="d-flex align-items-center text-muted fs-6">
-                                                    <i class="bi bi-calendar3 me-2 text-primary"></i>
-                                                    <span class="fw-medium text-dark">{{ evento.data_inicio|date:"d/m/Y" }}</span>
-                                                    <i class="bi bi-arrow-right mx-2 opacity-50"></i>
-                                                    <span class="fw-medium text-dark">{{ evento.data_fim|date:"d/m/Y" }}</span>
-                                                    
-                                                    {% if evento.esta_ocorrendo %}
-                                                    <div class="ms-auto d-flex align-items-center text-primary fw-bold">
-                                                        <span class="pulse-dot me-2"></span>
-                                                        <small class="text-uppercase" style="letter-spacing: 1px;">Em Curso</small>
                                                     </div>
-                                                    {% endif %}
+                                                    <div class="d-flex align-items-center text-muted fs-6">
+                                                        <i class="bi bi-calendar3 me-2 text-primary"></i>
+                                                        <span class="fw-medium text-dark">{{ evento.data_inicio|date:"d/m/Y" }}</span>
+                                                        <i class="bi bi-arrow-right mx-2 opacity-50"></i>
+                                                        <span class="fw-medium text-dark">{{ evento.data_fim|date:"d/m/Y" }}</span>
+                                                        
+                                                        {% if evento.esta_ocorrendo %}
+                                                        <div class="ms-auto d-flex align-items-center text-primary fw-bold">
+                                                            <span class="pulse-dot me-2"></span>
+                                                            <small class="text-uppercase" style="letter-spacing: 1px;">Em Curso</small>
+                                                        </div>
+                                                        {% endif %}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                        {% endif %}
                                     {% empty %}
                                     <div class="text-center py-5 bg-light rounded-5 border-dashed">
                                         <i class="bi bi-calendar-event text-muted display-4 mb-3 d-block"></i>
@@ -168,9 +170,9 @@
                                     </h4>
                                 </div>
 
-                                <div class="card border-0 bg-dark text-white rounded-4 p-3 mb-2 shadow-lg position-relative" style="font-size: 0.9rem;">
-                                    <div class="position-absolute top-0 end-0 p-2 opacity-10">
-                                        <span style="font-size: 4rem; font-weight: 800; font-family: 'Inter', sans-serif;">Kz</span>
+                                <div class="card border-0 bg-dark text-white rounded-4 p-4 mb-2 shadow-lg position-relative" style="font-size: 0.95rem; width: 100%; max-width: 500px; margin-left: auto;">
+                                    <div class="position-absolute top-0 end-0 p-3 opacity-10" style="pointer-events: none;">
+                                        <span style="font-size: 3.5rem; font-weight: 800; font-family: 'Inter', sans-serif; display: inline-block;">Kz</span>
                                     </div>
                                     
                                     <div class="position-relative z-1">

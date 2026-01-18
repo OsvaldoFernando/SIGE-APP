@@ -67,6 +67,7 @@ urlpatterns = [
     path('departamentos/', views.departamentos, name='departamentos'),
     path('recrutamento/', views.recrutamento, name='recrutamento'),
     path('gestao-tarefas/', views.gestao_tarefas, name='gestao_tarefas'),
+    path('enviar-mensagem-geral/', views.enviar_mensagem_geral, name='enviar_mensagem_geral'),
     path('gestao-eventos/', views.gestao_eventos, name='gestao_eventos'),
     path('gestao-financeira/', views.gestao_financeira, name='gestao_financeira'),
     path('faturas-pagamentos/', views.faturas_pagamentos, name='faturas_pagamentos'),

@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container-fluid py-4 bg-light min-vh-100">
     <!-- Header Section -->
-    <div class="row mb-4 align-items-center">
+    <div class="row mb-5 align-items-center">
         <div class="col-lg-5 mb-3 mb-lg-0">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb bg-transparent p-0 mb-2">
@@ -13,94 +13,111 @@
                     <li class="breadcrumb-item active fw-bold text-primary">Gestão de Eventos</li>
                 </ol>
             </nav>
-            <h1 class="h3 fw-bold mb-1"><i class="bi bi-calendar-check-fill text-primary me-2"></i>Gestão de Eventos</h1>
-            <p class="text-muted small mb-0">Gerencie marcos acadêmicos e comunicações com candidatos</p>
+            <div class="d-flex align-items-center">
+                <div class="bg-primary bg-opacity-10 p-3 rounded-4 me-3 shadow-sm">
+                    <i class="bi bi-calendar-check-fill text-primary fs-3"></i>
+                </div>
+                <div>
+                    <h1 class="h3 fw-bold mb-0">Gestão de Eventos</h1>
+                    <p class="text-muted small mb-0">Arquitectura de Planeamento e Controlo Académico</p>
+                </div>
+            </div>
         </div>
         <div class="col-lg-7 d-flex justify-content-lg-end gap-2 flex-wrap">
-            <a href="{% url 'cronograma_academico' %}" class="btn btn-white border shadow-sm rounded-pill px-3">
-                <i class="bi bi-arrow-left me-1"></i>Voltar
+            <a href="{% url 'cronograma_academico' %}" class="btn btn-white border shadow-sm rounded-pill px-4 py-2 fw-bold transition-hover">
+                <i class="bi bi-arrow-left me-2"></i>Voltar
             </a>
-            <button type="button" class="btn btn-soft-info rounded-pill px-3 shadow-sm border-0" data-bs-toggle="modal" data-bs-target="#mensagemInscritosModal">
-                <i class="bi bi-chat-dots-fill me-1"></i>Mensagem aos Inscritos
+            <button type="button" class="btn btn-white border shadow-sm rounded-pill px-4 py-2 fw-bold transition-hover" data-bs-toggle="modal" data-bs-target="#mensagemGeralModal">
+                <i class="bi bi-chat-dots text-primary me-2"></i>Enviar Mensagem
             </button>
-            <button type="button" class="btn btn-soft-danger rounded-pill px-3 shadow-sm border-0" data-bs-toggle="modal" data-bs-target="#bloquearDevedoresModal">
-                <i class="bi bi-person-x-fill me-1"></i>Bloquear Devedores
+            <button type="button" class="btn btn-soft-danger border shadow-sm rounded-pill px-4 py-2 fw-bold transition-hover" data-bs-toggle="modal" data-bs-target="#bloquearDevedoresModal">
+                <i class="bi bi-person-x me-2"></i>Bloquear Devedores
             </button>
-            <button type="button" class="btn btn-soft-primary rounded-pill px-3 shadow-sm border-0" data-bs-toggle="modal" data-bs-target="#configPropinaModal">
-                <i class="bi bi-cash-stack me-1"></i>Configurar Mensalidades
+            <button type="button" class="btn btn-white border shadow-sm rounded-pill px-4 py-2 fw-bold transition-hover" data-bs-toggle="modal" data-bs-target="#configPropinaModal">
+                <i class="bi bi-cash-stack text-primary me-2"></i>Configurar Mensalidades
             </button>
-            <button type="button" class="btn btn-primary rounded-pill px-4 shadow-sm border-0" data-bs-toggle="modal" data-bs-target="#novoEventoModal">
-                <i class="bi bi-plus-lg me-1"></i>Novo Evento
+            <button type="button" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow transition-hover text-white" data-bs-toggle="modal" data-bs-target="#novoEventoModal">
+                <i class="bi bi-plus-lg me-2"></i>Novo Evento
             </button>
         </div>
     </div>
 
     <!-- Main Content Card -->
-    <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px;">
+    <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 24px; background: #fff;">
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
-                    <thead class="bg-gray-50 border-bottom">
+                    <thead style="background: #fcfcfd; border-bottom: 2px solid #f1f5f9;">
                         <tr>
-                            <th class="ps-4 py-3 text-uppercase small fw-bold text-muted">Evento / Descrição</th>
-                            <th class="py-3 text-uppercase small fw-bold text-muted">Ano Lectivo</th>
-                            <th class="py-3 text-uppercase small fw-bold text-muted">Período</th>
-                            <th class="py-3 text-uppercase small fw-bold text-muted text-center">Estado</th>
-                            <th class="pe-4 py-3 text-uppercase small fw-bold text-muted text-end">Ações</th>
+                            <th class="ps-5 py-4 text-uppercase small fw-bold text-muted" style="letter-spacing: 1px;">Evento / Descrição</th>
+                            <th class="py-4 text-uppercase small fw-bold text-muted text-center" style="letter-spacing: 1px;">Ano Lectivo</th>
+                            <th class="py-4 text-uppercase small fw-bold text-muted text-center" style="letter-spacing: 1px;">Período</th>
+                            <th class="py-4 text-uppercase small fw-bold text-muted text-center" style="letter-spacing: 1px;">Estado</th>
+                            <th class="pe-5 py-4 text-uppercase small fw-bold text-muted text-end" style="letter-spacing: 1px;">Ações</th>
                         </tr>
                     </thead>
-                    <tbody class="border-0">
+                    <tbody style="border-top: 0;">
                         {% for evento in eventos %}
-                        <tr class="transition-all hover-bg-light">
-                            <td class="ps-4 py-4">
+                        <tr class="transition-hover">
+                            <td class="ps-5 py-4">
                                 <div class="d-flex align-items-center">
-                                    <div class="icon-shape bg-primary-soft text-primary rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 45px; height: 45px;">
-                                        <i class="bi bi-calendar-event fs-5"></i>
+                                    <div class="icon-shape bg-primary bg-opacity-10 text-primary rounded-4 me-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 52px; height: 52px;">
+                                        <i class="bi bi-calendar-event fs-4"></i>
                                     </div>
                                     <div>
-                                        <h6 class="mb-0 fw-bold">{{ evento.descricao }}</h6>
-                                        <span class="text-muted small">{{ evento.get_tipo_evento_display }}</span>
+                                        <h6 class="mb-1 fw-bold text-dark fs-6">{{ evento.descricao }}</h6>
+                                        <span class="text-muted smaller fw-medium text-uppercase" style="letter-spacing: 0.5px;">{{ evento.get_tipo_evento_display }}</span>
                                     </div>
                                 </div>
                             </td>
-                            <td class="py-4">
-                                <span class="badge bg-light text-dark border fw-medium rounded-pill px-3 py-2">
+                            <td class="py-4 text-center">
+                                <span class="badge bg-light text-dark border-0 rounded-pill px-4 py-2 fw-bold shadow-sm" style="font-size: 0.85rem;">
                                     {{ evento.ano_lectivo.codigo }}
                                 </span>
                             </td>
-                            <td class="py-4">
-                                <div class="small">
-                                    <div class="text-dark fw-medium"><i class="bi bi-clock me-1 text-primary"></i>{{ evento.data_inicio|date:"d/m/Y" }}</div>
-                                    <div class="text-muted"><i class="bi bi-arrow-right-short me-1"></i>{{ evento.data_fim|date:"d/m/Y" }}</div>
+                            <td class="py-4 text-center">
+                                <div class="d-inline-flex flex-column align-items-center">
+                                    <div class="text-dark fw-bold small"><i class="bi bi-clock me-2 text-primary"></i>{{ evento.data_inicio|date:"d/m/Y" }}</div>
+                                    <div class="text-muted smaller fw-medium mt-1"><i class="bi bi-arrow-right-short me-1"></i>{{ evento.data_fim|date:"d/m/Y" }}</div>
                                 </div>
                             </td>
                             <td class="py-4 text-center">
                                 {% if evento.esta_ocorrendo %}
-                                <span class="badge bg-success-soft text-success rounded-pill px-3 py-2 fw-bold">
-                                    <i class="bi bi-check-circle-fill me-1"></i>Ativo
+                                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-4 py-2 fw-bold shadow-sm border-0 d-inline-flex align-items-center">
+                                    <span class="pulse-dot-success me-2"></span>Ativo
                                 </span>
                                 {% else %}
-                                <span class="badge bg-warning-soft text-warning rounded-pill px-3 py-2 fw-bold">
-                                    <i class="bi bi-pause-fill me-1"></i>Inativo
+                                <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-4 py-2 fw-bold shadow-sm border-0 d-inline-flex align-items-center">
+                                    <span class="dot-static-danger me-2"></span>Encerrado
                                 </span>
                                 {% endif %}
                             </td>
-                            <td class="pe-4 py-4 text-end">
-                                <button type="button" class="btn btn-icon btn-soft-danger rounded-circle" 
-                                        data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" 
-                                        data-evento-id="{{ evento.id }}" 
-                                        data-evento-nome="{{ evento.descricao }}">
-                                    <i class="bi bi-trash3"></i>
-                                </button>
+                            <td class="pe-5 py-4 text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button class="btn btn-icon bg-light text-dark rounded-circle shadow-sm transition-hover">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-icon bg-danger bg-opacity-10 text-danger rounded-circle shadow-sm transition-hover" 
+                                            data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" 
+                                            data-evento-id="{{ evento.id }}" 
+                                            data-evento-nome="{{ evento.descricao }}">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         {% empty %}
                         <tr>
                             <td colspan="5" class="text-center py-5">
-                                <div class="py-4">
-                                    <i class="bi bi-calendar-x text-muted display-1 mb-3"></i>
-                                    <h5 class="text-muted">Nenhum evento registrado</h5>
-                                    <p class="text-muted small">Comece criando um novo evento para o ano lectivo.</p>
+                                <div class="py-5">
+                                    <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-4 shadow-sm" style="width: 100px; height: 100px;">
+                                        <i class="bi bi-calendar-x text-muted display-4"></i>
+                                    </div>
+                                    <h4 class="fw-bold text-dark">Nenhum marco acadêmico</h4>
+                                    <p class="text-muted mx-auto" style="max-width: 400px;">Configure o cronograma do ano lectivo criando novos marcos importantes para a instituição.</p>
+                                    <button class="btn btn-primary rounded-pill px-5 py-3 fw-bold mt-3 shadow" data-bs-toggle="modal" data-bs-target="#novoEventoModal">
+                                        <i class="bi bi-plus-lg me-2"></i>Começar Agora
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -113,21 +130,52 @@
 </div>
 
 <style>
-    .bg-primary-soft { background-color: rgba(13, 110, 253, 0.1); }
-    .bg-success-soft { background-color: rgba(25, 135, 84, 0.1); }
-    .bg-warning-soft { background-color: rgba(255, 193, 7, 0.1); }
-    .bg-danger-soft { background-color: rgba(220, 53, 69, 0.1); }
-    .btn-soft-primary { background-color: rgba(13, 110, 253, 0.1); color: #0d6efd; transition: all 0.3s; }
-    .btn-soft-primary:hover { background-color: #0d6efd; color: white; }
-    .btn-soft-danger { background-color: rgba(220, 53, 69, 0.1); color: #dc3545; transition: all 0.3s; }
+    .transition-hover {
+        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+    .transition-hover:hover {
+        transform: translateY(-2px);
+        background-color: #fcfcfd !important;
+    }
+    .btn-icon {
+        width: 42px;
+        height: 42px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        transition: all 0.2s;
+    }
+    .btn-icon:hover {
+        transform: scale(1.1);
+    }
+    .pulse-dot-success {
+        width: 8px;
+        height: 8px;
+        background-color: #10b981;
+        border-radius: 50%;
+        display: inline-block;
+        animation: pulse-success 2s infinite;
+    }
+    @keyframes pulse-success {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .dot-static-danger {
+        width: 8px;
+        height: 8px;
+        background-color: #ef4444;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    .bg-soft-danger { background-color: rgba(220, 53, 69, 0.05); }
+    .btn-soft-danger { background-color: rgba(220, 53, 69, 0.08); color: #dc3545; }
     .btn-soft-danger:hover { background-color: #dc3545; color: white; }
-    .btn-white { background-color: white; color: #6c757d; }
-    .btn-icon { width: 38px; height: 38px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border: none; transition: all 0.2s; }
-    .btn-icon:hover { transform: scale(1.1); }
-    .hover-bg-light:hover { background-color: #f8f9fa; }
-    .transition-all { transition: all 0.2s ease-in-out; }
-    .bg-gray-50 { background-color: #fcfcfd; }
-    .icon-shape { flex-shrink: 0; }
+    .btn-soft-primary { background-color: rgba(13, 110, 253, 0.08); color: #0d6efd; }
+    .btn-soft-primary:hover { background-color: #0d6efd; color: white; }
+    .smaller { font-size: 0.75rem; }
 </style>
 
 <!-- Modal Bloquear Devedores -->
@@ -326,27 +374,33 @@
         </div>
     </div>
 </div>
-<!-- Modal Mensagem aos Inscritos -->
-<div class="modal fade" id="mensagemInscritosModal" tabindex="-1" aria-hidden="true">
+<!-- Modal Mensagem Geral -->
+<div class="modal fade" id="mensagemGeralModal" tabindex="-1" aria-hidden="true" style="margin-top: 60px;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 25px;">
             <div class="modal-header border-0 pt-4 px-4 pb-0">
-                <h5 class="modal-title fw-bold"><i class="bi bi-chat-dots-fill text-info me-2"></i>Enviar Mensagem aos Inscritos</h5>
+                <h5 class="modal-title fw-bold d-flex align-items-center"><i class="bi bi-chat-dots-fill text-info me-2 fs-4"></i>Enviar Mensagem Geral</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{% url 'enviar_mensagem_inscritos' %}" method="POST">
+            <form action="{% url 'enviar_mensagem_geral' %}" method="POST">
                 {% csrf_token %}
                 <div class="modal-body p-4">
-                    <div class="alert alert-info border-0 rounded-4 small mb-4">
-                        <i class="bi bi-info-circle-fill me-2"></i>Esta mensagem será enviada para todos os <strong>{{ total_inscritos }}</strong> candidatos registrados no sistema.
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted text-uppercase">Destinatários</label>
+                        <select name="destinatario_grupo" class="form-select rounded-3 shadow-sm border-0 bg-light">
+                            <option value="inscritos">Apenas Inscritos (Candidatos)</option>
+                            <option value="admitidos">Admitidos</option>
+                            <option value="estudantes_antigos">Estudantes Antigos (Ativos)</option>
+                            <option value="todos">Todos os Estudantes/Candidatos</option>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-muted text-uppercase">Assunto / Título</label>
-                        <input type="text" name="titulo" class="form-control rounded-3" placeholder="Ex: Informação sobre Exames de Acesso" required>
+                        <input type="text" name="titulo" class="form-control rounded-3 shadow-sm border-0 bg-light" placeholder="Ex: Informação sobre Exames de Acesso" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-muted text-uppercase">Tipo de Aviso</label>
-                        <select name="tipo" class="form-select rounded-3">
+                        <select name="tipo" class="form-select rounded-3 shadow-sm border-0 bg-light">
                             <option value="INFO">Informativo</option>
                             <option value="AVISO">Aviso Importante</option>
                             <option value="URGENTE">Urgente</option>
@@ -354,11 +408,11 @@
                     </div>
                     <div class="mb-0">
                         <label class="form-label small fw-bold text-muted text-uppercase">Mensagem</label>
-                        <textarea name="mensagem" class="form-control rounded-3" rows="5" placeholder="Digite aqui o conteúdo da mensagem..." required></textarea>
+                        <textarea name="mensagem" class="form-control rounded-3 shadow-sm border-0 bg-light" rows="5" placeholder="Digite aqui o conteúdo da mensagem..." required></textarea>
                     </div>
                 </div>
-                <div class="modal-footer border-0 pb-4 px-4">
-                    <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Cancelar</button>
+                <div class="modal-footer border-0 pb-4 px-4 pt-0 justify-content-center">
+                    <button type="button" class="btn btn-light rounded-pill px-4 fw-bold me-2" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-info text-white rounded-pill px-5 shadow-sm fw-bold">Enviar Mensagem</button>
                 </div>
             </form>
